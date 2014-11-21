@@ -10,7 +10,7 @@
 	+ Call `*#06#` on your phone
 	+ Or find IMEI in system settings
 	+ Or use `adb shell dumpsys iphonesubinfo`
-+ Decrypt database and get decrypted_database.db
++ Decrypt database and get decrypted_database.db:
 ```
 ./decrypt_db.sh <path to EnMicroMsg.db> <imei> <uin>
 ```
