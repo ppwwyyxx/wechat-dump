@@ -1,0 +1,97 @@
+## Render WeChat Messages from Android
+
+## 安卓微信消息记录分析工具
+
+WeChat, as the most popular mobile IM app in China, doesn't provide any methods to read its message history.
+Customers are not able to analyze their own chat messages or interact with other data analysis tools.
+
+We provide this tool that can parse WeChat messages from a rooted android phone.
+This is necessary to provide interoperability between WeChat messages and other message analysis tools.
+As examples, we provide sample scripts to obtain statistics of the message history and
+render the messages into self-contained html files including voice messages, images, emojis, videos, etc.
+Users can also write custom programs based on this tool to manage their chat messages.
+
+The tool is last verified to work with latest version of WeChat on 2025/01/01.
+If the tool works for you, please take a moment to add your phone/OS to [the wiki](https://github.com/ppwwyyxx/wechat-dump/wiki).
+
+## How to use:
+
+#### Dependencies:
++ adb and rooted android phone connected to a Linux/Mac OSX/Win10+Bash.
++ Python >= 3.8
++ sox (command line tools)
++ Silk audio decoder (included; build it with `./third-party/compile_silk.sh`)
++ Other python dependencies: `pip install -r requirements.txt`.
+
+#### Get Necessary Data:
+
+1. Pull database file and (for older WeChat versions) avatar index:
+  + Automatic: `./android-interact.sh db`. It may use an incorrect userid.
+  + Manual:
+    + Figure out your `${userid}` by inspecting the contents of `/data/data/com.tencent.mm/MicroMsg` on the __root__ filesystem of the device.
+      It should be a 32-character-long name consisting of hexadecimal digits.
+    + Get `/data/data/com.tencent.mm/MicroMsg/${userid}/EnMicroMsg.db` from the device.
+2. Decode `EnMicroMsg.db`. We do not provide instructions to do that.
+3. Copy the unencrypted WeChat user resource directory `/data/data/com.tencent.mm/MicroMsg/${userid}/{avatar,emoji,image2,sfs,video,voice2}` from the phone to the `resource` directory:
+	+ `./android-interact.sh res`
+	+ Change `RES_DIR` in the script if the location of these directories is different on your phone.
+      For older version of WeChat, the directory may be `/mnt/sdcard/tencent/MicroMsg/`
+	+ This can take a while. It can be faster to first archive it with `tar` with or without compression, and then copy the archive,
+  	  `busybox tar` is recommended as the Android system's `tar` may choke on long paths.
+	+ In the end, we need a `resource` directory with the following subdir: `avatar,emoji,image2,sfs,video,voice2`.
+
+4. (Optional) Install and start a WXGF decoder server on an android device. Without this, certain WXGF images will not be rendered or will be rendered in low resolution.
+   See [WXGFDecoder](WXGFDecoder) for instructions.
+
+4. (Optional) Download the emoji cache from [here](https://github.com/ppwwyyxx/wechat-dump/releases/download/0.1/emoji.cache.tar.bz2)
+	and decompress it under `wechat-dump`. This will avoid downloading too many emojis during rendering.
+
+        wget -c https://github.com/ppwwyyxx/wechat-dump/releases/download/0.1/emoji.cache.tar.bz2
+        tar xf emoji.cache.tar.bz2
+
+#### Run:
++ Parse and dump text messages of __every__ chat (requires decoded database):
+
+    ```
+    ./dump-msg.py decoded.db output_dir
+    ```
+
++ List all chats (required decoded database):
+
+    ```
+    ./list-chats.py decoded.db
+    ```
+
++ Generate statistics report on text messages (requires `output_dir` from `./dump-msg.py`):
+
+    ```
+    ./count-message.sh output_dir
+    ```
+
++ Dump messages of one contact to html, containing voice messages, emojis, and images (requires decoded database and `resource`):
+
+    ```
+    ./dump-html.py "<contact_display_name>"
+    ```
+
+    * The output file is `output.html`. Check `./dump-html.py -h` to use different input/output paths.
+    * Add `--wxgf-server ws://xx.xx.xx.xx:xxxx` to use a WXGF decoder server.
+
+### Examples:
+Screenshots of generated html:
+
+![byvoid](https://github.com/ppwwyyxx/wechat-dump/raw/master/screenshots/byvoid.jpg)
+
+See [here](http://ppwwyyxx.com/static/wechat/example.html) for an example html.
+
+### TODO List (help needed!)
+* After chat history migration, some emojis in the `EmojiInfo` table don't have corresponding URLs but only a md5 -
+  they are not downloaded by WeChat until the message needs to be displayed. We don't know how to manually download these emojis.
+* Decoding WXGF images using an android app is too complex. Looking for an easier way (e.g. qemu).
+* Fix rare unhandled message types: > 10000 and < 0
+* Better user experiences... see `grep 'TODO' wechat -R`
+
+### Donate!
+<a href="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=7BC299GRDLEDU&lc=US&item_name=wechat%2ddump&item_number=wechat%2ddump&currency_code=USD&bn=PP%2dDonationsBF%3abtn_donate_SM%2egif%3aNonHosted">
+<img src="https://img.shields.io/badge/Paypal-Buy%20a%20Drink-blue.svg" alt="[paypal]" />
+</a>
