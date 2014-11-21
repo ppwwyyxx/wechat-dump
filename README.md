@@ -1,6 +1,6 @@
 ## Dump Wechat Messages from Android
 
-How to use:
+### How to use (for now, Linux x64 only):
 
 + Get /data/data/com.tencent.mm/MicroMsg/long-long-name/EnMicroMsg.db from rooted phone:
 + Get wechat uin:
@@ -18,3 +18,7 @@ How to use:
 ```
 ./dump_msg.py decrypted_database.db output_dir
 ```
+
+### TODO
++ parse audio messages, links, emoji and images
++ output to rich-content html
