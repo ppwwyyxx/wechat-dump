@@ -1,16 +1,13 @@
 #!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
-# File: dump.py
-# Date: Fri Nov 21 14:08:45 2014 +0800
+# File: Parser.py
+# Date: Fri Nov 21 14:36:18 2014 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
 import sqlite3
 from collections import defaultdict
-from pprint import PrettyPrinter
-pp = PrettyPrinter()
-def log(x): print repr(x).decode('unicode-escape')
-from lib.Msg import WeChatMsg
-from lib.utils import ensure_unicode
+from .Msg import WeChatMsg
+from .utils import ensure_unicode
 
 """ tables in concern:
 emojiinfo
@@ -71,7 +68,3 @@ SELECT {} FROM message
     def parse(self):
         self._parse_contact()
         self._parse_msg()
-
-if __name__ == '__main__':
-    parser = WeChatDBParser('./decrypted_database.db')
-    parser.parse()
