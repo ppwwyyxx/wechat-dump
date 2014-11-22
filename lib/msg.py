@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
-# File: Msg.py
-# Date: Sat Nov 22 22:28:15 2014 +0800
+# File: msg.py
+# Date: Sat Nov 22 23:23:52 2014 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
 from datetime import datetime
@@ -35,6 +35,7 @@ class WeChatMsg(object):
         for f, v in zip(WeChatMsg.FIELDS, row):
             setattr(self, f, v)
         self.createTime = datetime.fromtimestamp(self.createTime / 1000)
+        self.talker_name = None
         if self.content:
             self.content = ensure_unicode(self.content)
 
@@ -70,7 +71,8 @@ class WeChatMsg(object):
     def __repr__(self):
         ret = u"{}|{}:{}:{}".format(
             self.type,
-            ensure_unicode(self.talker) if not self.isSend else 'me',
+            (self.talker if not self.talker_name else self.talker_name) \
+                if not self.isSend else 'me',
             self.createTime,
             ensure_unicode(self.msg_str())).encode('utf-8')
         if self.imgPath:

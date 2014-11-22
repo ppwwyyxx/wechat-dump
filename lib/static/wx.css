@@ -166,9 +166,9 @@ html,
 body {
   height: 100%;
   min-height: 755px;
-  background: #4e5359 url(../images/bg_universal1844c2.png) repeat 0 0;
+  background: #4e5359 repeat 0 0;
   color: #666;
-  font: 14px/1.5 Helvetica, "å¾®è½¯é›…é»‘", "é»‘ä½“", Arial, Tahoma;
+  font: 14px/1.5 Helvetica, Arial, Tahoma;
   text-align: center;
   overflow-y: auto;
 }
@@ -2435,7 +2435,7 @@ ul.faceTab a.chooseFaceTab {
   border: none;
   border-bottom: 1px solid #fff;
   border: 1px solid #ccc\9;
-  font: 14px/1.5 Helvetica, "å¾®è½¯é›…é»‘", "é»‘ä½“", Arial, Tahoma;
+  font: 14px/1.5 Helvetica, Arial, Tahoma;
   line-height: 1.2em;
   resize: none;
 }
@@ -5266,7 +5266,7 @@ a.btnBlue:active .btnBluePanel {
   word-wrap: break-word;
   resize: none;
   overflow: auto;
-  font: 14px/1.5 Helvetica, "å¾®è½¯é›…é»‘", "é»‘ä½“", Arial, Tahoma;
+  font: 14px/1.5 Helvetica, Arial, Tahoma;
   line-height: 1.2em;
 }
 .feedbackWin .opArea {
