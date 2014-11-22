@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
 # File: Parser.py
-# Date: Sat Nov 22 20:48:04 2014 +0800
+# Date: Sat Nov 22 22:17:27 2014 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
 import sqlite3
@@ -9,7 +9,6 @@ from collections import defaultdict
 import itertools
 
 from .Msg import WeChatMsg
-from .Res import Resource
 from .utils import ensure_unicode
 
 """ tables in concern:
@@ -23,15 +22,13 @@ rcontact
 """
 
 class WeChatDBParser(object):
-    def __init__(self, db_fname, res_dir=None):
+    def __init__(self, db_fname):
         """ db_fname: EnMicroMsg.db"""
         self.db_fname = db_fname
         self.db_conn = sqlite3.connect(self.db_fname)
         self.cc = self.db_conn.cursor()
         self.contacts = {}
         self.msgs_by_talker = defaultdict(list)
-
-        self.res = Resource(res_dir) if res_dir else None
 
     def _parse_contact(self):
         contacts = self.cc.execute(
