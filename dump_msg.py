@@ -1,11 +1,10 @@
 #!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
 # File: dump_msg.py
-# Date: Fri Nov 21 14:36:23 2014 +0800
+# Date: Sat Nov 22 22:32:23 2014 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
-from lib.Parser import WeChatDBParser
-
+from lib.parser import WeChatDBParser
 import sys, os
 
 if len(sys.argv) != 3:
