@@ -1,11 +1,13 @@
 #!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
 # File: Parser.py
-# Date: Fri Nov 21 14:36:18 2014 +0800
+# Date: Sat Nov 22 08:07:56 2014 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
 import sqlite3
 from collections import defaultdict
+import itertools
+
 from .Msg import WeChatMsg
 from .utils import ensure_unicode
 
@@ -56,14 +58,14 @@ SELECT {} FROM message
             for msg in v:
                 msg.talker = k
 
-    def _find_msg_by_type(self):
+    def _find_msg_by_type(self, msgs=None):
         ret = []
-        for v in self.msgs_by_talker.itervalues():
-            for msg in v:
-                if msg.type == 34:
-                    print msg
-                    print
-        return ret
+        if msgs is None:
+            msgs = itertools.chain.from_iterable(self.msgs_by_talker.itervalues())
+        for msg in msgs:
+            if msg.type == 43:
+                ret.append(msg)
+        return sorted(ret)
 
     def parse(self):
         self._parse_contact()
