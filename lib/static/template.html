@@ -1,0 +1,30 @@
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html;charset=utf8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>WeChat</title>
+	<link rel="stylesheet" type="text/css" href="http://localhost:8000/wx.css">
+	<style type="text/css">{style}</style>
+</head>
+
+<body ctrl="1">
+	<div id="container">
+		<div id="chat" class="chatPanel normalPanel" ctrl="1">
+			<div class="chatContainer" style="height: 800px;">
+				<div class="chatMainPanel" id="chatMainPanel">
+					<div class="chatTitle">
+						<div class="chatNameWrap">
+							<p class="chatName" id="messagePanelTitle">{talker}</p>
+						</div>
+					</div>
+					<div class="chatScorll" style="height: 770px; overflow-y: scroll; position: relative;">
+						<div id="chat_chatmsglist" class="chatContent" ctrl="1" style="position: absolute;">
+							{messages}
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+</html>
