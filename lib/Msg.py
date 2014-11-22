@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
 # File: Msg.py
-# Date: Sat Nov 22 08:09:56 2014 +0800
+# Date: Sat Nov 22 20:58:01 2014 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
 from datetime import datetime
@@ -37,6 +37,10 @@ class WeChatMsg(object):
         self.createTime = datetime.fromtimestamp(self.createTime / 1000)
         if self.content:
             self.content = ensure_unicode(self.content)
+
+    def msg_html(self, res):
+        # TODO
+        assert res is not None
 
     def msg_str(self):
         # TODO: fix more types
