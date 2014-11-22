@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
 # File: parser.py
-# Date: Sat Nov 22 22:32:05 2014 +0800
+# Date: Sat Nov 22 23:23:44 2014 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
 import sqlite3
@@ -56,7 +56,7 @@ SELECT {} FROM message
                            for k, v in self.msgs_by_talker.iteritems()])
         for k, v in self.msgs_by_talker.iteritems():
             for msg in v:
-                msg.talker = k
+                msg.talker_name = ensure_unicode(k)
 
     def _find_msg_by_type(self, msgs=None):
         ret = []
