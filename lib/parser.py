@@ -1,14 +1,14 @@
 #!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
-# File: Parser.py
-# Date: Sat Nov 22 22:17:27 2014 +0800
+# File: parser.py
+# Date: Sat Nov 22 22:32:05 2014 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
 import sqlite3
 from collections import defaultdict
 import itertools
 
-from .Msg import WeChatMsg
+from .msg import WeChatMsg
 from .utils import ensure_unicode
 
 """ tables in concern:
