@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
 # File: Msg.py
-# Date: Fri Nov 21 14:10:21 2014 +0800
+# Date: Sat Nov 22 08:09:56 2014 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
 from datetime import datetime
@@ -14,7 +14,7 @@ TYPE_SPEAK = 34
 TYPE_VIDEO = 43
 TYPE_EMOJI = 47
 TYPE_LOCATION = 48
-TYPE_LINK = 49
+TYPE_LINK = 49  # link share or file from web
 TYPE_VOIP = 50
 TYPE_SYSTEM = 10000
 
@@ -52,6 +52,18 @@ class WeChatMsg(object):
             except:
                 pass
             return ret + " ({},{})".format(loc['x'], loc['y'])
+        elif self.type == TYPE_VOIP:
+            return "REQUEST VIDEO CHAT"
+        elif self.type == TYPE_LINK:
+            soup = BeautifulSoup(self.content)
+            url = soup.find('url').text
+            if not url:
+                title = soup.find('title').text
+                assert title, "No title or url found in TYPE_LINK"
+                return u"FILE:{}".format(title)
+            return u"URL:{}".format(url)
+        elif self.type == TYPE_VIDEO:
+            return "VIDEO"
         else:
             return self.content
 
@@ -66,3 +78,6 @@ class WeChatMsg(object):
             return ret.encode('utf-8')
         else:
             return ret
+
+    def __lt__(self, r):
+        return self.createTime < r.createTime
