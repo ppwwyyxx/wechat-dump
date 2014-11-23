@@ -1392,7 +1392,7 @@ a.btnSecondary:active {
 }
 /*ä¼šè¯å†…å®¹çª—ä½“*/
 .chatPanel .chatScorll {
-  height: 390px;
+  height: 100%;
   width: 100%;
   min-height: 200px;
   overflow: hidden;

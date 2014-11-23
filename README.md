@@ -3,14 +3,15 @@
 ### How to use:
 
 #### Install Dependencies:
-+ numpy
-+ PIL
-+ audioread
++ python-numpy
++ python-PIL
++ [eyed3](http://eyed3.nicfit.net/)
 + sox
++ python-csscompressor(optional)
 
 #### Get Necessary Data:
-+ Get /data/data/com.tencent.mm/MicroMsg/long-long-name/EnMicroMsg.db from rooted phone:
-+ Get Wechat resource directory, usually at storage:/tencent/MicroMsg/long-long-name
++ Get /data/data/com.tencent.mm/MicroMsg/long-long-name/EnMicroMsg.db from root filesystem .
++ Get Wechat resource directory from user filesystem, usually at storage:/tencent/MicroMsg/long-long-name.
 + Get Wechat uin:
 	+ login to [web-based wechat](https://wx.qq.com); get wxuin=1234567 from `document.cookie`
 	+ Or get ``default_uin`` from /data/data/com.tencent.mm/shared_prefs/system_config_prefs.xml.
@@ -28,11 +29,11 @@
 ```
 ./dump_msg.py decrypted_db.db output_dir
 ```
-+ Dump messages of one contact to html (for now, raw message only):
++ Dump messages of one contact to an html including voice messages and image thumbnail:
 ```
 ./dump_html.py decrypted_db.db <resource directory> <contact name> output.html
 ```
 
 ### TODO
-+ parse audio messages, links, emoji and images
-+ output to rich-content html
++ parse links, full images, and emoji
++ Fix UI

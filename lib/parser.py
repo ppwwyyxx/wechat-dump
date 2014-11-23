@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
 # File: parser.py
-# Date: Sun Nov 23 16:33:20 2014 +0800
+# Date: Sun Nov 23 20:44:02 2014 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
 import sqlite3
@@ -51,7 +51,7 @@ SELECT {} FROM message
 """.format(','.join(WeChatMsg.FIELDS)))
         for row in db_msgs:
             msg = WeChatMsg(row)
-            if msg.type not in WeChatMsg.FILTER_TYPES:
+            if not WeChatMsg.filter_type(msg.type):
                 self.msgs_by_talker[msg.talker].append(msg)
         self.msgs_by_talker = dict([
             (self.contacts[k], sorted(v, key=lambda x: x.createTime))
@@ -68,6 +68,11 @@ SELECT {} FROM message
         self.username = userinfo[2]
         print "Your username is: {}".format(self.username)
 
+    def _parse_imginfo(self):
+        imginfo_q = self.cc.execute("""SELECT msgSvrId, bigImgPath FROM ImgInfo2""")
+        self.imginfo = dict([(k, v) for (k, v) in imginfo_q if not v.startswith('SERVERID://')])
+        print "Got {} big images.".format(len(self.imginfo))
+
     def _find_msg_by_type(self, msgs=None):
         ret = []
         if msgs is None:
@@ -81,3 +86,4 @@ SELECT {} FROM message
         self._parse_userinfo()
         self._parse_contact()
         self._parse_msg()
+        self._parse_imginfo()

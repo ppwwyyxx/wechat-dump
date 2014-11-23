@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
 # File: msg.py
-# Date: Sat Nov 22 23:23:52 2014 +0800
+# Date: Sun Nov 23 20:44:33 2014 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
 from datetime import datetime
@@ -19,13 +19,11 @@ TYPE_VOIP = 50
 TYPE_SYSTEM = 10000
 
 class WeChatMsg(object):
-    """ fields in concern"""
     FIELDS = ["msgSvrId","type","isSend","createTime","talker","content","imgPath"]
-    FILTER_TYPES = [TYPE_SYSTEM]
 
     @staticmethod
-    def filter_types(tp):
-        if tp in WeChatMsg.FILTER_TYPES or tp > 10000 or tp < 0:
+    def filter_type(tp):
+        if tp in [TYPE_SYSTEM] or tp > 10000 or tp < 0:
             return True
         return False
 
