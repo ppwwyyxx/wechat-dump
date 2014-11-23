@@ -1,6 +1,6 @@
 #!/bin/bash -e
 # File: decrypt_db.sh
-# Date: Fri Nov 21 13:07:33 2014 +0800
+# Date: Sun Nov 23 16:46:51 2014 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
 MMSGDB=$1
@@ -18,6 +18,6 @@ LD_LIBRARY_PATH=./lib ./lib/sqlcipher $MMSGDB << EOF
 PRAGMA key='$KEY';
 PRAGMA cipher_use_hmac = off;
 ATTACH DATABASE "decoded_database.db" AS decoded_database KEY "";
-SELECT sqlcipher_export("decoded_database");
+SELECT sqlcipher_export("decoded_db");
 DETACH DATABASE decoded_database;
 EOF

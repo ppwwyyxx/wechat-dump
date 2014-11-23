@@ -1,10 +1,11 @@
 #!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
 # File: render.py
-# Date: Sun Nov 23 16:28:28 2014 +0800
+# Date: Sun Nov 23 17:52:08 2014 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
 import os
+import base64
 LIB_PATH = os.path.dirname(os.path.abspath(__file__))
 CSS_FILE = os.path.join(LIB_PATH, 'static/wx.css')
 HTML_FILE = os.path.join(LIB_PATH, 'static/template.html')
@@ -17,7 +18,7 @@ except:
 from .msg import *
 from .utils import ensure_unicode
 
-TEMPLATES_FILES = {TYPE_MSG: "TP_MSG"}
+TEMPLATES_FILES = {TYPE_MSG: "TP_MSG", TYPE_SPEAK: "TP_SPEAK"}
 TEMPLATES = dict([(k, open(os.path.join(
     LIB_PATH, 'static/{}.html'.format(v))).read())
     for k, v in TEMPLATES_FILES.iteritems()])
@@ -30,20 +31,38 @@ class HTMLRender(object):
         self.res = res
 
     def get_avatar_pair(self, username):
+        """ return base64 string pair of two avatars"""
         if self.res is None:
             return ("", "")
         avt1 = self.res.get_avatar(self.parser.username)
         avt2 = self.res.get_avatar(username)
         return (avt1, avt2)
 
+    def get_voice_mp3(self, imgpath):
+        """ return base64 string"""
+        if self.res is None:
+            return ""
+        amr_fpath = self.res.speak_data[imgpath]
+        mp3_file = os.path.join('/tmp', os.path.basename(amr_fpath)[:-4] + '.mp3')
+        os.system('sox {} {}'.format(amr_fpath, mp3_file))
+        mp3_string = open(mp3_file, 'rb').read()
+        os.unlink(mp3_file)
+        return base64.b64encode(mp3_string)
+
     def render_msg(self, msg):
         """ render a message, return the block"""
         # TODO
-        #template = ensure_unicode(TEMPLATES[msg.type])
-        template = ensure_unicode(TEMPLATES[1])
-        if False:
-            return ""
-        else:
+        try:
+            template = ensure_unicode(TEMPLATES[msg.type])
+            if msg.type == TYPE_SPEAK:
+                audio_str = self.get_voice_mp3(msg.imgPath)
+                return template.format(sender_label='you' if not msg.isSend else 'me',
+                                       voice_duration=10,
+                                       voice_str=audio_str)
+            else:
+                raise
+        except:
+            template = ensure_unicode(TEMPLATES[1])
             return template.format(sender_label='you' if not msg.isSend else 'me',
                                    content=msg.msg_str())
 
