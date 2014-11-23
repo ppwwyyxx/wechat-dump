@@ -37,6 +37,14 @@
       var avt = chats[k].getElementsByClassName('avatar')[0];
       avt.src = "data:image/jpg;base64,{avatar_you}";
     }}
+
+    var playVoice = function(event) {{
+      var target = event.target;
+      while (!target.classList.contains('cloud'))
+        target = target.parentElement;
+      var audio = target.getElementsByTagName('audio')[0];
+      audio.play();
+    }};
   </script>
 </body>
 </html>

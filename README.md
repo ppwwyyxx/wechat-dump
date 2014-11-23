@@ -1,12 +1,12 @@
 ## Dump Wechat Messages from Android
 
-### How to use (Linux x64 only):
+### How to use:
 
 #### Install Dependencies:
 + numpy
 + PIL
 
-#### Get Necessary Files:
+#### Get Necessary Data:
 + Get /data/data/com.tencent.mm/MicroMsg/long-long-name/EnMicroMsg.db from rooted phone:
 + Get Wechat resource directory, usually at storage:/tencent/MicroMsg/long-long-name
 + Get Wechat uin:
@@ -18,17 +18,17 @@
 	+ Or use `adb shell dumpsys iphonesubinfo | grep 'Device ID' | grep -o '[0-9]*'`
 
 #### Run:
-+ Decrypt database and get decrypted_database.db:
++ Decrypt database and get decrypted_db.db (for now, Linux x64 only):
 ```
 ./decrypt_db.sh <path to EnMicroMsg.db> <imei> <uin>
 ```
 + Parse and dump text messages of every contact:
 ```
-./dump_msg.py decrypted_database.db output_dir
+./dump_msg.py decrypted_db.db output_dir
 ```
 + Dump messages of one contact to html (for now, raw message only):
 ```
-./dump_html.py decrypted_database.db <resource directory> <contact name> output.html
+./dump_html.py decrypted_db.db <resource directory> <contact name> output.html
 ```
 
 ### TODO
