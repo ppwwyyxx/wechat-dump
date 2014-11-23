@@ -5,6 +5,8 @@
 #### Install Dependencies:
 + numpy
 + PIL
++ audioread
++ sox
 
 #### Get Necessary Data:
 + Get /data/data/com.tencent.mm/MicroMsg/long-long-name/EnMicroMsg.db from rooted phone:
