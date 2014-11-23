@@ -1,11 +1,12 @@
 #!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
 # File: render.py
-# Date: Sun Nov 23 17:52:08 2014 +0800
+# Date: Sun Nov 23 18:01:55 2014 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
 import os
 import base64
+import audioread
 LIB_PATH = os.path.dirname(os.path.abspath(__file__))
 CSS_FILE = os.path.join(LIB_PATH, 'static/wx.css')
 HTML_FILE = os.path.join(LIB_PATH, 'static/template.html')
@@ -46,8 +47,9 @@ class HTMLRender(object):
         mp3_file = os.path.join('/tmp', os.path.basename(amr_fpath)[:-4] + '.mp3')
         os.system('sox {} {}'.format(amr_fpath, mp3_file))
         mp3_string = open(mp3_file, 'rb').read()
+        duration = audioread.audio_open(mp3_file).duration
         os.unlink(mp3_file)
-        return base64.b64encode(mp3_string)
+        return base64.b64encode(mp3_string), duration
 
     def render_msg(self, msg):
         """ render a message, return the block"""
@@ -55,9 +57,9 @@ class HTMLRender(object):
         try:
             template = ensure_unicode(TEMPLATES[msg.type])
             if msg.type == TYPE_SPEAK:
-                audio_str = self.get_voice_mp3(msg.imgPath)
+                audio_str, duration = self.get_voice_mp3(msg.imgPath)
                 return template.format(sender_label='you' if not msg.isSend else 'me',
-                                       voice_duration=10,
+                                       voice_duration=duration,
                                        voice_str=audio_str)
             else:
                 raise
