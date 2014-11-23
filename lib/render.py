@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
 # File: render.py
-# Date: Sat Nov 22 23:24:10 2014 +0800
+# Date: Sun Nov 23 16:28:28 2014 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
 import os
@@ -22,13 +22,19 @@ TEMPLATES = dict([(k, open(os.path.join(
     LIB_PATH, 'static/{}.html'.format(v))).read())
     for k, v in TEMPLATES_FILES.iteritems()])
 
-
-
 class HTMLRender(object):
-    def __init__(self, res=None):
+    def __init__(self, parser, res=None):
         self.css = ensure_unicode(css_compress(open(CSS_FILE).read()))
         self.html = ensure_unicode(open(HTML_FILE).read())
+        self.parser = parser
         self.res = res
+
+    def get_avatar_pair(self, username):
+        if self.res is None:
+            return ("", "")
+        avt1 = self.res.get_avatar(self.parser.username)
+        avt2 = self.res.get_avatar(username)
+        return (avt1, avt2)
 
     def render_msg(self, msg):
         """ render a message, return the block"""
@@ -42,9 +48,13 @@ class HTMLRender(object):
                                    content=msg.msg_str())
 
     def render_msgs(self, msgs):
+        talker_name = msgs[0].talker
+        avatars = self.get_avatar_pair(talker_name)
         blocks = [self.render_msg(m) for m in msgs]
         return self.html.format(style=self.css, talker=msgs[0].talker_name,
-                               messages=u''.join(blocks))
+                               messages=u''.join(blocks),
+                               avatar_me=avatars[0],
+                               avatar_you=avatars[1])
 
 if __name__ == '__main__':
     r = HTMLRender()

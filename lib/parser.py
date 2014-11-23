@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
 # File: parser.py
-# Date: Sat Nov 22 23:23:44 2014 +0800
+# Date: Sun Nov 23 16:33:20 2014 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
 import sqlite3
@@ -18,7 +18,6 @@ addr_upload2
 chatroom
 message
 rcontact
-
 """
 
 class WeChatDBParser(object):
@@ -42,7 +41,10 @@ SELECT username,conRemark,nickname FROM rcontact
             else:
                 self.contacts[username] = ensure_unicode(nickname)
 
+        print "Got {} contacts.".format(len(self.contacts))
+
     def _parse_msg(self):
+        msgs_tot_cnt = 0
         db_msgs = self.cc.execute(
 """
 SELECT {} FROM message
@@ -57,6 +59,14 @@ SELECT {} FROM message
         for k, v in self.msgs_by_talker.iteritems():
             for msg in v:
                 msg.talker_name = ensure_unicode(k)
+            msgs_tot_cnt += len(v)
+        print "Got {} messages in total.".format(msgs_tot_cnt)
+
+    def _parse_userinfo(self):
+        userinfo_q = self.cc.execute(""" SELECT id, value FROM userinfo """)
+        userinfo = dict(userinfo_q)
+        self.username = userinfo[2]
+        print "Your username is: {}".format(self.username)
 
     def _find_msg_by_type(self, msgs=None):
         ret = []
@@ -68,5 +78,6 @@ SELECT {} FROM message
         return sorted(ret)
 
     def parse(self):
+        self._parse_userinfo()
         self._parse_contact()
         self._parse_msg()

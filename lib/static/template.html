@@ -10,14 +10,14 @@
 <body>
   <div id="container">
     <div id="chat" class="chatPanel normalPanel">
-      <div class="chatContainer" style="height: 800px;">
+      <div class="chatContainer" style="height: 600px;">
         <div class="chatMainPanel" id="chatMainPanel">
           <div class="chatTitle">
             <div class="chatNameWrap">
               <p class="chatName" id="messagePanelTitle">{talker}</p>
             </div>
           </div>
-          <div class="chatScorll" style="height: 770px; overflow-y: scroll; position: relative; font-family:initial;">
+          <div class="chatScorll" style="height: 550px; overflow-y: scroll; position: relative; font-family:initial;">
             <div id="chat_chatmsglist" class="chatContent" style="position: absolute;">
               {messages}
             </div>
@@ -26,5 +26,17 @@
       </div>
     </div>
   </div>
+  <script type='text/javascript'>
+    var chats = document.getElementsByClassName('me');
+    for (var k = 0; k < chats.length; k ++) {{
+      var avt = chats[k].getElementsByClassName('avatar')[0];
+      avt.src = "data:image/jpg;base64,{avatar_me}";
+    }}
+    var chats = document.getElementsByClassName('you');
+    for (var k = 0; k < chats.length; k ++) {{
+      var avt = chats[k].getElementsByClassName('avatar')[0];
+      avt.src = "data:image/jpg;base64,{avatar_you}";
+    }}
+  </script>
 </body>
 </html>
