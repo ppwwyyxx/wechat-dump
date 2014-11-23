@@ -1,11 +1,16 @@
 #!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
-# File: Res.py
-# Date: Sat Nov 22 20:54:25 2014 +0800
+# File: res.py
+# Date: Sun Nov 23 15:59:48 2014 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
 import glob
 import os
+import Image
+import cStringIO
+import base64
+
+from lib.avatar import AvatarReader
 
 VOICE_DIRNAME = 'voice2'
 
@@ -14,6 +19,7 @@ class Resource(object):
     def __init__(self, res_dir):
         assert os.path.isdir(res_dir), "No such directory: {}".format(res_dir)
         self.res_dir = res_dir
+        self.avt_reader = AvatarReader(self.res_dir)
         self.init()
 
     def init(self):
@@ -32,6 +38,16 @@ class Resource(object):
                     "Error interpreting the protocol, this is a bug!"
                 self.speak_data[key] = full_path
 
+    def get_avatar(self, username):
+        """ return base64 string"""
+        ret = self.avt_reader.get_avatar(username)
+        if ret is None:
+            return ""
+        im = Image.fromarray(ret)
+        buf = cStringIO.StringIO()
+        im.save(buf, 'JPEG', quality=50)
+        jpeg_str = buf.getvalue()
+        return base64.b64encode(jpeg_str)
 
 
 

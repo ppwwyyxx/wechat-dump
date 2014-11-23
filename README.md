@@ -2,6 +2,10 @@
 
 ### How to use (Linux x64 only):
 
+#### Dependencies:
++ numpy
++ PIL
+
 + Get /data/data/com.tencent.mm/MicroMsg/long-long-name/EnMicroMsg.db from rooted phone:
 + Get wechat uin:
 	+ login to [web-based wechat](https://wx.qq.com); get wxuin=1234567 from `document.cookie`
