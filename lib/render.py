@@ -1,12 +1,12 @@
 #!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
 # File: render.py
-# Date: Sun Nov 23 18:01:55 2014 +0800
+# Date: Sun Nov 23 22:57:13 2014 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
 import os
 import base64
-import audioread
+import eyed3
 LIB_PATH = os.path.dirname(os.path.abspath(__file__))
 CSS_FILE = os.path.join(LIB_PATH, 'static/wx.css')
 HTML_FILE = os.path.join(LIB_PATH, 'static/template.html')
@@ -19,7 +19,9 @@ except:
 from .msg import *
 from .utils import ensure_unicode
 
-TEMPLATES_FILES = {TYPE_MSG: "TP_MSG", TYPE_SPEAK: "TP_SPEAK"}
+TEMPLATES_FILES = {TYPE_MSG: "TP_MSG",
+                   TYPE_SPEAK: "TP_SPEAK",
+                   TYPE_IMG: "TP_IMG"}
 TEMPLATES = dict([(k, open(os.path.join(
     LIB_PATH, 'static/{}.html'.format(v))).read())
     for k, v in TEMPLATES_FILES.iteritems()])
@@ -40,19 +42,23 @@ class HTMLRender(object):
         return (avt1, avt2)
 
     def get_voice_mp3(self, imgpath):
-        """ return base64 string"""
+        """ return base64 string, and voice duration"""
         if self.res is None:
             return ""
         amr_fpath = self.res.speak_data[imgpath]
         mp3_file = os.path.join('/tmp', os.path.basename(amr_fpath)[:-4] + '.mp3')
-        os.system('sox {} {}'.format(amr_fpath, mp3_file))
+        # TODO is there a library to use?
+        ret = os.system('sox {} {}'.format(amr_fpath, mp3_file))
+        if ret != 0:
+            print "Sox Failed!"
+            return ""
         mp3_string = open(mp3_file, 'rb').read()
-        duration = audioread.audio_open(mp3_file).duration
+        duration = eyed3.load(mp3_file).info.time_secs
         os.unlink(mp3_file)
         return base64.b64encode(mp3_string), duration
 
     def render_msg(self, msg):
-        """ render a message, return the block"""
+        """ render a message, return the html block"""
         # TODO
         try:
             template = ensure_unicode(TEMPLATES[msg.type])
@@ -61,6 +67,19 @@ class HTMLRender(object):
                 return template.format(sender_label='you' if not msg.isSend else 'me',
                                        voice_duration=duration,
                                        voice_str=audio_str)
+            elif msg.type == TYPE_IMG:
+                img = ""
+                svrid = msg.msgSvrId
+                imgpath = msg.imgPath
+                #bigimg = self.parser.imginfo.get(svrid)
+                #if bigimg:
+                    #img = self.res.get_img(bigimg, smart=False)
+                if len(img) == 0:
+                    #print "Big Image Failed: {}".format(bigimg)
+                    img = imgpath.split('_')[-1]
+                    img = self.res.get_img(img)
+                return template.format(sender_label='you' if not msg.isSend else 'me',
+                                       img_data=img)
             else:
                 raise
         except:
