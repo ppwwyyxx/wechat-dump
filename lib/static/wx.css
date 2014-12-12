@@ -225,19 +225,7 @@ a:active {
   opacity: 0.5;
   filter: alpha(opacity=50);
 }
-::-webkit-scrollbar {
-  width: 8px;
-  height: 12px;
-  -webkit-border-radius: 12px;
-}
-::-webkit-scrollbar-thumb {
-  background: #6B747A;
-  -webkit-border-radius: 12px;
-}
-::-webkit-scrollbar-track {
-  background: #F5F5F5;
-}
-/*è‡ªå®šä¹‰æ»šåŠ¨æ¡*/
+
 .chatPanel .chatScorll::-webkit-scrollbar {
   width: 8px;
   height: 12px;
@@ -249,19 +237,6 @@ a:active {
 }
 .chatPanel .chatScorll::-webkit-scrollbar-track {
   background: #fff;
-}
-.chatPanel .listContentWrap::-webkit-scrollbar {
-  width: 8px;
-  height: 12px;
-  -webkit-border-radius: 12px;
-}
-.chatPanel .listContentWrap::-webkit-scrollbar-thumb {
-  background: #6B747A;
-  -webkit-border-radius: 12px;
-}
-chatPanel .listContentWrap:-webkit-scrollbar-button:single-button {
-  display: block;
-  height: 10px;
 }
 /*media mesg*/
 .chatPanel .media a {
@@ -1037,15 +1012,6 @@ a.btnSecondary:active {
   /*background:url(../images/bg_chat_dropdown1844c2.png) repeat 0 0 #b0b2b4;*/
   background-color: #f5f5f5;
 }
-.scrollbarBox {
-  width: 9px;
-}
-.scrollbarBox .scrollbar {
-  width: 100%;
-  background-color: #6B747A;
-  opacity: 0.6;
-  border-radius: 10px;
-}
 .chatPanel .listContent .viewport {
   height: 498px;
   width: 320px;
@@ -1061,11 +1027,6 @@ a.btnSecondary:active {
 .chatPanel .listContent .thumb .end,
 .chatPanel .listContent .thumb {
   background-color: #003D5D;
-}
-.chatPanel .listContent .scrollbar {
-  position: relative;
-  float: right;
-  width: 15px;
 }
 .chatPanel .listContent .track {
   background-color: #D8EEFD;
@@ -5171,9 +5132,6 @@ a.btnBlue:active .btnBluePanel {
 }
 .popupPhotoAlbumPanel .friendCirRPanel .comments ul {
   overflow-y: scroll;
-}
-.popupPhotoAlbumPanel .friendCirRPanel .comments ul::-webkit-scrollbar-track {
-  background: transparent;
 }
 .popupPhotoAlbumPanel .friendCirRPanel .comments ul li {
   margin-top: 11px;
