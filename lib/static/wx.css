@@ -2492,10 +2492,6 @@ a.chatSend b {
   text-align: center;
 }
 .chatPanel .chatMainPanel {
-  position: absolute;
-  /*
-   *width: 100%;
-   */
   border-radius: 2px 2px 6px 6px;
 }
 .chatPanel .chatOperator a.chatSend:active b {
