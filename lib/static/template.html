@@ -11,13 +11,13 @@
   <div id="container">
     <div id="chat" class="chatPanel normalPanel">
       <div class="chatContainer" style="min-height:100%;">
-        <div class="chatMainPanel" id="chatMainPanel" style="height:100%;">
-          <div class="chatTitle">
+        <div class="chatMainPanel" id="chatMainPanel" style="padding-top:40px;">
+          <div class="chatTitle" style="margin-top: -40px;">
             <div class="chatNameWrap">
               <p class="chatName" id="messagePanelTitle">{talker}</p>
             </div>
           </div>
-          <div class="chatScorll" style="height: 95%; overflow-y: scroll; position: relative; font-family:initial;">
+          <div class="chatScorll" style="height: 100%; overflow-y: scroll; position: relative; font-family:initial;">
             <div id="chat_chatmsglist" class="chatContent" style="position: absolute;">
               {messages}
             </div>
@@ -27,6 +27,7 @@
     </div>
   </div>
   <script type='text/javascript'>
+    // avoid repeatly inserting the same base64 img into html
     var chats = document.getElementsByClassName('me');
     for (var k = 0; k < chats.length; k ++) {{
       var avt = chats[k].getElementsByClassName('avatar')[0];
