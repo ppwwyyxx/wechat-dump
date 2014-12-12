@@ -1,12 +1,14 @@
 #!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
 # File: parser.py
-# Date: Sun Nov 23 20:44:02 2014 +0800
+# Date: Fri Dec 12 22:35:56 2014 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
 import sqlite3
 from collections import defaultdict
 import itertools
+import logging
+logger = logging.getLogger(__name__)
 
 from .msg import WeChatMsg
 from .utils import ensure_unicode
@@ -41,7 +43,7 @@ SELECT username,conRemark,nickname FROM rcontact
             else:
                 self.contacts[username] = ensure_unicode(nickname)
 
-        print "Got {} contacts.".format(len(self.contacts))
+        logger.info("Got {} contacts.".format(len(self.contacts)))
 
     def _parse_msg(self):
         msgs_tot_cnt = 0
@@ -60,18 +62,19 @@ SELECT {} FROM message
             for msg in v:
                 msg.talker_name = ensure_unicode(k)
             msgs_tot_cnt += len(v)
-        print "Got {} messages in total.".format(msgs_tot_cnt)
+        logger.info("Got {} messages in total.".format(msgs_tot_cnt))
 
     def _parse_userinfo(self):
         userinfo_q = self.cc.execute(""" SELECT id, value FROM userinfo """)
         userinfo = dict(userinfo_q)
         self.username = userinfo[2]
-        print "Your username is: {}".format(self.username)
+        logger.info("Your username is: {}".format(self.username))
 
     def _parse_imginfo(self):
         imginfo_q = self.cc.execute("""SELECT msgSvrId, bigImgPath FROM ImgInfo2""")
-        self.imginfo = dict([(k, v) for (k, v) in imginfo_q if not v.startswith('SERVERID://')])
-        print "Got {} big images.".format(len(self.imginfo))
+        self.imginfo = dict([(k, v) for (k, v) in imginfo_q
+                             if not v.startswith('SERVERID://')])
+        logger.info("Got {} big images.".format(len(self.imginfo)))
 
     def _find_msg_by_type(self, msgs=None):
         ret = []

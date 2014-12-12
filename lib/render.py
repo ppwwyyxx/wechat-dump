@@ -1,12 +1,14 @@
 #!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
 # File: render.py
-# Date: Sun Nov 23 22:57:13 2014 +0800
+# Date: Fri Dec 12 23:15:31 2014 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
 import os
 import base64
 import eyed3
+import logging
+logger = logging.getLogger(__name__)
 LIB_PATH = os.path.dirname(os.path.abspath(__file__))
 CSS_FILE = os.path.join(LIB_PATH, 'static/wx.css')
 HTML_FILE = os.path.join(LIB_PATH, 'static/template.html')
@@ -50,7 +52,7 @@ class HTMLRender(object):
         # TODO is there a library to use?
         ret = os.system('sox {} {}'.format(amr_fpath, mp3_file))
         if ret != 0:
-            print "Sox Failed!"
+            logger.warn("Sox Failed!")
             return ""
         mp3_string = open(mp3_file, 'rb').read()
         duration = eyed3.load(mp3_file).info.time_secs
@@ -68,18 +70,13 @@ class HTMLRender(object):
                                        voice_duration=duration,
                                        voice_str=audio_str)
             elif msg.type == TYPE_IMG:
-                img = ""
-                svrid = msg.msgSvrId
-                imgpath = msg.imgPath
-                #bigimg = self.parser.imginfo.get(svrid)
-                #if bigimg:
-                    #img = self.res.get_img(bigimg, smart=False)
-                if len(img) == 0:
-                    #print "Big Image Failed: {}".format(bigimg)
-                    img = imgpath.split('_')[-1]
-                    img = self.res.get_img(img)
+                # imgPath was original THUMBNAIL_DIRPATH://th_xxxxxxxxx
+                imgpath = msg.imgPath.split('_')[-1]
+                bigimgpath = self.parser.imginfo.get(msg.msgSvrId)
+
+                bigimg, smallimg = self.res.get_img([imgpath, bigimgpath])
                 return template.format(sender_label='you' if not msg.isSend else 'me',
-                                       img_data=img)
+                                       img_data=smallimg)
             else:
                 raise
         except:
