@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
 # File: avatar.py
-# Date: Sun Nov 23 16:28:00 2014 +0800
+# Date: Fri Dec 12 22:39:37 2014 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
 import os
@@ -13,7 +13,8 @@ from .utils import ensure_bin_str
 class AvatarReader(object):
     def __init__(self, res_dir):
         self.avt_dir = os.path.join(res_dir, 'avatar')
-        assert os.path.isdir(self.avt_dir), "No such directory {}".format(self.avt_dir)
+        assert os.path.isdir(self.avt_dir), \
+            "No such directory {}".format(self.avt_dir)
 
     @staticmethod
     def get_filename(username):
