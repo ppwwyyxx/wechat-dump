@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
 # File: render.py
-# Date: Sat Dec 13 00:29:29 2014 +0800
+# Date: Sun Dec 14 00:12:43 2014 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
 import os
@@ -23,8 +23,8 @@ from .msg import *
 from .utils import ensure_unicode
 
 TEMPLATES_FILES = {TYPE_MSG: "TP_MSG",
-                   TYPE_SPEAK: "TP_SPEAK",
-                   TYPE_IMG: "TP_IMG"}
+                   TYPE_IMG: "TP_IMG",
+                   TYPE_SPEAK: "TP_SPEAK"}
 TEMPLATES = dict([(k, open(os.path.join(
     LIB_PATH, 'static/{}.html'.format(v))).read())
     for k, v in TEMPLATES_FILES.iteritems()])
@@ -83,6 +83,9 @@ class HTMLRender(object):
         sender = 'you' if not msg.isSend else 'me'
         # TODO
         try:
+            if msg.type == TYPE_VIDEO:
+                # send a video file
+                raise
             template = ensure_unicode(TEMPLATES[msg.type])
             if msg.type == TYPE_SPEAK:
                 audio_str, duration = self.get_voice_mp3(msg.imgPath)
@@ -102,8 +105,9 @@ class HTMLRender(object):
                 raise
         except:
             template = ensure_unicode(TEMPLATES[1])
+            content = msg.msg_str()
             return template.format(sender_label=sender,
-                                   content=msg.msg_str())
+                                   content=content)
 
     def render_msgs(self, msgs):
         """ render msgs of the same friend"""
