@@ -35,5 +35,6 @@
 ```
 
 ### TODO
-+ parse links, full images, and emoji
-+ Fix UI
++ parse links and emoji
++ show name of unicode emoji in txt
++ given uid/username..
