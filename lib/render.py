@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
 # File: render.py
-# Date: Sun Dec 14 00:12:43 2014 +0800
+# Date: Mon Dec 15 21:44:07 2014 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
 import os
@@ -21,6 +21,7 @@ except:
 
 from .msg import *
 from .utils import ensure_unicode
+from emoji import EmojiProvider
 
 TEMPLATES_FILES = {TYPE_MSG: "TP_MSG",
                    TYPE_IMG: "TP_IMG",
@@ -34,6 +35,7 @@ class HTMLRender(object):
         self.html = ensure_unicode(open(HTML_FILE).read())
         self.parser = parser
         self.res = res
+        self.emoji = EmojiProvider()
 
         csss = glob.glob(os.path.join(LIB_PATH, 'static/*.css'))
         css_string = []
@@ -106,6 +108,7 @@ class HTMLRender(object):
         except:
             template = ensure_unicode(TEMPLATES[1])
             content = msg.msg_str()
+            content = self.emoji.replace_emojicode(content)
             return template.format(sender_label=sender,
                                    content=content)
 
