@@ -1,11 +1,11 @@
 #!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
 # File: avatar.py
-# Date: Fri Dec 12 22:39:37 2014 +0800
+# Date: Wed Dec 17 00:08:06 2014 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
 import os
-import md5
+import hashlib
 import numpy as np
 
 from .utils import ensure_bin_str
@@ -18,7 +18,7 @@ class AvatarReader(object):
 
     @staticmethod
     def get_filename(username):
-        m = md5.new()
+        m = hashlib.md5()
         m.update(username)
         return m.hexdigest()
 
@@ -33,7 +33,8 @@ class AvatarReader(object):
             # avatar not found!
             return None
         else:
-            return AvatarReader.read_bm(filename)
+            img = AvatarReader.read_bm(filename)
+            return img
 
     @staticmethod
     def read_bm(fname):

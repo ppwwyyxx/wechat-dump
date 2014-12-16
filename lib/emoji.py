@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
 # File: emoji.py
-# Date: Tue Dec 16 23:49:40 2014 +0800
+# Date: Tue Dec 16 23:52:13 2014 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
 import os
@@ -40,7 +40,6 @@ class EmojiProvider(object):
         self.unicode_emoji = dict([(unichr(int(k, 16)), hex(ord(v))[2:])
                                 for k, v in
                                   json.load(open(UNICODE_EMOJI_FILE)).iteritems()])
-        print self.unicode_emoji.items()[0]
         self.used_emoji_id = set()
 
 
@@ -62,9 +61,6 @@ class EmojiProvider(object):
            and (not '\:' in msg) and (not '/' in msg):
             return msg
         for k, v in self.tencent_emoji.iteritems():
-            if k == u'[挥手]':
-                print k
-                print type(k)
             if k in msg:
                 self.used_emoji_id.add(v)
                 msg = msg.replace(k, self.gen_replace_elem(v))
