@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
 # File: res.py
-# Date: Fri Dec 12 23:12:06 2014 +0800
+# Date: Wed Dec 17 00:02:13 2014 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
 import glob
@@ -10,6 +10,7 @@ import Image
 import cStringIO
 import base64
 import logging
+import eyed3
 logger = logging.getLogger(__name__)
 
 from lib.avatar import AvatarReader
@@ -43,6 +44,22 @@ class Resource(object):
                 assert len(key) == 26, \
                     "Error interpreting the protocol, this is a bug!"
                 self.speak_data[key] = full_path
+
+    def get_voice_mp3(self, imgpath):
+        """ return base64 string, and voice duration"""
+        amr_fpath = self.speak_data[imgpath]
+        assert amr_fpath.endswith('.amr')
+        mp3_file = os.path.join('/tmp',
+                                os.path.basename(amr_fpath)[:-4] + '.mp3')
+        # TODO is there a library to use?
+        ret = os.system('sox {} {}'.format(amr_fpath, mp3_file))
+        if ret != 0:
+            logger.warn("Sox Failed!")
+            return ""
+        mp3_string = open(mp3_file, 'rb').read()
+        duration = eyed3.load(mp3_file).info.time_secs
+        os.unlink(mp3_file)
+        return base64.b64encode(mp3_string), duration
 
     @staticmethod
     def get_file_b64(fname):

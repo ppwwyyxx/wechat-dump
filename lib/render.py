@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
 # File: render.py
-# Date: Mon Dec 15 21:44:07 2014 +0800
+# Date: Wed Dec 17 00:04:02 2014 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
 import os
@@ -10,7 +10,6 @@ import glob
 import logging
 logger = logging.getLogger(__name__)
 
-import eyed3
 LIB_PATH = os.path.dirname(os.path.abspath(__file__))
 HTML_FILE = os.path.join(LIB_PATH, 'static/template.html')
 
@@ -35,6 +34,8 @@ class HTMLRender(object):
         self.html = ensure_unicode(open(HTML_FILE).read())
         self.parser = parser
         self.res = res
+        if self.res is None:
+            logger.warn("Resource Directory not given. Images / Voice Message won't be displayed.")
         self.emoji = EmojiProvider()
 
         csss = glob.glob(os.path.join(LIB_PATH, 'static/*.css'))
@@ -49,9 +50,9 @@ class HTMLRender(object):
         jss = glob.glob(os.path.join(LIB_PATH, 'static/*.js'))
         js_string = []
         for js in jss:
-            # TODO: add js compress
             logger.info("Load {}".format(os.path.basename(js)))
             js = ensure_unicode(open(js).read())
+            # TODO: add js compress
             js = u'<script type="text/javascript">{}</script>'.format(js)
             js_string.append(js)
         self.js_string = u"\n".join(js_string)
@@ -64,22 +65,6 @@ class HTMLRender(object):
         avt2 = self.res.get_avatar(username)
         return (avt1, avt2)
 
-    def get_voice_mp3(self, imgpath):
-        """ return base64 string, and voice duration"""
-        if self.res is None:
-            return ""
-        amr_fpath = self.res.speak_data[imgpath]
-        mp3_file = os.path.join('/tmp', os.path.basename(amr_fpath)[:-4] + '.mp3')
-        # TODO is there a library to use?
-        ret = os.system('sox {} {}'.format(amr_fpath, mp3_file))
-        if ret != 0:
-            logger.warn("Sox Failed!")
-            return ""
-        mp3_string = open(mp3_file, 'rb').read()
-        duration = eyed3.load(mp3_file).info.time_secs
-        os.unlink(mp3_file)
-        return base64.b64encode(mp3_string), duration
-
     def render_msg(self, msg):
         """ render a message, return the html block"""
         sender = 'you' if not msg.isSend else 'me'
@@ -90,7 +75,7 @@ class HTMLRender(object):
                 raise
             template = ensure_unicode(TEMPLATES[msg.type])
             if msg.type == TYPE_SPEAK:
-                audio_str, duration = self.get_voice_mp3(msg.imgPath)
+                audio_str, duration = self.res.get_voice_mp3(msg.imgPath)
                 return template.format(sender_label=sender,
                                        voice_duration=duration,
                                        voice_str=audio_str)
