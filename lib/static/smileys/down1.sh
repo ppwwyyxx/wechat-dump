@@ -1,9 +1,9 @@
 #!/bin/zsh
 # File: down1.sh
-# Date: Sun Dec 14 01:19:46 2014 +0800
+# Date: Sat Dec 20 17:53:23 2014 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
-# Download 105 tencent emoji
+# Download 105 tencent smiley
 
 for i in {0..104}; do
 	size=$(wc -c "$i.png" 2>/dev/null | cut -f 1 -d ' ')

@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
 # File: parser.py
-# Date: Wed Dec 17 23:04:54 2014 +0800
+# Date: Sat Dec 20 15:58:16 2014 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
 import sqlite3
@@ -30,6 +30,7 @@ class WeChatDBParser(object):
         self.cc = self.db_conn.cursor()
         self.contacts = {}
         self.msgs_by_talker = defaultdict(list)
+        self.parse()
 
     def _parse_contact(self):
         contacts = self.cc.execute(

@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
 # File: render.py
-# Date: Sat Dec 20 15:40:19 2014 +0800
+# Date: Sat Dec 20 17:48:48 2014 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
 import os
@@ -20,7 +20,7 @@ except:
 
 from .msg import *
 from .utils import ensure_unicode
-from emoji import EmojiProvider
+from smiley import SmileyProvider
 
 TEMPLATES_FILES = {TYPE_MSG: "TP_MSG",
                    TYPE_IMG: "TP_IMG",
@@ -36,12 +36,12 @@ class HTMLRender(object):
         self.res = res
         if self.res is None:
             logger.warn("Resource Directory not given. Images / Voice Message won't be displayed.")
-        self.emoji = EmojiProvider()
+        self.smiley = SmileyProvider()
 
         csss = glob.glob(os.path.join(LIB_PATH, 'static/*.css'))
         css_string = []
         for css in csss:
-            logger.info("Loading {}.".format(os.path.basename(css)))
+            logger.info("Loading {}".format(os.path.basename(css)))
             css = ensure_unicode(css_compress(open(css).read()))
             css = u'<style type="text/css">{}</style>'.format(css)
             css_string.append(css)
@@ -71,7 +71,7 @@ class HTMLRender(object):
         def fallback():
             template = ensure_unicode(TEMPLATES[1])
             content = msg.msg_str()
-            content = self.emoji.replace_emojicode(content)
+            content = self.smiley.replace_smileycode(content)
             return template.format(sender_label=sender,
                                    content=content)
         if msg.type not in TEMPLATES:
@@ -94,6 +94,12 @@ class HTMLRender(object):
             return template.format(sender_label=sender,
                                    small_img=smallimg,
                                    big_img=bigimg)
+        elif msg.type == TYPE_EMOJI:
+            imgpath = msg.imgPath
+            print imgpath
+            return fallback()
+            # custom emoji
+
         return fallback()
 
     def render_msgs(self, msgs):

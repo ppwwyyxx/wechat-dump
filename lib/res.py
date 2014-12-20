@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
 # File: res.py
-# Date: Sat Dec 20 15:40:33 2014 +0800
+# Date: Sat Dec 20 16:26:51 2014 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
 import glob
@@ -16,6 +16,7 @@ logger = logging.getLogger(__name__)
 from lib.avatar import AvatarReader
 
 VOICE_DIRNAME = 'voice2'
+IMG_DIRNAME = 'image2'
 JPEG_QUALITY = 50
 
 class Resource(object):
@@ -23,7 +24,7 @@ class Resource(object):
     def __init__(self, res_dir):
         assert os.path.isdir(res_dir), "No such directory: {}".format(res_dir)
         self.res_dir = res_dir
-        self.img_dir = os.path.join(res_dir, 'image2')
+        self.img_dir = os.path.join(res_dir, IMG_DIRNAME)
         assert os.path.isdir(self.img_dir), \
                      "No such directory: {}".format(self.img_dir)
         self.avt_reader = AvatarReader(self.res_dir)
