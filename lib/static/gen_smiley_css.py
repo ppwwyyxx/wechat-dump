@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
 # File: gen_emoji_css.py
-# Date: Mon Dec 15 22:15:54 2014 +0800
+# Date: Sat Dec 20 17:50:57 2014 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
 import os
@@ -9,9 +9,9 @@ import glob
 import base64
 
 DIR_PATH = os.path.dirname(os.path.abspath(__file__))
-OUTPUT_FILE = os.path.join(DIR_PATH, 'emoji.css')
+OUTPUT_FILE = os.path.join(DIR_PATH, 'smiley.css')
 
-HEAD = """.emoji {
+HEAD = """.smiley {
     background-position: -2px -2px;
     background-repeat: norepeat;
     width: 20px;
@@ -22,7 +22,7 @@ HEAD = """.emoji {
 }
 """
 
-TEMPLATE = """.emoji{name} {{
+TEMPLATE = """.smiley{name} {{
     background-image: url("data:image/png;base64,{b64}");
 }}"""
 
@@ -32,8 +32,8 @@ def get_file_b64(fname):
 
 with open(OUTPUT_FILE, 'w') as f:
     print >> f, HEAD
-    for fname in glob.glob(os.path.join(DIR_PATH, 'emojis', '*.png')):
+    for fname in glob.glob(os.path.join(DIR_PATH, 'smileys', '*.png')):
         b64 = get_file_b64(fname)
         basename = os.path.basename(fname)
-        emojiname = basename[:-4]
-        print >> f, TEMPLATE.format(name=emojiname, b64=b64);
+        smileyname = basename[:-4]
+        print >> f, TEMPLATE.format(name=smileyname, b64=b64);

@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
 # File: dump_msg.py
-# Date: Sat Nov 22 22:32:23 2014 +0800
+# Date: Sat Dec 20 15:58:29 2014 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
 from lib.parser import WeChatDBParser
@@ -20,7 +20,6 @@ if not os.path.isdir(output_dir):
     sys.exit("Error creating directory {}".format(output_dir))
 
 parser = WeChatDBParser(db_file)
-parser.parse()
 
 for name, msgs in parser.msgs_by_talker.iteritems():
     print u"Writing msgs for {}".format(name)
