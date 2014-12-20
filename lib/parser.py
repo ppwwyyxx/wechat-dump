@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
 # File: parser.py
-# Date: Sat Dec 20 15:58:16 2014 +0800
+# Date: Sat Dec 20 19:40:31 2014 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
 import sqlite3
@@ -30,6 +30,7 @@ class WeChatDBParser(object):
         self.cc = self.db_conn.cursor()
         self.contacts = {}
         self.msgs_by_talker = defaultdict(list)
+        self.emojis = {}
         self.parse()
 
     def _parse_contact(self):
@@ -86,8 +87,17 @@ SELECT {} FROM message
                 ret.append(msg)
         return sorted(ret)
 
+    def _parse_emoji(self):
+        # wechat provided emojis
+        emojiinfo_q = self.cc.execute(
+""" SELECT md5, desc, groupid FROM EmojiInfoDesc """)
+        for row in emojiinfo_q:
+            md5, desc, group = row
+            self.emojis[md5] = (group, desc)
+
     def parse(self):
         self._parse_userinfo()
         self._parse_contact()
         self._parse_msg()
         self._parse_imginfo()
+        self._parse_emoji()

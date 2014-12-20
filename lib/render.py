@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
 # File: render.py
-# Date: Sat Dec 20 17:48:48 2014 +0800
+# Date: Sat Dec 20 20:15:47 2014 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
 import os
@@ -24,7 +24,8 @@ from smiley import SmileyProvider
 
 TEMPLATES_FILES = {TYPE_MSG: "TP_MSG",
                    TYPE_IMG: "TP_IMG",
-                   TYPE_SPEAK: "TP_SPEAK"}
+                   TYPE_SPEAK: "TP_SPEAK",
+                   TYPE_EMOJI: "TP_EMOJI"}
 TEMPLATES = dict([(k, open(os.path.join(
     LIB_PATH, 'static/{}.html'.format(v))).read())
     for k, v in TEMPLATES_FILES.iteritems()])
@@ -96,10 +97,15 @@ class HTMLRender(object):
                                    big_img=bigimg)
         elif msg.type == TYPE_EMOJI:
             imgpath = msg.imgPath
-            print imgpath
-            return fallback()
-            # custom emoji
 
+            if imgpath in self.parser.emojis:
+                group, _ = self.parser.emojis[imgpath]
+            else:
+                group = None
+            emoji_img, format = self.res.get_emoji(imgpath, group)
+            return template.format(sender_label=sender,
+                                  emoji_format=format,
+                                  emoji_img=emoji_img)
         return fallback()
 
     def render_msgs(self, msgs):
