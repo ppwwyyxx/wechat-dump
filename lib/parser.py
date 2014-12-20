@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
 # File: parser.py
-# Date: Fri Dec 12 22:35:56 2014 +0800
+# Date: Wed Dec 17 23:04:54 2014 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
 import sqlite3
@@ -43,7 +43,7 @@ SELECT username,conRemark,nickname FROM rcontact
             else:
                 self.contacts[username] = ensure_unicode(nickname)
 
-        logger.info("Got {} contacts.".format(len(self.contacts)))
+        logger.info("Found {} contacts.".format(len(self.contacts)))
 
     def _parse_msg(self):
         msgs_tot_cnt = 0
@@ -62,7 +62,7 @@ SELECT {} FROM message
             for msg in v:
                 msg.talker_name = ensure_unicode(k)
             msgs_tot_cnt += len(v)
-        logger.info("Got {} messages in total.".format(msgs_tot_cnt))
+        logger.info("Found {} message records.".format(msgs_tot_cnt))
 
     def _parse_userinfo(self):
         userinfo_q = self.cc.execute(""" SELECT id, value FROM userinfo """)
@@ -74,7 +74,7 @@ SELECT {} FROM message
         imginfo_q = self.cc.execute("""SELECT msgSvrId, bigImgPath FROM ImgInfo2""")
         self.imginfo = dict([(k, v) for (k, v) in imginfo_q
                              if not v.startswith('SERVERID://')])
-        logger.info("Got {} big images.".format(len(self.imginfo)))
+        logger.info("Found {} big images records.".format(len(self.imginfo)))
 
     def _find_msg_by_type(self, msgs=None):
         ret = []
