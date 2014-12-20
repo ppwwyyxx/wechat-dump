@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
 # File: msg.py
-# Date: Sun Nov 23 20:44:33 2014 +0800
+# Date: Sat Dec 20 15:12:34 2014 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
 from datetime import datetime
@@ -11,10 +11,11 @@ from .utils import ensure_bin_str, ensure_unicode
 TYPE_MSG = 1
 TYPE_IMG = 3
 TYPE_SPEAK = 34
+TYPE_NAMECARD = 42
 TYPE_VIDEO = 43
 TYPE_EMOJI = 47
 TYPE_LOCATION = 48
-TYPE_LINK = 49  # link share or file from web
+TYPE_LINK = 49  # link share OR file from web
 TYPE_VOIP = 50
 TYPE_SYSTEM = 10000
 
@@ -36,6 +37,8 @@ class WeChatMsg(object):
         self.talker_name = None
         if self.content:
             self.content = ensure_unicode(self.content)
+        else:
+            self.content = u""
 
     def msg_str(self):
         # TODO: fix more types
@@ -58,11 +61,22 @@ class WeChatMsg(object):
             url = soup.find('url').text
             if not url:
                 title = soup.find('title').text
-                assert title, "No title or url found in TYPE_LINK"
+                if not title:
+                    print self.content
+                    from IPython import embed; embed()
+                assert title, \
+                        u"No title or url found in TYPE_LINK: {}".format(self.content)
                 return u"FILE:{}".format(title)
             return u"URL:{}".format(url)
         elif self.type == TYPE_VIDEO:
             return "VIDEO"
+        elif self.type == TYPE_NAMECARD:
+            soup = BeautifulSoup(self.content)
+            msg = soup.find('msg').attrs
+            name = msg.get('nickname', '')
+            if not name:
+                name = msg.get('alias', '')
+            return u"NAMECARD: {}".format(name)
         else:
             return self.content
 

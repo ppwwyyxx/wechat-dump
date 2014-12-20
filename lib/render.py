@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
 # File: render.py
-# Date: Wed Dec 17 00:04:02 2014 +0800
+# Date: Sat Dec 20 15:40:19 2014 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
 import os
@@ -41,7 +41,7 @@ class HTMLRender(object):
         csss = glob.glob(os.path.join(LIB_PATH, 'static/*.css'))
         css_string = []
         for css in csss:
-            logger.info("Load {}".format(os.path.basename(css)))
+            logger.info("Loading {}.".format(os.path.basename(css)))
             css = ensure_unicode(css_compress(open(css).read()))
             css = u'<style type="text/css">{}</style>'.format(css)
             css_string.append(css)
@@ -50,7 +50,7 @@ class HTMLRender(object):
         jss = glob.glob(os.path.join(LIB_PATH, 'static/*.js'))
         js_string = []
         for js in jss:
-            logger.info("Load {}".format(os.path.basename(js)))
+            logger.info("Loading {}".format(os.path.basename(js)))
             js = ensure_unicode(open(js).read())
             # TODO: add js compress
             js = u'<script type="text/javascript">{}</script>'.format(js)
@@ -68,39 +68,39 @@ class HTMLRender(object):
     def render_msg(self, msg):
         """ render a message, return the html block"""
         sender = 'you' if not msg.isSend else 'me'
-        # TODO
-        try:
-            if msg.type == TYPE_VIDEO:
-                # send a video file
-                raise
-            template = ensure_unicode(TEMPLATES[msg.type])
-            if msg.type == TYPE_SPEAK:
-                audio_str, duration = self.res.get_voice_mp3(msg.imgPath)
-                return template.format(sender_label=sender,
-                                       voice_duration=duration,
-                                       voice_str=audio_str)
-            elif msg.type == TYPE_IMG:
-                # imgPath was original THUMBNAIL_DIRPATH://th_xxxxxxxxx
-                imgpath = msg.imgPath.split('_')[-1]
-                bigimgpath = self.parser.imginfo.get(msg.msgSvrId)
-
-                bigimg, smallimg = self.res.get_img([imgpath, bigimgpath])
-                return template.format(sender_label=sender,
-                                       small_img=smallimg,
-                                       big_img=bigimg)
-            else:
-                raise
-        except:
+        def fallback():
             template = ensure_unicode(TEMPLATES[1])
             content = msg.msg_str()
             content = self.emoji.replace_emojicode(content)
             return template.format(sender_label=sender,
                                    content=content)
+        if msg.type not in TEMPLATES:
+            return fallback()
+
+        template = ensure_unicode(TEMPLATES[msg.type])
+        if msg.type == TYPE_SPEAK:
+            audio_str, duration = self.res.get_voice_mp3(msg.imgPath)
+            return template.format(sender_label=sender,
+                                   voice_duration=duration,
+                                   voice_str=audio_str)
+        elif msg.type == TYPE_IMG:
+            # imgPath was original THUMBNAIL_DIRPATH://th_xxxxxxxxx
+            imgpath = msg.imgPath.split('_')[-1]
+            bigimgpath = self.parser.imginfo.get(msg.msgSvrId)
+            fnames = [k for k in [imgpath, bigimgpath] if k is not None]
+            bigimg, smallimg = self.res.get_img(fnames)
+            assert smallimg
+            # TODO do not show fancybox when no bigimg found
+            return template.format(sender_label=sender,
+                                   small_img=smallimg,
+                                   big_img=bigimg)
+        return fallback()
 
     def render_msgs(self, msgs):
         """ render msgs of the same friend"""
         talker_name = msgs[0].talker
-        logger.info(u"Rendering messages of {}".format(talker_name))
+        logger.info(u"Rendering {} messages of {}({})".format(
+            len(msgs), self.parser.contacts[talker_name], talker_name))
         avatars = self.get_avatar_pair(talker_name)
         blocks = [self.render_msg(m) for m in msgs]
 

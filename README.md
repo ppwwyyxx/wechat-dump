@@ -10,18 +10,20 @@
 + python-csscompressor(optional)
 
 #### Get Necessary Data:
-+ Get /data/data/com.tencent.mm/MicroMsg/long-long-name/EnMicroMsg.db from root filesystem.
-+ Get WeChat user resource directory from user filesystem, for example: storage/tencent/MicroMsg/long-long-name.
-+ Get Wechat uin:
-	+ login to [web-based wechat](https://wx.qq.com); get wxuin=1234567 from `document.cookie`
-	+ Or get ``default_uin`` from /data/data/com.tencent.mm/shared_prefs/system_config_prefs.xml.
-+ Get phone IMEI:
++ Get /data/data/com.tencent.mm/MicroMsg/long-long-name/EnMicroMsg.db from root filesystem, possible ways are:
+	+ `adb root`, `adb pull /xxx/xxx.db`
+	+ Use your rooted file system manager app
++ Get WeChat user resource directory from user filesystem, for example: sdcard:/tencent/MicroMsg/long-long-name. (could be different)
++ Get Wechat uin, possible ways are:
+	+ Login to [web-based wechat](https://wx.qq.com); get wxuin=1234567 from `document.cookie`
+	+ Get ``default_uin`` from /data/data/com.tencent.mm/shared_prefs/system_config_prefs.xml.
++ Get phone IMEI, possible ways are:
 	+ Call `*#06#` on your phone
-	+ Or find IMEI in system settings
-	+ Or use `adb shell dumpsys iphonesubinfo | grep 'Device ID' | grep -o '[0-9]*'`
+	+ Find IMEI in system settings
+	+ `adb shell dumpsys iphonesubinfo | grep 'Device ID' | grep -o '[0-9]*'`
 
 #### Run:
-+ Decrypt database and get decrypted_db.db (for now, Linux x64 only):
++ Decrypt database, will produce decrypted_db.db (for now, Linux x64 only):
 ```
 ./decrypt_db.sh <path to EnMicroMsg.db> <imei> <uin>
 ```
@@ -29,12 +31,12 @@
 ```
 ./dump_msg.py decrypted_db.db output_dir
 ```
-+ Dump messages of one contact to single-file html, containing voice messages and image thumbnail:
++ Dump messages of one contact to single-file html, containing voice messages and images:
 ```
 ./dump_html.py decrypted_db.db <resource directory> <contact name> output.html
 ```
 
 ### TODO
-+ parse links, custom emoji, and other message types
-+ show name of unicode emoji in txt
-+ given uid/username..
++ Parse custom emoji, and other message types
++ Show name of emoji in text
++ Search by uid/username..

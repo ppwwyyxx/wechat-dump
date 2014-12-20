@@ -1361,8 +1361,7 @@ a.btnSecondary:active {
   background-color: #EFF3F7;
 }
 .chatPanel .chatContent {
-  padding: 10px;
-  width: 100%;
+  padding-left: 10px;
   overflow: hidden;
   position: relative;
 }

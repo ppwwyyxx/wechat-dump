@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
 # File: res.py
-# Date: Wed Dec 17 00:02:13 2014 +0800
+# Date: Sat Dec 20 15:40:33 2014 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
 import glob
@@ -110,17 +110,19 @@ class Resource(object):
             else:
                 logger.warn("Found big image but not thumbnail: {}".format(fname))
                 return (name, "")
-        big, small = cands[-1], cands[0]
-        if not name_is_thumbnail(small[0]):
+        big = cands[-1]
+        ths = filter(name_is_thumbnail, [k[0] for k in cands])
+        if not ths:
             return (big[0], "")
-        return (big[0], small[0])
+        return (big[0], ths[0])
+
 
     def get_img(self, fnames):
         """ return two base64 jpg string"""
         big_file, small_file = self.get_img_file(fnames)
 
         def get_jpg_b64(img_file):
-            if not big_file:
+            if not img_file:
                 return None
             if not img_file.endswith('jpg'):
                 # possibly not jpg

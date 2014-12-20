@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
 # File: emoji.py
-# Date: Tue Dec 16 23:52:13 2014 +0800
+# Date: Sat Dec 20 15:08:45 2014 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
 import os
