@@ -5242,7 +5242,6 @@ a.btnBlue:active .btnBluePanel {
 }
 .cloudImg .cloudContent {
   min-height: 30px;
-  max-height: 200px;
 }
 .cloudImg .cloudContent img {
   min-width: 50px;
@@ -5447,8 +5446,6 @@ a.btnBlue:active .btnBluePanel {
 }
 .you .cloudImg .img_wrap{
     display: block;
-    max-width: 280px;
-    max-height: 150px;
     overflow: hidden;
 }
 .you .cloudImg .cloudArrow {

@@ -1,22 +1,26 @@
 #!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
 # File: res.py
-# Date: Sat Dec 20 16:26:51 2014 +0800
+# Date: Sat Dec 20 20:14:40 2014 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
 import glob
 import os
+import re
 import Image
 import cStringIO
 import base64
 import logging
-import eyed3
+import imghdr
 logger = logging.getLogger(__name__)
+
+import eyed3
 
 from lib.avatar import AvatarReader
 
 VOICE_DIRNAME = 'voice2'
 IMG_DIRNAME = 'image2'
+EMOJI_DIRNAME = 'emoji'
 JPEG_QUALITY = 50
 
 class Resource(object):
@@ -25,6 +29,7 @@ class Resource(object):
         assert os.path.isdir(res_dir), "No such directory: {}".format(res_dir)
         self.res_dir = res_dir
         self.img_dir = os.path.join(res_dir, IMG_DIRNAME)
+        self.emoji_dir = os.path.join(res_dir, EMOJI_DIRNAME)
         assert os.path.isdir(self.img_dir), \
                      "No such directory: {}".format(self.img_dir)
         self.avt_reader = AvatarReader(self.res_dir)
@@ -78,7 +83,7 @@ class Resource(object):
         jpeg_str = buf.getvalue()
         return base64.b64encode(jpeg_str)
 
-    def get_img_file(self, fnames):
+    def _get_img_file(self, fnames):
         """ fnames: a list of filename to search for
             return (filename, filename) of (big, small) image.
             could be empty string.
@@ -120,13 +125,13 @@ class Resource(object):
 
     def get_img(self, fnames):
         """ return two base64 jpg string"""
-        big_file, small_file = self.get_img_file(fnames)
+        big_file, small_file = self._get_img_file(fnames)
 
         def get_jpg_b64(img_file):
             if not img_file:
                 return None
-            if not img_file.endswith('jpg'):
-                # possibly not jpg
+            if not img_file.endswith('jpg') and \
+               imghdr.what(img_file) != 'jpeg':
                 im = Image.open(open(img_file, 'rb'))
                 buf = cStringIO.StringIO()
                 im.save(buf, 'JPEG', quality=JPEG_QUALITY)
@@ -139,4 +144,18 @@ class Resource(object):
             # TODO resize big to a thumbnail
             pass
         return (big_file, small_file)
+
+    def get_emoji(self, md5, pack_id):
+        path = self.emoji_dir
+        if pack_id:
+            path = os.path.join(path, pack_id)
+        candidates = glob.glob(os.path.join(path, '{}*'.format(md5)))
+        candidates = [k for k in candidates if \
+                      not k.endswith('_thumb') and not k.endswith('_cover')]
+        if len(candidates) > 1:
+            # annimation
+            candidates = [k for k in candidates if not re.match('.*_[0-9]+$', k)]
+            assert len(candidates) == 1
+        fname = candidates[0]
+        return Resource.get_file_b64(fname), imghdr.what(fname)
 

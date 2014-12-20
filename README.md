@@ -37,6 +37,8 @@
 ```
 
 ### TODO
-+ Parse custom emoji, and other message types
++ Parse uncommon message types
 + Show name of emoji in text
 + Search by uid/username..
++ Fix emoji sizes..
++ Sometimes beautiful soup failed on links..

@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
 # File: msg.py
-# Date: Sat Dec 20 15:12:34 2014 +0800
+# Date: Sat Dec 20 18:38:59 2014 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
 from datetime import datetime
@@ -77,6 +77,9 @@ class WeChatMsg(object):
             if not name:
                 name = msg.get('alias', '')
             return u"NAMECARD: {}".format(name)
+        elif self.type == TYPE_EMOJI:
+            # TODO add emoji name
+            return self.content
         else:
             return self.content
 
@@ -95,3 +98,11 @@ class WeChatMsg(object):
 
     def __lt__(self, r):
         return self.createTime < r.createTime
+
+    def get_emoji_product_id(self):
+        assert self.type == TYPE_EMOJI, "Wrong call to get_emoji_product_id()!"
+        soup = BeautifulSoup(self.content)
+        emoji = soup.find('emoji')
+        if emoji is None:
+            return None
+        return emoji.get('productid', None)
