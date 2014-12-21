@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
 # File: smiley.py
-# Date: Sat Dec 20 17:49:42 2014 +0800
+# Date: Sun Dec 21 23:41:14 2014 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
 import os
@@ -58,7 +58,7 @@ class SmileyProvider(object):
 
     def _replace_tencent(self, msg):
         if (not '[' in msg or not ']' in msg) \
-           and (not '\:' in msg) and (not '/' in msg):
+           and (not '/:' in msg) and (not '/' in msg):
             return msg
         for k, v in self.tencent_smiley.iteritems():
             if k in msg:
@@ -76,6 +76,6 @@ class SmileyProvider(object):
 
 if __name__ == '__main__':
     smiley = SmileyProvider()
-    msg = u"[挥手]哈哈呵呵ｈｉｈｉ\U0001f684\u2728\u0001"
+    msg = u"[挥手]哈哈呵呵ｈｉｈｉ\U0001f684\u2728\u0001 /::<"
     msg = smiley.replace_smileycode(msg)
     print msg

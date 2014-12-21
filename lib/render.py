@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
 # File: render.py
-# Date: Sun Dec 21 21:21:53 2014 +0800
+# Date: Sun Dec 21 23:48:29 2014 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
 import os
@@ -25,9 +25,10 @@ from smiley import SmileyProvider
 TEMPLATES_FILES = {TYPE_MSG: "TP_MSG",
                    TYPE_IMG: "TP_IMG",
                    TYPE_SPEAK: "TP_SPEAK",
-                   TYPE_EMOJI: "TP_EMOJI"}
-TEMPLATES = dict([(k, open(os.path.join(
-    LIB_PATH, 'static/{}.html'.format(v))).read())
+                   TYPE_EMOJI: "TP_EMOJI",
+                   TYPE_LINK: "TP_MSG"}
+TEMPLATES = dict([(k, ensure_unicode(open(os.path.join(
+    LIB_PATH, 'static/{}.html'.format(v))).read()))
     for k, v in TEMPLATES_FILES.iteritems()])
 
 class HTMLRender(object):
@@ -70,7 +71,7 @@ class HTMLRender(object):
         """ render a message, return the html block"""
         sender = 'you' if not msg.isSend else 'me'
         def fallback():
-            template = ensure_unicode(TEMPLATES[1])
+            template = TEMPLATES[TYPE_MSG]
             content = msg.msg_str()
             content = self.smiley.replace_smileycode(content)
             return template.format(sender_label=sender,
@@ -78,7 +79,7 @@ class HTMLRender(object):
         if msg.type not in TEMPLATES:
             return fallback()
 
-        template = ensure_unicode(TEMPLATES[msg.type])
+        template = TEMPLATES[msg.type]
         if msg.type == TYPE_SPEAK:
             audio_str, duration = self.res.get_voice_mp3(msg.imgPath)
             return template.format(sender_label=sender,
@@ -108,6 +109,13 @@ class HTMLRender(object):
             return template.format(sender_label=sender,
                                   emoji_format=format,
                                   emoji_img=emoji_img)
+        elif msg.type == TYPE_LINK:
+            content = msg.msg_str()
+            if content.startswith(u'URL:'):
+                url = content[4:]
+                content = u'URL:<a target="_blank" href="{0}">{0}</a>'.format(url)
+                return template.format(sender_label=sender,
+                                       content=content)
         return fallback()
 
     def render_msgs(self, msgs):
