@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
 # File: render.py
-# Date: Sat Dec 20 20:15:47 2014 +0800
+# Date: Sun Dec 21 21:21:53 2014 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
 import os
@@ -90,7 +90,9 @@ class HTMLRender(object):
             bigimgpath = self.parser.imginfo.get(msg.msgSvrId)
             fnames = [k for k in [imgpath, bigimgpath] if k is not None]
             bigimg, smallimg = self.res.get_img(fnames)
-            assert smallimg
+            if not smallimg:
+                logger.warn("No image thumbnail found for {}".format(imgpath))
+                return fallback()
             # TODO do not show fancybox when no bigimg found
             return template.format(sender_label=sender,
                                    small_img=smallimg,
