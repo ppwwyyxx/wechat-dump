@@ -10,33 +10,6 @@ body {
   text-overflow: ellipsis;
   word-wrap: normal;
 }
-.loadingIcon {
-  height: 20px;
-  width: 20px;
-  margin: 20px auto;
-  background: url(../images/ico_loading11844c2.gif) no-repeat center;
-}
-.chatPanel .unreadDot {
-  position: absolute;
-  background: url(../images/button_chat20067a.png) no-repeat -5px -980px;
-  width: 28px;
-  height: 24px;
-  margin: -7px 0 0 -21px;
-  left: 64px;
-  text-align: center;
-  line-height: 25px;
-  font-size: 12px;
-  color: #FFF;
-  _left: -5px;
-}
-.chatPanel .unreadDotS {
-  position: absolute;
-  left: 45px;
-  top: 1px;
-  width: 19px;
-  height: 19px;
-  background: url(../images/button_chat20067a.png) no-repeat -156px -1008px;
-}
 /* reset */
 html,
 body,
@@ -165,7 +138,6 @@ table {
 html,
 body {
   height: 100%;
-  min-height: 755px;
   background: #4e5359 repeat 0 0;
   color: #666;
   font: 14px/1.5 Helvetica, Arial, Tahoma;
@@ -198,33 +170,6 @@ a:active {
 .lightText {
   color: #ccc;
 }
-.loadingMask {
-  position: absolute;
-  top: 0px;
-  left: 0px;
-  width: 415px;
-  height: 356px;
-  margin-left: -17px;
-  margin-top: -33px;
-  background-color: #000;
-  background: rgba(0, 0, 0, 0.5) url(../images/ico_loading11844c2.gif) no-repeat center;
-  opacity: 0.5;
-  z-index: 101;
-  border-radius: 0px 0px 4px 4px;
-  filter: alpha(opacity=50);
-}
-.loadingMaskWind {
-  margin: auto;
-  width: 100%;
-  height: 100%;
-  border-radius: 4px;
-  -moz-border-radius: 4px;
-  -webkit-border-radius: 4px;
-  background-color: #000;
-  opacity: 0.5;
-  filter: alpha(opacity=50);
-}
-
 .chatPanel .chatScorll::-webkit-scrollbar {
   width: 8px;
   height: 12px;
@@ -1305,7 +1250,7 @@ a.btnSecondary:active {
   /*ie hack*/
   _height: 400px;
 }
-.chatPanel .chatContainer {
+.chatPanel {
   /*background:#fff;*/
   position: relative;
   border-radius: 2px 2px 6px 6px;
@@ -1330,13 +1275,9 @@ a.btnSecondary:active {
   -o-border-radius: 4px 4px 0 0;
   -ms-border-radius: 4px 4px 0 0;
 }
-/*single and group chat*/
-.chatPanel .chatNameWrap {
+.chatPanel .chatName {
   border-radius: 6px 6px 0 0;
   text-align: center;
-  font-size: 16px;
-}
-.chatPanel .chatNameWrap .chatName {
   margin: 0 auto;
   width: 600px;
   white-space: nowrap;
@@ -1396,8 +1337,6 @@ a.btnSecondary:active {
 .chatItem .avatar {
   width: 38px;
   height: 38px;
-  border: 1px solid #ccc\9;
-  border: 1px solid #FFF;
   box-shadow: 0px 1px 0px #B3B6BA;
 }
 .chatItem .cloud {

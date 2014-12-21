@@ -4,23 +4,31 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <title>WeChat</title>
   <link rel="stylesheet" type="text/css" href="http://localhost:8000/wx.css">
+  <style type="text/css">
+  .me .avatar {{
+    background-size: 100%;
+    background-image: url("data:image/jpeg;base64,{avatar_me}");
+  }}
+  .you .avatar {{
+    background-size: 100%;
+    background-image: url("data:image/jpeg;base64,{avatar_you}");
+  }}
+  </style>
   {extra_css}
   {extra_js}
 </head>
 
 <body>
   <div id="chat" class="chatPanel normalPanel">
-    <div class="chatContainer" style="min-height:85%;">
-      <div class="chatMainPanel" id="chatMainPanel" style="padding-top:40px;">
-        <div class="chatTitle" style="margin-top: -40px;">
-          <div class="chatNameWrap">
-            <p class="chatName" id="messagePanelTitle">{talker}</p>
-          </div>
+    <div class="chatMainPanel" id="chatMainPanel" style="padding-top:40px;">
+      <div class="chatTitle" style="margin-top: -40px;">
+        <div class="chatNameWrap">
+          <p class="chatName" id="messagePanelTitle">{talker}</p>
         </div>
-        <div class="chatScorll" style="height: 100%; overflow-y: scroll; position: relative; font-family:initial;">
-          <div id="chat_chatmsglist" class="chatContent" style="position: absolute;">
-            {messages}
-          </div>
+      </div>
+      <div class="chatScorll" style="position: relative; font-family:initial;">
+        <div id="chat_chatmsglist" class="chatContent" style="position: absolute;">
+          {messages}
         </div>
       </div>
     </div>
@@ -37,14 +45,10 @@ var playVoice = function(event) {{
 
 $(document).ready(function() {{
     $(".fancybox").fancybox({{
-      // fancybox will otherwise scroll page to top
-      helpers: {{ overlay : {{ locked : false}}}}
-    }});
-
-    // initialize avatar, avoid repeatly inserting the same base64 img into html
-    $('.me .avatar').each(function(_, e) {{ e.src = "data:image/jpg;base64,{avatar_me}"; }})
-    $('.you .avatar').each(function(_, e) {{ e.src = "data:image/jpg;base64,{avatar_you}"; }})
+        // fancybox will otherwise scroll page to top
+helpers: {{ overlay : {{ locked : false}}}}
 }});
+    }});
   </script>
 </body>
 </html>

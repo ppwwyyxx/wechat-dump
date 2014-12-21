@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
-# File: parse_tencent_emoji.py
-# Date: Sat Dec 20 17:52:20 2014 +0800
+# File: parse_tencent_smiley.py
+# Date: Sun Dec 21 23:35:36 2014 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
 import xml.etree.ElementTree as ET
@@ -22,6 +22,9 @@ for child in root:
         assert len(lst) == 105
         for idx, v in enumerate(lst):
             if type(v) == str:
+                # two code appears in the xml.. don't know why
+                v = v.replace('&lt;', '<')
+                v = v.replace('&amp;', '&')
                 v = v.decode('utf-8')
             smileys[v] = idx
 
