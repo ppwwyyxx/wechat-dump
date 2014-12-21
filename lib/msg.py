@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
 # File: msg.py
-# Date: Sat Dec 20 18:38:59 2014 +0800
+# Date: Sun Dec 21 21:23:27 2014 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
 from datetime import datetime
@@ -61,6 +61,7 @@ class WeChatMsg(object):
             url = soup.find('url').text
             if not url:
                 title = soup.find('title').text
+                # TODO sometimes fail to parse title
                 if not title:
                     print self.content
                     from IPython import embed; embed()

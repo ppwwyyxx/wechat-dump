@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
 # File: res.py
-# Date: Sat Dec 20 20:14:40 2014 +0800
+# Date: Sun Dec 21 21:22:44 2014 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
 import glob
@@ -155,6 +155,7 @@ class Resource(object):
         if len(candidates) > 1:
             # annimation
             candidates = [k for k in candidates if not re.match('.*_[0-9]+$', k)]
+            # only one file is the gif in need, others are frames and cover
             assert len(candidates) == 1
         fname = candidates[0]
         return Resource.get_file_b64(fname), imghdr.what(fname)
