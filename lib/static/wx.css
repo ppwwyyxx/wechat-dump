@@ -1701,7 +1701,7 @@ a.btnSecondary:active {
   -webkit-border-radius: 5px 0px 0px 5px;
   border-radius: 5px 0px 0px 5px;
 }
-.cloudMesgPanel img.zoomIn{
+.cloudContent img.zoomIn{
     max-width: 200px;
     max-height: 150px;
 }
@@ -5669,7 +5669,6 @@ a.btnBlue:active .btnBluePanel {
   padding: 5px\9;
   border: none;
   border-radius: 8px\9;
-  max-height: 150px;
 }
 .me .cloudImg .imageBorder {
   border: 5px solid #E5E5E5\9;
