@@ -3,8 +3,8 @@
 ### How to use:
 
 #### Install Dependencies:
-+ python-numpy
 + python-PIL
++ [PyQuery](https://pypi.python.org/pypi/pyquery/1.2.1)
 + [eyed3](http://eyed3.nicfit.net/)
 + sox
 + python-csscompressor(optional)
@@ -38,7 +38,7 @@
 
 ### TODO
 + Parse uncommon message types
-+ Show name of emoji in text
++ Add date/time in html
++ Fix smiley spacing in html
++ Show name of emoji in text output
 + Search by uid/username..
-+ Fix emoji sizes..
-+ Sometimes beautiful soup failed on links..
