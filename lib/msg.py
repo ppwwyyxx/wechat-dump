@@ -1,11 +1,11 @@
 #!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
 # File: msg.py
-# Date: Sun Dec 21 21:23:27 2014 +0800
+# Date: Sun Dec 21 21:50:50 2014 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
 from datetime import datetime
-from bs4 import BeautifulSoup
+from pyquery import PyQuery
 from .utils import ensure_bin_str, ensure_unicode
 
 TYPE_MSG = 1
@@ -41,30 +41,24 @@ class WeChatMsg(object):
             self.content = u""
 
     def msg_str(self):
-        # TODO: fix more types
         if self.type == TYPE_LOCATION:
-            soup = BeautifulSoup(self.content)
-            loc = soup.find('location')
+            pq = PyQuery(self.content)
+            loc = pq('location').attr
             label = loc['label']
-            ret = label
             try:
                 poiname = loc['poiname']
                 if poiname:
-                    ret = poiname
+                    label = poiname
             except:
                 pass
-            return ret + " ({},{})".format(loc['x'], loc['y'])
+            return label + " ({},{})".format(loc['x'], loc['y'])
         elif self.type == TYPE_VOIP:
             return "REQUEST VIDEO CHAT"
         elif self.type == TYPE_LINK:
-            soup = BeautifulSoup(self.content)
-            url = soup.find('url').text
+            pq = PyQuery(self.content)
+            url = pq('url').text()
             if not url:
-                title = soup.find('title').text
-                # TODO sometimes fail to parse title
-                if not title:
-                    print self.content
-                    from IPython import embed; embed()
+                title = pq('title').text()
                 assert title, \
                         u"No title or url found in TYPE_LINK: {}".format(self.content)
                 return u"FILE:{}".format(title)
@@ -72,11 +66,13 @@ class WeChatMsg(object):
         elif self.type == TYPE_VIDEO:
             return "VIDEO"
         elif self.type == TYPE_NAMECARD:
-            soup = BeautifulSoup(self.content)
-            msg = soup.find('msg').attrs
-            name = msg.get('nickname', '')
+            pq = PyQuery(self.content)
+            msg = pq('msg').attr
+            name = msg['nickname']
             if not name:
-                name = msg.get('alias', '')
+                name = msg['alias']
+            if not name:
+                name = ""
             return u"NAMECARD: {}".format(name)
         elif self.type == TYPE_EMOJI:
             # TODO add emoji name
@@ -102,8 +98,8 @@ class WeChatMsg(object):
 
     def get_emoji_product_id(self):
         assert self.type == TYPE_EMOJI, "Wrong call to get_emoji_product_id()!"
-        soup = BeautifulSoup(self.content)
-        emoji = soup.find('emoji')
-        if emoji is None:
+        pq = PyQuery(self.content)
+        emoji = pq('emoji')
+        if not emoji:
             return None
-        return emoji.get('productid', None)
+        return emoji.attrs['productid']
