@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
-# File: gen_emoji_css.py
-# Date: Sat Dec 20 17:50:57 2014 +0800
+# File: gen_smiley_css.py
+# Date: Sun Dec 21 23:13:23 2014 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
 import os
@@ -12,6 +12,7 @@ DIR_PATH = os.path.dirname(os.path.abspath(__file__))
 OUTPUT_FILE = os.path.join(DIR_PATH, 'smiley.css')
 
 HEAD = """.smiley {
+    padding: 1px;
     background-position: -2px -2px;
     background-repeat: norepeat;
     width: 20px;
