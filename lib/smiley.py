@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
 # File: smiley.py
-# Date: Sun Dec 21 23:41:14 2014 +0800
+# Date: Mon Dec 22 16:50:15 2014 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
 import os
@@ -29,17 +29,16 @@ class SmileyProvider(object):
 
         # some extra smiley from javascript on wx.qq.com
         extra_smiley = json.load(open(TENCENT_EXTRASMILEY_FILE))
-        extra_smiley = dict([(u'[' + k + u']', v) for k, v in
-                            extra_smiley.iteritems()])
+        extra_smiley = {u'[' + k + u']': v for k, v in
+                            extra_smiley.iteritems()}
         self.tencent_smiley.update(extra_smiley)
 
         # 1f35c -> "\ue340"
         #self.unicode_smiley_code = gUnicodeCodeMap
 
         # u'\U0001f35c' -> "e340"
-        self.unicode_smiley = dict([(unichr(int(k, 16)), hex(ord(v))[2:])
-                                for k, v in
-                                  json.load(open(UNICODE_SMILEY_FILE)).iteritems()])
+        self.unicode_smiley = {unichr(int(k, 16)): hex(ord(v))[2:] for k, v in
+                                  json.load(open(UNICODE_SMILEY_FILE)).iteritems()}
         self.used_smiley_id = set()
 
 
