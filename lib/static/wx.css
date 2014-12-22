@@ -1081,12 +1081,6 @@ a.btnSecondary:active {
 .hasSysScroll.chatPanel .chatListColumn .desc {
   width: 135px;
 }
-.chatPanel .chatListColumn .time {
-  font-size: 12px;
-  color: #47778D;
-  margin-top: 3px;
-  text-shadow: none;
-}
 .chatPanel .chatListColumn .mute {
   height: 19px;
   width: 17px;
@@ -1217,9 +1211,6 @@ a.btnSecondary:active {
 .chatPanel .listContent div.activeColumn .desc {
   color: #FFF;
 }
-.chatPanel .listContent div.activeColumn .time {
-  color: #FFF;
-}
 .chatPanel .listContent .desc img {
   margin-bottom: -7px;
   margin-top: -2px;
@@ -1231,12 +1222,6 @@ a.btnSecondary:active {
   width: 11px;
   height: 73px;
   background: url(../images/bg_chat_listclick_blue1844c2.png) 0px 0px;
-}
-.chatPanel .activeColumn .nickName,
-.chatPanel .activeColumn .desc,
-.chatPanel .activeColumn .time,
-.chatPanel .activeColumn .lightText {
-  /*color:#fff; text-shadow:0 -1px 0 #3e627e; */
 }
 .chatPanel .activeColumn .edited {
   display: none;
@@ -1318,17 +1303,17 @@ a.btnSecondary:active {
   position: relative;
   _position: static;
 }
-.chatItem .time {
+.time {
   font-size: 12px;
   padding: 2px 0;
   margin: 0px auto 10px;
-  width: 100px;
+  width: 145px;
   border-radius: 20px;
   color: #7f7f7f;
   /*background-color:#EEE;*/
   text-shadow: 0 1px 0 #fff;
 }
-.chatItem .time .timeBg {
+.time .timeBg {
   height: 1px;
   width: 27px;
   margin-top: 8px;
@@ -1571,9 +1556,6 @@ a.btnSecondary:active {
   padding-top: 8px;
   font-size: 12px;
   text-align: left;
-}
-.cloudVoice .replyVoice {
-  position: absolute;
 }
 .systemTip {
   display: block;
@@ -5124,14 +5106,6 @@ a.btnBlue:active .btnBluePanel {
   -o-text-overflow: ellipsis;
   overflow: hidden;
 }
-.popupPhotoAlbumPanel .friendCirRPanel .comments .commentPanel .reply {
-  color: #5E749B;
-  font-size: 12px;
-}
-.popupPhotoAlbumPanel .friendCirRPanel .comments .commentPanel .time {
-  color: #A6A6A6;
-  font-size: 12px;
-}
 /*friendCircle end*/
 /*feedback*/
 .feedbackWin {
@@ -5168,9 +5142,6 @@ a.btnBlue:active .btnBluePanel {
 /*feedback end*/
 .cloudVoice {
   cursor: pointer;
-}
-.cloudVoice .replyVoice {
-  position: absolute;
 }
 .cloudText img {
   vertical-align: text-bottom;
@@ -5321,24 +5292,12 @@ a.btnBlue:active .btnBluePanel {
 .you .cloudVoice {
   margin-left: 10px;
 }
-.you .cloudVoice .replyVoice {
-  left: 35px;
-  top: 15px;
-}
 .you .cloudVoice .cloudBody {
   position: relative;
   margin: 0 17px;
   margin: 0 7px\9;
   padding-left: 18px\9;
   margin: 0px 8px 9px 7px;
-}
-.you .cloudVoice .cloudArrow {
-  position: absolute;
-  width: 18px;
-  height: 25px;
-  left: 0px;
-  top: 11px;
-  background: url(../images/cloud/bubble_white_guid1dbc46.png) no-repeat 0 0;
 }
 .you .cloudVoice .cloudContent {
   display: block;
@@ -5354,21 +5313,6 @@ a.btnBlue:active .btnBluePanel {
   height: 20px;
   background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAAAgCAYAAACinX6EAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAA2ZpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMy1jMDExIDY2LjE0NTY2MSwgMjAxMi8wMi8wNi0xNDo1NjoyNyAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wTU09Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9tbS8iIHhtbG5zOnN0UmVmPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvc1R5cGUvUmVzb3VyY2VSZWYjIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtcE1NOk9yaWdpbmFsRG9jdW1lbnRJRD0ieG1wLmRpZDo2NDNDQzNGRjA4RENFMzExODlENTg2M0UxQjZFMDkyQyIgeG1wTU06RG9jdW1lbnRJRD0ieG1wLmRpZDpFRDhENzczMkRDMEUxMUUzQTkzNEQ5MDhCQjY4MjRDNiIgeG1wTU06SW5zdGFuY2VJRD0ieG1wLmlpZDpFRDhENzczMURDMEUxMUUzQTkzNEQ5MDhCQjY4MjRDNiIgeG1wOkNyZWF0b3JUb29sPSJBZG9iZSBQaG90b3Nob3AgQ1M2IChXaW5kb3dzKSI+IDx4bXBNTTpEZXJpdmVkRnJvbSBzdFJlZjppbnN0YW5jZUlEPSJ4bXAuaWlkOjY0M0NDM0ZGMDhEQ0UzMTE4OUQ1ODYzRTFCNkUwOTJDIiBzdFJlZjpkb2N1bWVudElEPSJ4bXAuZGlkOjY0M0NDM0ZGMDhEQ0UzMTE4OUQ1ODYzRTFCNkUwOTJDIi8+IDwvcmRmOkRlc2NyaXB0aW9uPiA8L3JkZjpSREY+IDwveDp4bXBtZXRhPiA8P3hwYWNrZXQgZW5kPSJyIj8+FPaLpgAAA0lJREFUeNrsWH9k1GEYv90xxjHGsX86IiLisilxGUfZ7EQsToplaZWlXMoyxiaaxfRHpkZGvzSms5hO02waEUeMY4zTZYxjHOOIuT4Pn5fH12Rz73vFvi8fz/s+9z3f5/k8P973+zZUq9XAQR4NPgH7IODN+9kOiHHg2uVUz6oro+4/P9QI8QIoAQ+f3Pi14+pdwX04n4D4DJwElrA+7tD5D0CvLIFplxkQ3IPjcaAJ02XgJdUtwBz0YQc2PQK6OV8HRklMnOTUjwA4OATxFfgENCPtb0FO8efDwFPL0ZcSS3O5CZxB+q9DP0g7ljBvrQsBjG6Myw5GPAR5F8hT38e+YMP5EOs+RNVVOL8J/RXMHyvSo04JgEOdgEQ8gohfhJzhT3FgCLoK5G31l7QlWy4ARzl/B+ezcF4cnqROGuIpIAf9CDBpoySCHufPMt072egiEgmgwEcGpB+AhEXMzS7QDV2LJQLMeGbeB5g+0w9Siiy7YeAm8NYqAXBsgdHdYaqNM+ITfCSiDM1QSsq2WSAgYSINR7+xJHqpy0OXYY8YoE5s7bdeAnBY2H/NZQ/lonrEOJtXumM11r9E2TQ3k1lHuNvIyFJeotwGUiBly1UTzFGGkd6t3I7MMIbqlzfVaIcuoZLKNjOKqgmajNhy0gQ5TDOSUih7DCzv4vTvGu3YVvPmv+gMOVFbZ4LddoGYqr159oC4euQHpT4JFmoxgtEse8hfAypqBwqoHUmycMQ6AXA+yuNumAY98Gx1Eul5T9eWLPluwZYVk+aIbhtIqajaT0AXg+6jev8gdGmrBCDaUmvnaEwS6zWeBk/zkSnoNvgdYJrhgugsEJBR8z7KMRIsO8I0HJayS/FZ+UiacPo1CEeHVapJIzzBtPzC06GMFAiYsXASFOd+svlJprXDwVU59HDfDzDTktCX6vUxJNvfBrtwFxyVxnRHOS/9YNaGIUz5e1xKg3tFUkbVtpz17D7u7wN4GpTTXxHz6zyvB5gJ7dDnLX8QzUGcV32hC+Rssy/k/tmFCJxvZOrH6XySR2Lb9wHN6t6hzJRf+V9uhEKsx2UXzntIkJunMThfCDgc/p2gT4BPgE+AT4BPgE+AT4BPgE/AAR1/BBgA8iNe2jzu2vcAAAAASUVORK5CYII=) no-repeat 9px -1px;
   cursor: pointer;
-}
-.you .cloudVoice .cloudContent .icoVoicePlaying {
-  display: inline-block;
-  float: left;
-}
-.you .cloudText .sendStatus {
-  margin-top: -8px;
-}
-.you .cloudText .cloudArrow {
-  position: absolute;
-  left: -7px;
-  top: 11px;
-  width: 13px;
-  height: 24px;
-  background: url(../images/cloud/bubble_white_guid1dbc46.png) no-repeat;
 }
 .you .cloudImg .cloudContent {
   padding: 5px 13px\9;
@@ -5601,17 +5545,6 @@ a.btnBlue:active .btnBluePanel {
 .me .cloudImg .imageBorder {
   border: 5px solid #E5E5E5\9;
   border-radius: 0px\9;
-}
-.me .cloudImg .sendStatus {
-  margin-top: -10px;
-}
-.me .cloudImg .cloudArrow {
-  position: absolute;
-  width: 18px;
-  height: 25px;
-  right: -17px;
-  top: 8px;
-  background: url(../images/cloud/bubble_green_guid1dbc46.png) no-repeat 0 0;
 }
 .me .cloudVideo .imageBorder {
   border: 1px solid #a4a4a4\9;
