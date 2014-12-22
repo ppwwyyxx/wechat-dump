@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
 # File: render.py
-# Date: Mon Dec 22 09:49:12 2014 +0800
+# Date: Mon Dec 22 16:52:48 2014 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
 import os
@@ -27,9 +27,8 @@ TEMPLATES_FILES = {TYPE_MSG: "TP_MSG",
                    TYPE_SPEAK: "TP_SPEAK",
                    TYPE_EMOJI: "TP_EMOJI",
                    TYPE_LINK: "TP_MSG"}
-TEMPLATES = dict([(k, ensure_unicode(open(os.path.join(
-    LIB_PATH, 'static/{}.html'.format(v))).read()))
-    for k, v in TEMPLATES_FILES.iteritems()])
+TEMPLATES = {k: ensure_unicode(open(os.path.join(LIB_PATH, 'static/{}.html'.format(v))).read())
+    for k, v in TEMPLATES_FILES.iteritems()}
 
 class HTMLRender(object):
     def __init__(self, parser, res=None):
@@ -108,7 +107,7 @@ class HTMLRender(object):
                 else:
                     group = None
                 emoji_img, format = self.res.get_emoji(imgpath, group)
-            assert emoji_img
+            #assert emoji_img
             return template.format(sender_label=sender,
                                   emoji_format=format,
                                   emoji_img=emoji_img)

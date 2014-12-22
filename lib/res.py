@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
 # File: res.py
-# Date: Mon Dec 22 09:48:16 2014 +0800
+# Date: Mon Dec 22 16:52:56 2014 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
 import glob
@@ -158,7 +158,9 @@ class Resource(object):
             # annimation
             candidates = [k for k in candidates if not re.match('.*_[0-9]+$', k)]
             # only one file is the gif in need, others are frames and cover
-            assert len(candidates) == 1
+            if len(candidates) == 0:
+                # TODO stitch frames to gif
+                return None, None
         if not candidates:
             return None, None
         fname = candidates[0]
@@ -166,6 +168,6 @@ class Resource(object):
 
     def get_internal_emoji(self, fname):
         f = os.path.join(INTERNAL_EMOJI_DIR, fname)
-        return Resource.get_file_b64(fname), imghdr.what(fname)
+        return Resource.get_file_b64(f), imghdr.what(f)
 
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
 # File: parser.py
-# Date: Mon Dec 22 09:45:35 2014 +0800
+# Date: Mon Dec 22 16:50:31 2014 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
 import sqlite3
@@ -58,9 +58,8 @@ SELECT {} FROM message
             msg = WeChatMsg(row)
             if not WeChatMsg.filter_type(msg.type):
                 self.msgs_by_talker[msg.talker].append(msg)
-        self.msgs_by_talker = dict([
-            (self.contacts[k], sorted(v, key=lambda x: x.createTime))
-                           for k, v in self.msgs_by_talker.iteritems()])
+        self.msgs_by_talker = {self.contacts[k]: sorted(v, key=lambda x: x.createTime)
+                           for k, v in self.msgs_by_talker.iteritems()}
         for k, v in self.msgs_by_talker.iteritems():
             for msg in v:
                 msg.talker_name = ensure_unicode(k)
@@ -75,8 +74,8 @@ SELECT {} FROM message
 
     def _parse_imginfo(self):
         imginfo_q = self.cc.execute("""SELECT msgSvrId, bigImgPath FROM ImgInfo2""")
-        self.imginfo = dict([(k, v) for (k, v) in imginfo_q
-                             if not v.startswith('SERVERID://')])
+        self.imginfo = {k: v for (k, v) in imginfo_q
+                             if not v.startswith('SERVERID://')}
         logger.info("Found {} big images records.".format(len(self.imginfo)))
 
     def _find_msg_by_type(self, msgs=None):
