@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
 # File: parser.py
-# Date: Mon Dec 22 16:50:31 2014 +0800
+# Date: Mon Dec 22 21:59:26 2014 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
 import sqlite3
@@ -95,7 +95,7 @@ SELECT {} FROM message
             md5, desc, group = row
             self.emojis[md5] = (group, desc)
 
-        NEEDED_EMOJI_CATALOG = [49, 50]
+        NEEDED_EMOJI_CATALOG = [49, 50, 17]
         emojiinfo_q = self.cc.execute(
 """ SELECT md5, catalog, name FROM EmojiInfo WHERE name <> ''""")
         for row in emojiinfo_q:
@@ -103,6 +103,7 @@ SELECT {} FROM message
             if catalog not in NEEDED_EMOJI_CATALOG:
                 continue
             self.internal_emojis[md5] = name
+        print self.internal_emojis
 
 
     def parse(self):

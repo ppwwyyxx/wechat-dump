@@ -39,8 +39,7 @@
 ### TODO
 + Parse uncommon message types
 + Add date/time in html
-+ Show href for LINK type
-+ Internal emoji parsing. 'EmojiInfo' table.
++ Group message
 + Fix smiley spacing in html
 + Show name of emoji in text output
 + Search by uid/username..
