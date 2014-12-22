@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
 # File: res.py
-# Date: Sun Dec 21 23:49:46 2014 +0800
+# Date: Mon Dec 22 09:48:16 2014 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
 import glob
@@ -18,6 +18,8 @@ import eyed3
 
 from lib.avatar import AvatarReader
 
+LIB_PATH = os.path.dirname(os.path.abspath(__file__))
+INTERNAL_EMOJI_DIR = os.path.join(LIB_PATH, 'static', 'internal_emoji')
 VOICE_DIRNAME = 'voice2'
 IMG_DIRNAME = 'image2'
 EMOJI_DIRNAME = 'emoji'
@@ -157,7 +159,13 @@ class Resource(object):
             candidates = [k for k in candidates if not re.match('.*_[0-9]+$', k)]
             # only one file is the gif in need, others are frames and cover
             assert len(candidates) == 1
-        print candidates, md5
+        if not candidates:
+            return None, None
         fname = candidates[0]
         return Resource.get_file_b64(fname), imghdr.what(fname)
+
+    def get_internal_emoji(self, fname):
+        f = os.path.join(INTERNAL_EMOJI_DIR, fname)
+        return Resource.get_file_b64(fname), imghdr.what(fname)
+
 

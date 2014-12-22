@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
 # File: render.py
-# Date: Sun Dec 21 23:48:29 2014 +0800
+# Date: Mon Dec 22 09:49:12 2014 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
 import os
@@ -100,12 +100,15 @@ class HTMLRender(object):
                                    big_img=bigimg)
         elif msg.type == TYPE_EMOJI:
             imgpath = msg.imgPath
-
-            if imgpath in self.parser.emojis:
-                group, _ = self.parser.emojis[imgpath]
+            if imgpath in self.parser.internal_emojis:
+                emoji_img, format = self.res.get_internal_emoji(self.parser.internal_emojis[imgpath])
             else:
-                group = None
-            emoji_img, format = self.res.get_emoji(imgpath, group)
+                if imgpath in self.parser.emojis:
+                    group, _ = self.parser.emojis[imgpath]
+                else:
+                    group = None
+                emoji_img, format = self.res.get_emoji(imgpath, group)
+            assert emoji_img
             return template.format(sender_label=sender,
                                   emoji_format=format,
                                   emoji_img=emoji_img)
