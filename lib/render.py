@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
 # File: render.py
-# Date: Mon Dec 22 16:52:48 2014 +0800
+# Date: Mon Dec 22 22:48:32 2014 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
 import os
@@ -11,7 +11,8 @@ import logging
 logger = logging.getLogger(__name__)
 
 LIB_PATH = os.path.dirname(os.path.abspath(__file__))
-HTML_FILE = os.path.join(LIB_PATH, 'static/template.html')
+HTML_FILE = os.path.join(LIB_PATH, 'static', 'template.html')
+TIME_HTML_FILE = os.path.join(LIB_PATH, 'static', 'TP_TIME.html')
 
 try:
     from csscompressor import compress as css_compress
@@ -20,7 +21,8 @@ except:
 
 from .msg import *
 from .utils import ensure_unicode
-from smiley import SmileyProvider
+from .smiley import SmileyProvider
+from .msgslice import MessageSlicer
 
 TEMPLATES_FILES = {TYPE_MSG: "TP_MSG",
                    TYPE_IMG: "TP_IMG",
@@ -33,11 +35,13 @@ TEMPLATES = {k: ensure_unicode(open(os.path.join(LIB_PATH, 'static/{}.html'.form
 class HTMLRender(object):
     def __init__(self, parser, res=None):
         self.html = ensure_unicode(open(HTML_FILE).read())
+        self.time_html = open(TIME_HTML_FILE).read()
         self.parser = parser
         self.res = res
         if self.res is None:
             logger.warn("Resource Directory not given. Images / Voice Message won't be displayed.")
         self.smiley = SmileyProvider()
+        self.slicer = MessageSlicer()
 
         csss = glob.glob(os.path.join(LIB_PATH, 'static/*.css'))
         css_string = []
@@ -69,21 +73,23 @@ class HTMLRender(object):
     def render_msg(self, msg):
         """ render a message, return the html block"""
         sender = 'you' if not msg.isSend else 'me'
+        format_dict = {'sender_label': sender,
+                       'time': msg.createTime }
         def fallback():
             template = TEMPLATES[TYPE_MSG]
             content = msg.msg_str()
-            content = self.smiley.replace_smileycode(content)
-            return template.format(sender_label=sender,
-                                   content=content)
+            format_dict['content'] = self.smiley.replace_smileycode(content)
+            return template.format(**format_dict)
+
         if msg.type not in TEMPLATES:
             return fallback()
 
         template = TEMPLATES[msg.type]
         if msg.type == TYPE_SPEAK:
             audio_str, duration = self.res.get_voice_mp3(msg.imgPath)
-            return template.format(sender_label=sender,
-                                   voice_duration=duration,
-                                   voice_str=audio_str)
+            format_dict['voice_duration'] = duration
+            format_dict['voice_str'] = audio_str
+            return template.format(**format_dict)
         elif msg.type == TYPE_IMG:
             # imgPath was original THUMBNAIL_DIRPATH://th_xxxxxxxxx
             imgpath = msg.imgPath.split('_')[-1]
@@ -94,9 +100,9 @@ class HTMLRender(object):
                 logger.warn("No image thumbnail found for {}".format(imgpath))
                 return fallback()
             # TODO do not show fancybox when no bigimg found
-            return template.format(sender_label=sender,
-                                   small_img=smallimg,
-                                   big_img=bigimg)
+            format_dict['small_img'] = smallimg
+            format_dict['big_img'] = bigimg
+            return template.format(**format_dict)
         elif msg.type == TYPE_EMOJI:
             imgpath = msg.imgPath
             if imgpath in self.parser.internal_emojis:
@@ -107,33 +113,42 @@ class HTMLRender(object):
                 else:
                     group = None
                 emoji_img, format = self.res.get_emoji(imgpath, group)
-            #assert emoji_img
-            return template.format(sender_label=sender,
-                                  emoji_format=format,
-                                  emoji_img=emoji_img)
+            format_dict['emoji_format'] = format
+            format_dict['emoji_img'] = emoji_img
+            return template.format(**format_dict)
         elif msg.type == TYPE_LINK:
             content = msg.msg_str()
             if content.startswith(u'URL:'):
                 url = content[4:]
                 content = u'URL:<a target="_blank" href="{0}">{0}</a>'.format(url)
-                return template.format(sender_label=sender,
-                                       content=content)
+                format_dict['content'] = content
+                return template.format(**format_dict)
         return fallback()
 
     def render_msgs(self, msgs):
-        """ render msgs of the same friend"""
+        """ render msgs of one friend"""
         talker_name = msgs[0].talker
         logger.info(u"Rendering {} messages of {}({})".format(
             len(msgs), self.parser.contacts[talker_name], talker_name))
         avatars = self.get_avatar_pair(talker_name)
-        blocks = [self.render_msg(m) for m in msgs]
+        slices = self.slicer.slice(msgs)
+
+        blocks = []
+        for idx, slice in enumerate(slices):
+            nowtime = slice[0].createTime
+            if idx == 0 or \
+               slices[idx - 1][0].createTime.date() != nowtime.date():
+                timestr = nowtime
+            else:
+                timestr = nowtime.strftime("%H:%M:%S")
+            blocks.append(self.time_html.format(time=timestr))
+            blocks.extend([self.render_msg(m) for m in slice])
 
         return self.html.format(extra_css=self.css_string,
                                 extra_js=self.js_string,
                                 talker=msgs[0].talker_name,
                                 messages=u''.join(blocks),
-                                avatar_me=avatars[0],
-                                avatar_you=avatars[1])
+                                avatars=avatars)
 
 if __name__ == '__main__':
     r = HTMLRender()
