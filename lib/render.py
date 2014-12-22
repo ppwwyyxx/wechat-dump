@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
 # File: render.py
-# Date: Mon Dec 22 22:48:32 2014 +0800
+# Date: Mon Dec 22 23:07:05 2014 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
 import os
@@ -138,7 +138,7 @@ class HTMLRender(object):
             nowtime = slice[0].createTime
             if idx == 0 or \
                slices[idx - 1][0].createTime.date() != nowtime.date():
-                timestr = nowtime
+                timestr = nowtime.strftime("%m/%d %H:%M:%S")
             else:
                 timestr = nowtime.strftime("%H:%M:%S")
             blocks.append(self.time_html.format(time=timestr))

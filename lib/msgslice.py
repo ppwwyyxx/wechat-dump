@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
 # File: msgslice.py
-# Date: Mon Dec 22 22:24:32 2014 +0800
+# Date: Mon Dec 22 23:07:02 2014 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
 class MessageSlicer(object):
@@ -25,7 +25,10 @@ class MessageSlicer(object):
                 continue
 
             ret.append(now)
-            now = []
+            now = [m]
+        ret.append(now)
+
+        assert len(msgs) == sum([len(k) for k in ret])
         return ret
 
 
