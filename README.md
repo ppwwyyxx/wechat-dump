@@ -38,7 +38,7 @@
 
 ### TODO
 + Parse uncommon message types
-+ Add date/time in html
++ Separate messages into multiple html files
 + Group message
 + Fix smiley spacing in html
 + Show name of emoji in text output

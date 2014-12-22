@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
 # File: render.py
-# Date: Mon Dec 22 23:07:05 2014 +0800
+# Date: Tue Dec 23 00:01:11 2014 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
 import os
@@ -20,9 +20,9 @@ except:
     css_compress = lambda x: x
 
 from .msg import *
-from .utils import ensure_unicode
+from .utils import ensure_unicode, ProgressReporter
 from .smiley import SmileyProvider
-from .msgslice import MessageSlicer
+from .msgslice import MessageSlicerByTime, MessageSlicerBySize
 
 TEMPLATES_FILES = {TYPE_MSG: "TP_MSG",
                    TYPE_IMG: "TP_IMG",
@@ -41,7 +41,6 @@ class HTMLRender(object):
         if self.res is None:
             logger.warn("Resource Directory not given. Images / Voice Message won't be displayed.")
         self.smiley = SmileyProvider()
-        self.slicer = MessageSlicer()
 
         csss = glob.glob(os.path.join(LIB_PATH, 'static/*.css'))
         css_string = []
@@ -125,13 +124,12 @@ class HTMLRender(object):
                 return template.format(**format_dict)
         return fallback()
 
-    def render_msgs(self, msgs):
-        """ render msgs of one friend"""
+    def _render_partial_msgs(self, msgs):
+        """ return single html"""
         talker_name = msgs[0].talker
-        logger.info(u"Rendering {} messages of {}({})".format(
-            len(msgs), self.parser.contacts[talker_name], talker_name))
         avatars = self.get_avatar_pair(talker_name)
-        slices = self.slicer.slice(msgs)
+        slicer = MessageSlicerByTime()
+        slices = slicer.slice(msgs)
 
         blocks = []
         for idx, slice in enumerate(slices):
@@ -143,12 +141,26 @@ class HTMLRender(object):
                 timestr = nowtime.strftime("%H:%M:%S")
             blocks.append(self.time_html.format(time=timestr))
             blocks.extend([self.render_msg(m) for m in slice])
+            self.prgs.trigger(len(slice))
 
         return self.html.format(extra_css=self.css_string,
                                 extra_js=self.js_string,
                                 talker=msgs[0].talker_name,
                                 messages=u''.join(blocks),
                                 avatars=avatars)
+
+
+    def render_msgs(self, msgs):
+        """ render msgs of one friend, return a list of html"""
+        talker_name = msgs[0].talker
+        logger.info(u"Rendering {} messages of {}({})".format(
+            len(msgs), self.parser.contacts[talker_name], talker_name))
+
+        self.prgs = ProgressReporter("Render", total=len(msgs))
+        slice_by_size = MessageSlicerBySize().slice(msgs)
+        ret = [self._render_partial_msgs(s) for s in slice_by_size]
+        self.prgs.finish()
+        return ret
 
 if __name__ == '__main__':
     r = HTMLRender()
