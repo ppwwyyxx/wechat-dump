@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
 # File: dump_html.py
-# Date: Sat Dec 20 15:58:35 2014 +0800
+# Date: Tue Dec 23 00:01:20 2014 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
 import sys
@@ -22,7 +22,12 @@ parser = WeChatDBParser(db_file)
 msgs = parser.msgs_by_talker[name]
 
 render = HTMLRender(parser, res)
-html = render.render_msgs(msgs).encode('utf-8')
+htmls = render.render_msgs(msgs)
 
-with open(output_file, 'w') as f:
-    print >> f, html
+if len(htmls) == 1:
+    with open(output_file, 'w') as f:
+        print >> f, htmls[0].encode('utf-8')
+else:
+    for idx, html in enumerate(htmls):
+        with open(output_file + '.{}'.format(idx), 'w') as f:
+            print >> f, html.encode('utf-8')
