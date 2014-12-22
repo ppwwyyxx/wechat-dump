@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
 # File: msg.py
-# Date: Sun Dec 21 21:50:50 2014 +0800
+# Date: Mon Dec 22 21:56:45 2014 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
 from datetime import datetime
@@ -64,7 +64,7 @@ class WeChatMsg(object):
                 return u"FILE:{}".format(title)
             return u"URL:{}".format(url)
         elif self.type == TYPE_VIDEO:
-            return "VIDEO"
+            return "VIDEO FILE"
         elif self.type == TYPE_NAMECARD:
             pq = PyQuery(self.content)
             msg = pq('msg').attr

@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
 # File: gen_smiley_css.py
-# Date: Sun Dec 21 23:13:23 2014 +0800
+# Date: Mon Dec 22 21:44:00 2014 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
 import os
@@ -13,8 +13,8 @@ OUTPUT_FILE = os.path.join(DIR_PATH, 'smiley.css')
 
 HEAD = """.smiley {
     padding: 1px;
-    background-position: -2px -2px;
-    background-repeat: norepeat;
+    background-position: 0px -2px;
+    background-repeat: no-repeat;
     width: 20px;
     height: 20px;
     display: inline-block;
