@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
 # File: parser.py
-# Date: Mon Dec 22 21:59:26 2014 +0800
+# Date: Mon Dec 22 22:14:18 2014 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
 import sqlite3
@@ -76,7 +76,7 @@ SELECT {} FROM message
         imginfo_q = self.cc.execute("""SELECT msgSvrId, bigImgPath FROM ImgInfo2""")
         self.imginfo = {k: v for (k, v) in imginfo_q
                              if not v.startswith('SERVERID://')}
-        logger.info("Found {} big images records.".format(len(self.imginfo)))
+        logger.info("Found {} hd image records.".format(len(self.imginfo)))
 
     def _find_msg_by_type(self, msgs=None):
         ret = []
@@ -103,7 +103,6 @@ SELECT {} FROM message
             if catalog not in NEEDED_EMOJI_CATALOG:
                 continue
             self.internal_emojis[md5] = name
-        print self.internal_emojis
 
 
     def parse(self):
