@@ -11,17 +11,14 @@
 
 #### Get Necessary Data:
 + Get /data/data/com.tencent.mm/MicroMsg/long-long-name/EnMicroMsg.db from root filesystem, possible ways are:
-	+ `adb root`, `adb pull /data/data/com.tencent.mm/MicroMsg/long-long-name/EnMicroMsg.db`
+	+ `adb root`; `adb pull /data/data/com.tencent.mm/MicroMsg/long-long-name/EnMicroMsg.db`
 	+ Use your rooted file system manager app
-+ Get WeChat user resource directory from user filesystem, possibly at: /mnt/sdcard/tencent/MicroMsg/long-long-name:
-	+ adb pull /mnt/sdcard/tencent/MicroMsg/long-long-name
++ Get WeChat user resource directory from user filesystem, possible ways:
+	+ `adb pull /mnt/sdcard/tencent/MicroMsg/long-long-name` # location could be different
 + Get Wechat uin, possible ways are:
 	+ Login to [web-based wechat](https://wx.qq.com); get wxuin=1234567 from `document.cookie`
-	+
-```
-adb pull /data/data/com.tencent.mm/shared_prefs/system_config_prefs.xml
-grep 'default_uin' system_config_prefs.xml | grep -o 'value="[0-9]*' | cut -c 8-
-```
+	+ `adb pull /data/data/com.tencent.mm/shared_prefs/system_config_prefs.xml`;
+	`grep 'default_uin' system_config_prefs.xml | grep -o 'value="[0-9]*' | cut -c 8-`
 
 
 + Get phone IMEI, possible ways are:
