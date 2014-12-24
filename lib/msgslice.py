@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
 # File: msgslice.py
-# Date: Mon Dec 22 23:56:55 2014 +0800
+# Date: Wed Dec 24 22:06:41 2014 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
 class MessageSlicerByTime(object):
@@ -52,7 +52,7 @@ class MessageSlicerBySize(object):
                     now = [m]
                     continue
             now.append(m)
-        if len(now) > self.size / 2:
+        if len(now) > self.size / 2 or len(ret) == 0:
             ret.append(now)
         else:
             ret[-1].extend(now)

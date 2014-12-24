@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
 # File: msg.py
-# Date: Mon Dec 22 23:04:02 2014 +0800
+# Date: Wed Dec 24 22:00:42 2014 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
 from datetime import datetime
@@ -51,7 +51,7 @@ class WeChatMsg(object):
                     label = poiname
             except:
                 pass
-            return label + " ({},{})".format(loc['x'], loc['y'])
+            return "LOCATION:" + label + " ({},{})".format(loc['x'], loc['y'])
         elif self.type == TYPE_VOIP:
             return "REQUEST VIDEO CHAT"
         elif self.type == TYPE_LINK:

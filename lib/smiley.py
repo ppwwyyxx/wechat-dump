@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
 # File: smiley.py
-# Date: Mon Dec 22 16:50:15 2014 +0800
+# Date: Wed Dec 24 22:16:33 2014 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
 import os
@@ -13,7 +13,8 @@ UNICODE_SMILEY_FILE = os.path.join(LIB_PATH, 'static', 'unicode-smiley.json')
 TENCENT_SMILEY_FILE = os.path.join(LIB_PATH, 'static', 'tencent-smiley.json')
 TENCENT_EXTRASMILEY_FILE = os.path.join(LIB_PATH,
                                        'static', 'tencent-smiley-extra.json')
-UNICODE_SMILEY_RE = re.compile(u'[\U00010000-\U0010ffff]|[\u2600-\u2764]|\u2122|\u00a9|\u00ae')
+UNICODE_SMILEY_RE = re.compile(
+    u'[\U00010000-\U0010ffff]|[\u2600-\u2764]|\u2122|\u00a9|\u00ae|[\ue000-\ue5ff]')
 
 class SmileyProvider(object):
     def __init__(self, html_replace=True):
@@ -36,9 +37,13 @@ class SmileyProvider(object):
         # 1f35c -> "\ue340"
         #self.unicode_smiley_code = gUnicodeCodeMap
 
-        # u'\U0001f35c' -> "e340"
+        # u'\U0001f35c' -> "e340"   # for iphone
+        # u'\ue415' -> 'e415'       # for android
+        unicode_smiley_dict = json.load(open(UNICODE_SMILEY_FILE))
         self.unicode_smiley = {unichr(int(k, 16)): hex(ord(v))[2:] for k, v in
-                                  json.load(open(UNICODE_SMILEY_FILE)).iteritems()}
+                                unicode_smiley_dict.iteritems()}
+        self.unicode_smiley.update({v: hex(ord(v))[2:] for _, v in
+                                unicode_smiley_dict.iteritems()})
         self.used_smiley_id = set()
 
 
@@ -75,6 +80,6 @@ class SmileyProvider(object):
 
 if __name__ == '__main__':
     smiley = SmileyProvider()
-    msg = u"[挥手]哈哈呵呵ｈｉｈｉ\U0001f684\u2728\u0001 /::<"
+    msg = u"[挥手]哈哈呵呵ｈｉｈｉ\U0001f684\u2728\u0001 /::<\ue415"
     msg = smiley.replace_smileycode(msg)
     print msg
