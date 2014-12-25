@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
 # File: render.py
-# Date: Thu Dec 25 10:18:20 2014 +0800
+# Date: Thu Dec 25 22:05:41 2014 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
 import os
@@ -20,7 +20,7 @@ except:
     css_compress = lambda x: x
 
 from .msg import *
-from .utils import ensure_unicode, ProgressReporter, pmap
+from .utils import ensure_unicode, ProgressReporter, pmap, timing
 from .smiley import SmileyProvider
 from .msgslice import MessageSlicerByTime, MessageSlicerBySize
 
@@ -97,7 +97,6 @@ class HTMLRender(object):
                 return fallback()
             bigimgpath = self.parser.imginfo.get(msg.msgSvrId)
             fnames = [k for k in [imgpath, bigimgpath] if k]
-            assert len(fnames) > 0, msg.msg_str()
             bigimg, smallimg = self.res.get_img(fnames)
             if not smallimg:
                 logger.warn("No image thumbnail found for {}".format(imgpath))
@@ -130,8 +129,6 @@ class HTMLRender(object):
 
     def _render_partial_msgs(self, msgs):
         """ return single html"""
-        talker_name = msgs[0].talker
-        avatars = self.get_avatar_pair(talker_name)
         slicer = MessageSlicerByTime()
         slices = slicer.slice(msgs)
 
@@ -151,12 +148,12 @@ class HTMLRender(object):
                                 extra_js=self.js_string,
                                 talker=msgs[0].talker_name,
                                 messages=u''.join(blocks),
-                                avatars=avatars)
-
+                                avatars=self.avatars)
 
     def render_msgs(self, msgs):
         """ render msgs of one friend, return a list of html"""
         talker_name = msgs[0].talker
+        self.avatars = self.get_avatar_pair(talker_name)
         logger.info(u"Rendering {} messages of {}({})".format(
             len(msgs), self.parser.contacts[talker_name], talker_name))
 

@@ -1,11 +1,16 @@
 #!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
 # File: utils.py
-# Date: Thu Dec 25 10:11:21 2014 +0800
+# Date: Thu Dec 25 16:27:39 2014 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
 import sys
 import time
+import logging
+logger = logging.getLogger(__name__)
+
+import time, functools
+from collections import defaultdict
 
 def ensure_bin_str(s):
     if type(s) == str:
@@ -111,3 +116,43 @@ def pimap(map_func, iterator, nr_proc=None, nr_precompute=None):
 def pmap(map_func, iterator, nr_proc=None, nr_precompute=None):
     '''parallel map'''
     return list(pimap(map_func, iterator, nr_proc, nr_precompute))
+
+
+class TotalTimer(object):
+    def __init__(self):
+        self.times = defaultdict(float)
+
+    def add(self, name, t):
+        self.times[name] += t
+
+    def reset(self):
+        self.times = defaultdict(float)
+
+    def __del__(self):
+        for k, v in self.times.iteritems():
+            logger.info("{} took {} seconds in total.".format(k, v))
+
+_total_timer = TotalTimer()
+class timing(object):
+    def __init__(self, total=False):
+        self.total = total
+
+    def __call__(self, func):
+        @functools.wraps(func)
+        def wrapper(*args, **kwargs):
+            start_time = time.time()
+            ret = func(*args, **kwargs)
+            duration = time.time() - start_time
+
+            if hasattr(func, '__name__'):
+                func_name = func.__name__
+            else:
+                func_name = 'function in module {}'.format(func.__module__)
+            if self.total:
+                _total_timer.add(func_name, duration)
+            else:
+                logger.info('Duration for `{}\': {}'.format(
+                    func_name, duration))
+            return ret
+        return wrapper
+
