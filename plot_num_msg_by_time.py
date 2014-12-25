@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
 # File: plot_num_msg_by_time.py
-# Date: Sat Nov 22 22:32:50 2014 +0800
+# Date: Thu Dec 25 00:35:57 2014 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
 from lib.parser import WeChatDBParser
@@ -17,10 +17,9 @@ if len(sys.argv) != 3:
 
 db_file = sys.argv[1]
 name = ensure_unicode(sys.argv[2])
-every_k_days = 2
+every_k_days = 3
 
 parser = WeChatDBParser(db_file)
-parser.parse()
 msgs = parser.msgs_by_talker[name]
 times = [x.createTime for x in msgs]
 start_time = times[0]
