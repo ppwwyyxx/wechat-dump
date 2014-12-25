@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
 # File: res.py
-# Date: Mon Dec 22 16:52:56 2014 +0800
+# Date: Thu Dec 25 10:04:29 2014 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
 import glob
@@ -127,6 +127,7 @@ class Resource(object):
 
     def get_img(self, fnames):
         """ return two base64 jpg string"""
+        fnames = [k for k in fnames if k]   # filter out empty string
         big_file, small_file = self._get_img_file(fnames)
 
         def get_jpg_b64(img_file):

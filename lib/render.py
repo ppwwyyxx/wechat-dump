@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
 # File: render.py
-# Date: Tue Dec 23 00:01:11 2014 +0800
+# Date: Thu Dec 25 10:01:58 2014 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
 import os
@@ -92,8 +92,12 @@ class HTMLRender(object):
         elif msg.type == TYPE_IMG:
             # imgPath was original THUMBNAIL_DIRPATH://th_xxxxxxxxx
             imgpath = msg.imgPath.split('_')[-1]
+            if not imgpath:
+                logger.warn('No imgpath in an image message. Perhaps a bug in wechat.')
+                return fallback()
             bigimgpath = self.parser.imginfo.get(msg.msgSvrId)
-            fnames = [k for k in [imgpath, bigimgpath] if k is not None]
+            fnames = [k for k in [imgpath, bigimgpath] if k]
+            assert len(fnames) > 0, msg.msg_str()
             bigimg, smallimg = self.res.get_img(fnames)
             if not smallimg:
                 logger.warn("No image thumbnail found for {}".format(imgpath))

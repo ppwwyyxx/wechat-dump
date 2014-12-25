@@ -20,7 +20,6 @@
 	+ `adb pull /data/data/com.tencent.mm/shared_prefs/system_config_prefs.xml`;
 	`grep 'default_uin' system_config_prefs.xml | grep -o 'value="[0-9]*' | cut -c 8-`
 
-
 + Get phone IMEI, possible ways are:
 	+ Call `*#06#` on your phone
 	+ Find IMEI in system settings

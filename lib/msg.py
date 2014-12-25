@@ -1,11 +1,13 @@
 #!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
 # File: msg.py
-# Date: Wed Dec 24 22:00:42 2014 +0800
+# Date: Thu Dec 25 09:56:24 2014 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
+import re
 from datetime import datetime
 from pyquery import PyQuery
+
 from .utils import ensure_bin_str, ensure_unicode
 
 TYPE_MSG = 1
@@ -66,7 +68,14 @@ class WeChatMsg(object):
         elif self.type == TYPE_VIDEO:
             return "VIDEO FILE"
         elif self.type == TYPE_NAMECARD:
-            pq = PyQuery(self.content)
+            try:
+                pq = PyQuery(self.content)
+            except ValueError:
+                # pq doesn't support xml
+                pat = re.compile('<msg.*<\/msg>', re.DOTALL)
+                msg = pat.search(self.content).group()
+                pq = PyQuery(msg)
+
             msg = pq('msg').attr
             name = msg['nickname']
             if not name:
