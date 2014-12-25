@@ -5,8 +5,7 @@
 #### Install Dependencies:
 + python-PIL
 + [PyQuery](https://pypi.python.org/pypi/pyquery/1.2.1)
-+ [eyed3](http://eyed3.nicfit.net/)
-+ sox
++ pysox(https://pypi.python.org/pypi/pysox/0.3.6.alpha)
 + python-csscompressor(optional)
 
 #### Get Necessary Data:

@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
 # File: res.py
-# Date: Thu Dec 25 10:04:29 2014 +0800
+# Date: Thu Dec 25 23:19:32 2014 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
 import glob
@@ -14,9 +14,10 @@ import logging
 import imghdr
 logger = logging.getLogger(__name__)
 
-import eyed3
+import pysox
 
-from lib.avatar import AvatarReader
+from .avatar import AvatarReader
+from .utils import timing
 
 LIB_PATH = os.path.dirname(os.path.abspath(__file__))
 INTERNAL_EMOJI_DIR = os.path.join(LIB_PATH, 'static', 'internal_emoji')
@@ -53,21 +54,25 @@ class Resource(object):
                     "Error interpreting the protocol, this is a bug!"
                 self.speak_data[key] = full_path
 
+    @timing(total=True)
     def get_voice_mp3(self, imgpath):
         """ return base64 string, and voice duration"""
         amr_fpath = self.speak_data[imgpath]
         assert amr_fpath.endswith('.amr')
         mp3_file = os.path.join('/tmp',
                                 os.path.basename(amr_fpath)[:-4] + '.mp3')
-        # TODO is there a library to use?
-        ret = os.system('sox {} {}'.format(amr_fpath, mp3_file))
-        if ret != 0:
-            logger.warn("Sox Failed!")
-            return ""
-        mp3_string = open(mp3_file, 'rb').read()
-        duration = eyed3.load(mp3_file).info.time_secs
+
+        infile = pysox.CSoxStream(amr_fpath)
+        outfile = pysox.CSoxStream(mp3_file, 'w', infile.get_signal())
+        chain = pysox.CEffectsChain(infile, outfile)
+        chain.flow_effects()
+        outfile.close()
+
+        signal = infile.get_signal().get_signalinfo()
+        duration = signal['length'] * 1.0 / signal['rate']
+        mp3_string = Resource.get_file_b64(mp3_file)
         os.unlink(mp3_file)
-        return base64.b64encode(mp3_string), duration
+        return mp3_string, duration
 
     @staticmethod
     def get_file_b64(fname):
