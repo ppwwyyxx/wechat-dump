@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
 # File: utils.py
-# Date: Mon Dec 22 23:24:02 2014 +0800
+# Date: Thu Dec 25 10:11:21 2014 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
 import sys
@@ -62,3 +62,52 @@ class ProgressReporter(object):
         self._fout.write('\n')
         self._fout.flush()
         return self.total_time
+
+
+
+import multiprocessing
+from multiprocessing import Process, Queue
+from collections import deque
+import inspect
+import dill
+class PickleableMethodProxy(object):
+    def __init__(self, func):
+        self.data = dill.dumps(func)
+        return
+        assert inspect.ismethod(func)
+        self.im_self = func.im_self
+        self.method_name = func.__name__
+
+    def __call__(self, *args, **kwargs):
+        return dill.loads(self.data)(*args, **kwargs)
+        return getattr(self.im_self, self.method_name)(*args, **kwargs)
+
+
+def ensure_pickleable_func(func):
+    if inspect.ismethod(func):
+        return PickleableMethodProxy(func)
+    return func
+
+def pimap(map_func, iterator, nr_proc=None, nr_precompute=None):
+    '''parallel imap'''
+    map_func = ensure_pickleable_func(map_func)
+    if nr_proc is None:
+        nr_proc = multiprocessing.cpu_count()
+    if nr_precompute is None:
+        nr_precompute = nr_proc * 2
+
+    pool = multiprocessing.Pool(nr_proc)
+    results = deque()
+    for i in iterator:
+        results.append(pool.apply_async(map_func, [i]))
+        if len(results) == nr_precompute:
+            yield results.popleft().get()
+    for r in results:
+        yield r.get()
+    pool.close()
+    pool.join()
+    pool.terminate()
+
+def pmap(map_func, iterator, nr_proc=None, nr_precompute=None):
+    '''parallel map'''
+    return list(pimap(map_func, iterator, nr_proc, nr_precompute))

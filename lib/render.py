@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
 # File: render.py
-# Date: Thu Dec 25 10:01:58 2014 +0800
+# Date: Thu Dec 25 10:18:20 2014 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
 import os
@@ -20,7 +20,7 @@ except:
     css_compress = lambda x: x
 
 from .msg import *
-from .utils import ensure_unicode, ProgressReporter
+from .utils import ensure_unicode, ProgressReporter, pmap
 from .smiley import SmileyProvider
 from .msgslice import MessageSlicerByTime, MessageSlicerBySize
 
