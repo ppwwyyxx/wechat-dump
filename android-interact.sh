@@ -1,9 +1,9 @@
 #!/bin/bash -e
 # File: android-interact.sh
-# Date: Thu Dec 25 00:25:07 2014 +0800
+# Date: Thu Dec 25 23:26:56 2014 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
-# Please check that your path is the same, since this might be differnt on devices
+# Please check that your path is the same, since this might be different among devices
 RES_DIR="/mnt/sdcard/tencent/MicroMsg"
 MM_DIR="/data/data/com.tencent.mm"
 
@@ -43,17 +43,16 @@ elif [[ $1 == "db" || $1 == "res" ]]; then
 		echo "Pulling resources... this might take a long time..."
 		mkdir resource
 		cd resource
-		adb pull $RES_DIR/$chooseUser/image2
-		adb pull $RES_DIR/$chooseUser/voice2
-		adb pull $RES_DIR/$chooseUser/emoji
-		adb pull $RES_DIR/$chooseUser/avatar
-		[[ -d image2 && -d voice2 && -d emoji && -d avatar ]] && {
-			echo "Resource pulled."
-			echo "Total size: $(du -sh $chooseUser | cut -f1)"
-		} || {
-			echo "Failed to download resource directory: $RES_DIR/$chooseUser"
-			exit 1
-		}
+		for d in image2 voice2 emoji avatar; do
+			adb pull $RES_DIR/$chooseUser/$d
+			[[ -d $d ]] || {
+				echo "Failed to download resource directory: $RES_DIR/$chooseUser/$d"
+				exit 1
+			}
+		done
+		cd ..
+		echo "Resource pulled at ./resource"
+		echo "Total size: $(du -sh resource | cut -f1)"
 	else
 		echo "Pulling database file..."
 		adb pull $MM_DIR/MicroMsg/$chooseUser/EnMicroMsg.db

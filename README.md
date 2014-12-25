@@ -25,7 +25,7 @@
 	+ `adb shell dumpsys iphonesubinfo | grep 'Device ID' | grep -o '[0-9]*'`
 
 #### Run:
-+ Decrypt database, will produce decrypted_db.db (for now, Linux x64 only):
++ Decrypt database, will produce decrypted_db.db (for now, Linux only):
 ```
 ./decrypt_db.sh <path to EnMicroMsg.db> <imei> <uin>
 ```
@@ -41,6 +41,5 @@
 ### TODO
 + Group message
 + Change max size for custom emoji
-+ Fix smiley spacing in html
 + Show name of emoji in text output
 + Search by uid/username..

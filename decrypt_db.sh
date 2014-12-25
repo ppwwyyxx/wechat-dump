@@ -1,11 +1,12 @@
 #!/bin/bash -e
 # File: decrypt_db.sh
-# Date: Thu Dec 25 00:30:10 2014 +0800
+# Date: Fri Dec 26 00:16:12 2014 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
-MMSGDB=$1
+MSGDB=$1
 imei=$2
 uin=$3
+output=decrypted.db
 
 if [[ -z "$1" || -z "$2" || -z "$3" ]]; then
 	echo "Usage: $0 <path to EnMicroMsg.db> <imei> <uin>"
@@ -15,11 +16,21 @@ fi
 KEY=$(echo -n "$imei$uin" | md5sum | cut -b 1-7)
 echo "KEY: $KEY"
 
-export LD_LIBRARY_PATH=./lib
-./lib/sqlcipher $MMSGDB << EOF
+uname -m | grep x86_64 > /dev/null || version=32bit && version=64bit
+echo "Use $version sqlcipher."
+
+echo "Dump decrypted database... "
+echo "Don't worry about libcrypt.so version warning."
+
+
+SQLCIPHER=./sqlcipher/$version
+export LD_LIBRARY_PATH=$SQLCIPHER
+$SQLCIPHER/sqlcipher $MSGDB << EOF
 PRAGMA key='$KEY';
 PRAGMA cipher_use_hmac = off;
-ATTACH DATABASE "decrypted_database.db" AS decrypted_db KEY "";
-SELECT sqlcipher_export("decrypted_db");
-DETACH DATABASE decrypted_db;
+ATTACH DATABASE "$output" AS db KEY "";
+SELECT sqlcipher_export("db");
+DETACH DATABASE db;
 EOF
+
+echo "Database dumped to $output"
