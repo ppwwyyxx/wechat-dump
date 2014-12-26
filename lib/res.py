@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
 # File: res.py
-# Date: Thu Dec 25 23:19:32 2014 +0800
+# Date: Sat Dec 27 00:06:26 2014 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
 import glob
@@ -54,7 +54,6 @@ class Resource(object):
                     "Error interpreting the protocol, this is a bug!"
                 self.speak_data[key] = full_path
 
-    @timing(total=True)
     def get_voice_mp3(self, imgpath):
         """ return base64 string, and voice duration"""
         amr_fpath = self.speak_data[imgpath]

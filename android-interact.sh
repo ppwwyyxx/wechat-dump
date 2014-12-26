@@ -1,6 +1,6 @@
 #!/bin/bash -e
 # File: android-interact.sh
-# Date: Thu Dec 25 23:26:56 2014 +0800
+# Date: Sat Dec 27 00:04:17 2014 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
 # Please check that your path is the same, since this might be different among devices
@@ -41,14 +41,15 @@ elif [[ $1 == "db" || $1 == "res" ]]; then
 
 	if [[ $1 == "res" ]]; then
 		echo "Pulling resources... this might take a long time..."
-		mkdir resource
-		cd resource
+		mkdir resource; cd resource
 		for d in image2 voice2 emoji avatar; do
+			mkdir $d; cd $d
 			adb pull $RES_DIR/$chooseUser/$d
 			[[ -d $d ]] || {
 				echo "Failed to download resource directory: $RES_DIR/$chooseUser/$d"
 				exit 1
 			}
+			cd ..
 		done
 		cd ..
 		echo "Resource pulled at ./resource"
