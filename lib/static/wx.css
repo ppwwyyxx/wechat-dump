@@ -1626,6 +1626,10 @@ a.btnSecondary:active {
     max-width: 200px;
     max-height: 150px;
 }
+.cloudContent img.emojiImg {
+    max-width: 200px;
+    max-height: 120px;
+}
 .chatItem .cloudMesg .cloudMesgPanel .cloudMesgContent p {
   color: #1F252B;
   width: 100%;
@@ -5315,8 +5319,7 @@ a.btnBlue:active .btnBluePanel {
   cursor: pointer;
 }
 .you .cloudImg .cloudContent {
-  padding: 5px 13px\9;
-  padding: 6px;
+  padding: 3px;
   color: #030303;
 }
 .you .cloudImg .img_wrap{
@@ -5537,8 +5540,7 @@ a.btnBlue:active .btnBluePanel {
   _display: none;
 }
 .me .cloudImg .cloudContent {
-  padding: 7px;
-  padding: 5px\9;
+  padding: 3px;
   border: none;
   border-radius: 8px\9;
 }

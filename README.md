@@ -10,19 +10,17 @@
 
 #### Get Necessary Data:
 + Get /data/data/com.tencent.mm/MicroMsg/long-long-name/EnMicroMsg.db from root filesystem, possible ways are:
-	+ `adb root`; `adb pull /data/data/com.tencent.mm/MicroMsg/long-long-name/EnMicroMsg.db`
+	+ `./android-interact.sh db`
 	+ Use your rooted file system manager app
-+ Get WeChat user resource directory from user filesystem, possible ways:
-	+ `adb pull /mnt/sdcard/tencent/MicroMsg/long-long-name` # location could be different
++ Get WeChat user resource directory from your phone:
+	+ `./android-interact.sh res`		# you might need to specify a location if the default doesn't work
 + Get Wechat uin, possible ways are:
-	+ Login to [web-based wechat](https://wx.qq.com); get wxuin=1234567 from `document.cookie`
-	+ `adb pull /data/data/com.tencent.mm/shared_prefs/system_config_prefs.xml`;
-	`grep 'default_uin' system_config_prefs.xml | grep -o 'value="[0-9]*' | cut -c 8-`
-
+	+ `./android-interact.sh uin`
+	+ Login to [web wechat](https://wx.qq.com), get wxuin=1234567 from `document.cookie`
 + Get phone IMEI, possible ways are:
+	+ `./android-interact.sh imei`
 	+ Call `*#06#` on your phone
 	+ Find IMEI in system settings
-	+ `adb shell dumpsys iphonesubinfo | grep 'Device ID' | grep -o '[0-9]*'`
 
 #### Run:
 + Decrypt database, will produce decrypted_db.db (for now, Linux only):
