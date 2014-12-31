@@ -9,7 +9,7 @@
 + python-csscompressor(optional)
 
 #### Get Necessary Data:
-+ Get /data/data/com.tencent.mm/MicroMsg/long-long-name/EnMicroMsg.db from root filesystem, possible ways are:
++ Get /data/data/com.tencent.mm/MicroMsg/long-long-name/EnMicroMsg.db from *root* filesystem, possible ways are:
 	+ `./android-interact.sh db`
 	+ Use your rooted file system manager app
 + Get WeChat user resource directory from your phone:
@@ -38,6 +38,5 @@
 
 ### TODO
 + Group message
-+ Change max size for custom emoji
 + Show name of emoji in text output
 + Search by uid/username..
