@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
 # File: render.py
-# Date: Fri Jan 02 23:23:51 2015 +0800
+# Date: Fri Jan 02 23:29:32 2015 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
 import os
@@ -11,13 +11,14 @@ import logging
 logger = logging.getLogger(__name__)
 
 LIB_PATH = os.path.dirname(os.path.abspath(__file__))
-HTML_FILE = os.path.join(LIB_PATH, 'static', 'template.html')
-FRIEND_AVATAR_CSS_FILE = os.path.join(LIB_PATH, 'static', 'avatar.css.tpl')
-TIME_HTML_FILE = os.path.join(LIB_PATH, 'static', 'TP_TIME.html')
+STATIC_PATH = os.path.join(LIB_PATH, 'static')
+HTML_FILE = os.path.join(STATIC_PATH, 'TP_INDEX.html')
+TIME_HTML_FILE = os.path.join(STATIC_PATH, 'TP_TIME.html')
+FRIEND_AVATAR_CSS_FILE = os.path.join(STATIC_PATH, 'avatar.css.tpl')
 
 try:
     from csscompressor import compress as css_compress
-except:
+except ImportError:
     css_compress = lambda x: x
 
 from .msg import *
@@ -30,7 +31,7 @@ TEMPLATES_FILES = {TYPE_MSG: "TP_MSG",
                    TYPE_SPEAK: "TP_SPEAK",
                    TYPE_EMOJI: "TP_EMOJI",
                    TYPE_LINK: "TP_MSG"}
-TEMPLATES = {k: ensure_unicode(open(os.path.join(LIB_PATH, 'static/{}.html'.format(v))).read())
+TEMPLATES = {k: ensure_unicode(open(os.path.join(STATIC_PATH, '{}.html'.format(v))).read())
     for k, v in TEMPLATES_FILES.iteritems()}
 
 class HTMLRender(object):
@@ -58,20 +59,16 @@ class HTMLRender(object):
             self.js_string.append(js)
 
     def get_all_css(self):
-        ret = []
-        for css in self.css_string:
+        def process(css):
             css = css_compress(css)
-            css = u'<style type="text/css">{}</style>'.format(css)
-            ret.append(css)
-        return u"\n".join(ret)
+            return u'<style type="text/css">{}</style>'.format(css)
+        return u"\n".join(map(process, self.css_string))
 
     def get_all_js(self):
-        ret = []
-        for js in self.js_string:
-            ## TODO: add js compress
-            js = u'<script type="text/javascript">{}</script>'.format(js)
-            ret.append(js)
-        return u"\n".join(ret)
+        def process(js):
+            # TODO: add js compress
+            return u'<script type="text/javascript">{}</script>'.format(js)
+        return u"\n".join(map(process, self.js_string))
 
     def render_msg(self, msg):
         """ render a message, return the html block"""
