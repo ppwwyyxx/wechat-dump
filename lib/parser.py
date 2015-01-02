@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
 # File: parser.py
-# Date: Thu Dec 25 00:34:35 2014 +0800
+# Date: Fri Jan 02 23:02:25 2015 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
 import sqlite3

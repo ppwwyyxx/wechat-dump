@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
 # File: render.py
-# Date: Thu Dec 25 22:05:41 2014 +0800
+# Date: Fri Jan 02 23:23:51 2015 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
 import os
@@ -12,6 +12,7 @@ logger = logging.getLogger(__name__)
 
 LIB_PATH = os.path.dirname(os.path.abspath(__file__))
 HTML_FILE = os.path.join(LIB_PATH, 'static', 'template.html')
+FRIEND_AVATAR_CSS_FILE = os.path.join(LIB_PATH, 'static', 'avatar.css.tpl')
 TIME_HTML_FILE = os.path.join(LIB_PATH, 'static', 'TP_TIME.html')
 
 try:
@@ -42,32 +43,35 @@ class HTMLRender(object):
             logger.warn("Resource Directory not given. Images / Voice Message won't be displayed.")
         self.smiley = SmileyProvider()
 
-        csss = glob.glob(os.path.join(LIB_PATH, 'static/*.css'))
-        css_string = []
-        for css in csss:
+        css_files = glob.glob(os.path.join(LIB_PATH, 'static/*.css'))
+        self.css_string = []    # css to add
+        for css in css_files:
             logger.info("Loading {}".format(os.path.basename(css)))
-            css = ensure_unicode(css_compress(open(css).read()))
-            css = u'<style type="text/css">{}</style>'.format(css)
-            css_string.append(css)
-        self.css_string = u"\n".join(css_string)
+            css = ensure_unicode((open(css).read()))
+            self.css_string.append(css)
 
-        jss = glob.glob(os.path.join(LIB_PATH, 'static/*.js'))
-        js_string = []
-        for js in jss:
+        js_files = glob.glob(os.path.join(LIB_PATH, 'static/*.js'))
+        self.js_string = []
+        for js in js_files:
             logger.info("Loading {}".format(os.path.basename(js)))
             js = ensure_unicode(open(js).read())
-            # TODO: add js compress
-            js = u'<script type="text/javascript">{}</script>'.format(js)
-            js_string.append(js)
-        self.js_string = u"\n".join(js_string)
+            self.js_string.append(js)
 
-    def get_avatar_pair(self, username):
-        """ return base64 string pair of two avatars"""
-        if self.res is None:
-            return ("", "")
-        avt1 = self.res.get_avatar(self.parser.username)
-        avt2 = self.res.get_avatar(username)
-        return (avt1, avt2)
+    def get_all_css(self):
+        ret = []
+        for css in self.css_string:
+            css = css_compress(css)
+            css = u'<style type="text/css">{}</style>'.format(css)
+            ret.append(css)
+        return u"\n".join(ret)
+
+    def get_all_js(self):
+        ret = []
+        for js in self.js_string:
+            ## TODO: add js compress
+            js = u'<script type="text/javascript">{}</script>'.format(js)
+            ret.append(js)
+        return u"\n".join(ret)
 
     def render_msg(self, msg):
         """ render a message, return the html block"""
@@ -144,16 +148,23 @@ class HTMLRender(object):
             blocks.extend([self.render_msg(m) for m in slice])
             self.prgs.trigger(len(slice))
 
-        return self.html.format(extra_css=self.css_string,
-                                extra_js=self.js_string,
+        return self.html.format(extra_css=self.get_all_css(),
+                                extra_js=self.get_all_js(),
                                 talker=msgs[0].talker_name,
-                                messages=u''.join(blocks),
-                                avatars=self.avatars)
+                                messages=u''.join(blocks)
+                               )
+
+    def prepare_avatar_css(self, talker_name):
+        avatars = (self.res.get_avatar(self.parser.username),
+                   self.res.get_avatar(talker_name))
+        avatar_css = open(FRIEND_AVATAR_CSS_FILE).read().format(avatars=avatars)
+        self.css_string.append(avatar_css)
 
     def render_msgs(self, msgs):
         """ render msgs of one friend, return a list of html"""
         talker_name = msgs[0].talker
-        self.avatars = self.get_avatar_pair(talker_name)
+        self.prepare_avatar_css(talker_name)
+
         logger.info(u"Rendering {} messages of {}({})".format(
             len(msgs), self.parser.contacts[talker_name], talker_name))
 

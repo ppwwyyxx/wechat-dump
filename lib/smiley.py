@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
 # File: smiley.py
-# Date: Wed Dec 24 22:16:33 2014 +0800
+# Date: Wed Dec 31 23:33:07 2014 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
 import os
