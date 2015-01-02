@@ -1,6 +1,6 @@
 #!/bin/bash -e
 # File: decrypt_db.sh
-# Date: Fri Dec 26 00:16:12 2014 +0800
+# Date: Wed Dec 31 23:38:16 2014 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
 MSGDB=$1
@@ -33,4 +33,4 @@ SELECT sqlcipher_export("db");
 DETACH DATABASE db;
 EOF
 
-echo "Database dumped to $output"
+echo "Database successfully dumped to $output"

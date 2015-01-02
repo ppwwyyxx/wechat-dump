@@ -1,7 +1,10 @@
 #!/bin/bash -e
 # File: android-interact.sh
-# Date: Wed Dec 31 23:27:47 2014 +0800
+# Date: Wed Dec 31 23:42:08 2014 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
+PROG_NAME=`readlink -f "$0"`
+PROG_DIR=`dirname "$PROG_NAME"`
+cd "$PROG_DIR"
 
 # Please check that your path is the same, since this might be different among devices
 RES_DIR="/mnt/sdcard/tencent/MicroMsg"
@@ -63,8 +66,21 @@ elif [[ $1 == "db" || $1 == "res" ]]; then
 			exit 1
 		}
 	fi
+elif [[ $1 == "all" ]]; then
+	echo "Getting uin..."
+	$0 uin | tail -n1 | grep -o '[0-9]*' > /tmp/uin
+	echo "Getting imei..."
+	$0 imei | tail -n1 | grep -o '[0-9]*' > /tmp/imei
+	echo "Getting db..."
+	$0 db
+	echo "Decrypting db..."
+	./decrypt_db.sh EnMicroMsg.db $(</tmp/imei) $(</tmp/uin)
+	rm /tmp/{uin,imei}
+	echo "Getting res..."
+	$0 res
+	echo "Done"
 else
-	echo "Usage: $0 <imei|uin|db|res>"
+	echo "Usage: $0 <imei|uin|db|res|all>"
 	exit 1
 fi
 
