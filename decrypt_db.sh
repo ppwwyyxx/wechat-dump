@@ -1,6 +1,6 @@
 #!/bin/bash -e
 # File: decrypt_db.sh
-# Date: Wed Jan 07 22:08:56 2015 +0800
+# Date: Wed Jan 07 22:34:45 2015 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
 MSGDB=$1

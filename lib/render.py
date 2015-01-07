@@ -1,13 +1,14 @@
 #!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
 # File: render.py
-# Date: Wed Jan 07 22:03:53 2015 +0800
+# Date: Wed Jan 07 23:43:59 2015 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
 import os
 import base64
 import glob
 import logging
+from pyquery import PyQuery
 logger = logging.getLogger(__name__)
 
 LIB_PATH = os.path.dirname(os.path.abspath(__file__))
@@ -30,6 +31,7 @@ TEMPLATES_FILES = {TYPE_MSG: "TP_MSG",
                    TYPE_IMG: "TP_IMG",
                    TYPE_SPEAK: "TP_SPEAK",
                    TYPE_EMOJI: "TP_EMOJI",
+                   TYPE_CUSTOM_EMOJI: "TP_IMG",
                    TYPE_LINK: "TP_MSG"}
 TEMPLATES = {k: ensure_unicode(open(os.path.join(STATIC_PATH, '{}.html'.format(v))).read())
     for k, v in TEMPLATES_FILES.iteritems()}
@@ -72,6 +74,7 @@ class HTMLRender(object):
 
     def render_msg(self, msg):
         """ render a message, return the html block"""
+        # TODO for chatroom, add nickname on avatar
         sender = u'you ' + msg.get_msg_talker_id() if not msg.isSend else 'me'
         format_dict = {'sender_label': sender,
                        'time': msg.createTime }
@@ -81,10 +84,7 @@ class HTMLRender(object):
             format_dict['content'] = self.smiley.replace_smileycode(content)
             return template.format(**format_dict)
 
-        if msg.type not in TEMPLATES:
-            return fallback()
-
-        template = TEMPLATES[msg.type]
+        template = TEMPLATES.get(msg.type)
         if msg.type == TYPE_SPEAK:
             audio_str, duration = self.res.get_voice_mp3(msg.imgPath)
             format_dict['voice_duration'] = duration
@@ -104,20 +104,26 @@ class HTMLRender(object):
                 return fallback()
             # TODO do not show fancybox when no bigimg found
             format_dict['small_img'] = smallimg
-            format_dict['big_img'] = bigimg
+            format_dict['big_img'] = (bigimg, 'jpeg')
             return template.format(**format_dict)
         elif msg.type == TYPE_EMOJI:
-            imgpath = msg.imgPath
-            if imgpath in self.parser.internal_emojis:
-                emoji_img, format = self.res.get_internal_emoji(self.parser.internal_emojis[imgpath])
+            md5 = msg.imgPath
+            if md5 in self.parser.internal_emojis:
+                emoji_img, format = self.res.get_internal_emoji(self.parser.internal_emojis[md5])
             else:
-                if imgpath in self.parser.emojis:
-                    group, _ = self.parser.emojis[imgpath]
+                if md5 in self.parser.emojis:
+                    group, _ = self.parser.emojis[md5]
                 else:
                     group = None
-                emoji_img, format = self.res.get_emoji(imgpath, group)
+                emoji_img, format = self.res.get_emoji(md5, group)
             format_dict['emoji_format'] = format
             format_dict['emoji_img'] = emoji_img
+            return template.format(**format_dict)
+        elif msg.type == TYPE_CUSTOM_EMOJI:
+            pq = PyQuery(msg.content)
+            md5 = pq('emoticonmd5').text()
+            format_dict['big_img'] = self.res.get_emoji(md5, None)
+            format_dict['small_img'] = format_dict['big_img'][0]
             return template.format(**format_dict)
         elif msg.type == TYPE_LINK:
             content = msg.msg_str()
