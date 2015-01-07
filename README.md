@@ -43,6 +43,7 @@ This tool can parse and dump WeChat chat history on a rooted android phone.
 + Add nickname in chatroom
 + Show name of emoji in text output
 + Search by uid/username
++ Skip existing files when copying android resources
 + Better user experiences... see TODOs
 
 ### Disclaimers
