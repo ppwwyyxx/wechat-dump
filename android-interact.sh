@@ -1,6 +1,6 @@
 #!/bin/bash -e
 # File: android-interact.sh
-# Date: Wed Dec 31 23:42:08 2014 +0800
+# Date: Wed Jan 07 21:57:59 2015 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 PROG_NAME=`readlink -f "$0"`
 PROG_DIR=`dirname "$PROG_NAME"`
@@ -45,7 +45,7 @@ elif [[ $1 == "db" || $1 == "res" ]]; then
 	if [[ $1 == "res" ]]; then
 		echo "Pulling resources... this might take a long time..."
 		mkdir -p resource; cd resource
-		for d in image2 voice2 emoji avatar; do
+		for d in image2 voice2 emoji avatar video; do
 			mkdir -p $d; cd $d
 			adb pull $RES_DIR/$chooseUser/$d
 			cd ..

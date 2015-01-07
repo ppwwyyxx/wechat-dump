@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
 # File: render.py
-# Date: Fri Jan 02 23:29:32 2015 +0800
+# Date: Wed Jan 07 22:01:33 2015 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
 import os
@@ -72,7 +72,7 @@ class HTMLRender(object):
 
     def render_msg(self, msg):
         """ render a message, return the html block"""
-        sender = 'you' if not msg.isSend else 'me'
+        sender = u'you ' + msg.get_msg_talker_id() if not msg.isSend else 'me'
         format_dict = {'sender_label': sender,
                        'time': msg.createTime }
         def fallback():
@@ -121,6 +121,7 @@ class HTMLRender(object):
             return template.format(**format_dict)
         elif msg.type == TYPE_LINK:
             content = msg.msg_str()
+            # TODO show a short link with long href, if link too long
             if content.startswith(u'URL:'):
                 url = content[4:]
                 content = u'URL:<a target="_blank" href="{0}">{0}</a>'.format(url)
@@ -151,19 +152,29 @@ class HTMLRender(object):
                                 messages=u''.join(blocks)
                                )
 
-    def prepare_avatar_css(self, talker_name):
-        avatars = (self.res.get_avatar(self.parser.username),
-                   self.res.get_avatar(talker_name))
-        avatar_css = open(FRIEND_AVATAR_CSS_FILE).read().format(avatars=avatars)
-        self.css_string.append(avatar_css)
+    def prepare_avatar_css(self, talkers):
+        avatar_tpl= ensure_unicode(open(FRIEND_AVATAR_CSS_FILE).read())
+        my_avatar = self.res.get_avatar(self.parser.username)
+        css = avatar_tpl.format(name='me', avatar=my_avatar)
+
+        for talker in talkers:
+            avatar = self.res.get_avatar(talker)
+            css += avatar_tpl.format(name=talker, avatar=avatar)
+        self.css_string.append(css)
 
     def render_msgs(self, msgs):
         """ render msgs of one friend, return a list of html"""
-        talker_name = msgs[0].talker
-        self.prepare_avatar_css(talker_name)
+        talker_id = msgs[0].talker
+        if msgs[0].is_chatroom():
+            talkers = set()
+            for msg in msgs:
+                talkers.add(msg.get_msg_talker_id())
+        else:
+            talkers = set([talker_id])
+        self.prepare_avatar_css(talkers)
 
         logger.info(u"Rendering {} messages of {}({})".format(
-            len(msgs), self.parser.contacts[talker_name], talker_name))
+            len(msgs), self.parser.contacts[talker_id], talker_id))
 
         self.prgs = ProgressReporter("Render", total=len(msgs))
         slice_by_size = MessageSlicerBySize().slice(msgs)
