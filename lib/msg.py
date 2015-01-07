@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
 # File: msg.py
-# Date: Thu Dec 25 09:56:24 2014 +0800
+# Date: Wed Jan 07 22:00:37 2015 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
 import re
@@ -14,11 +14,12 @@ TYPE_MSG = 1
 TYPE_IMG = 3
 TYPE_SPEAK = 34
 TYPE_NAMECARD = 42
-TYPE_VIDEO = 43
+TYPE_VIDEO_FILE = 43
 TYPE_EMOJI = 47
 TYPE_LOCATION = 48
 TYPE_LINK = 49  # link share OR file from web
 TYPE_VOIP = 50
+TYPE_WX_VIDEO = 62  # video took by wechat
 TYPE_SYSTEM = 10000
 
 class WeChatMsg(object):
@@ -65,8 +66,10 @@ class WeChatMsg(object):
                         u"No title or url found in TYPE_LINK: {}".format(self.content)
                 return u"FILE:{}".format(title)
             return u"URL:{}".format(url)
-        elif self.type == TYPE_VIDEO:
+        elif self.type == TYPE_VIDEO_FILE:
             return "VIDEO FILE"
+        elif self.type == TYPE_WX_VIDEO:
+            return "WeChat VIDEO"
         elif self.type == TYPE_NAMECARD:
             try:
                 pq = PyQuery(self.content)
@@ -85,9 +88,15 @@ class WeChatMsg(object):
             return u"NAMECARD: {}".format(name)
         elif self.type == TYPE_EMOJI:
             # TODO add emoji name
-            return self.content
+            return self.content_no_first_line
         else:
+            return self.content_no_first_line
+
+    @property
+    def content_no_first_line(self):
+        if not self.is_chatroom():
             return self.content
+        return self.content[self.content.find('\n')+1:]
 
     def __repr__(self):
         ret = u"{}|{}:{}:{}".format(
@@ -105,6 +114,14 @@ class WeChatMsg(object):
     def __lt__(self, r):
         return self.createTime < r.createTime
 
+    def is_chatroom(self):
+        return self.talker.endswith('@chatroom')
+
+    def get_msg_talker_id(self):
+        if not self.is_chatroom():
+            return self.talker
+        return self.content[:self.content.find(':')]
+
     def get_emoji_product_id(self):
         assert self.type == TYPE_EMOJI, "Wrong call to get_emoji_product_id()!"
         pq = PyQuery(self.content)
@@ -112,3 +129,4 @@ class WeChatMsg(object):
         if not emoji:
             return None
         return emoji.attrs['productid']
+

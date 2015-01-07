@@ -1,12 +1,13 @@
 #!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
 # File: res.py
-# Date: Sat Dec 27 00:06:26 2014 +0800
+# Date: Wed Jan 07 21:21:39 2015 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
 import glob
 import os
 import re
+# TODO: perhaps we don't need to introduce PIL and numpy. libjpeg might be enough
 import Image
 import cStringIO
 import base64
