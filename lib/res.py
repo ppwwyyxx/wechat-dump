@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
 # File: res.py
-# Date: Thu Jan 08 00:08:43 2015 +0800
+# Date: Thu Jan 08 00:52:13 2015 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
 import glob
@@ -13,6 +13,7 @@ import cStringIO
 import base64
 import logging
 import imghdr
+from multiprocessing import Pool
 logger = logging.getLogger(__name__)
 
 import pysox
@@ -26,6 +27,24 @@ VOICE_DIRNAME = 'voice2'
 IMG_DIRNAME = 'image2'
 EMOJI_DIRNAME = 'emoji'
 JPEG_QUALITY = 50
+
+def do_get_voice_mp3(amr_fpath):
+    """ return base64 string, and voice duration"""
+    assert amr_fpath.endswith('.amr')
+    mp3_file = os.path.join('/tmp',
+                            os.path.basename(amr_fpath)[:-4] + '.mp3')
+
+    infile = pysox.CSoxStream(amr_fpath)
+    outfile = pysox.CSoxStream(mp3_file, 'w', infile.get_signal())
+    chain = pysox.CEffectsChain(infile, outfile)
+    chain.flow_effects()
+    outfile.close()
+
+    signal = infile.get_signal().get_signalinfo()
+    duration = signal['length'] * 1.0 / signal['rate']
+    mp3_string = Resource.get_file_b64(mp3_file)
+    os.unlink(mp3_file)
+    return mp3_string, duration
 
 class Resource(object):
     """ multimedia resources in chat"""
@@ -53,25 +72,19 @@ class Resource(object):
                     "Error interpreting the protocol, this is potentially a bug!"
                 self.speak_data[key] = full_path
 
-    #@timing(total=True)
+    @timing(total=True)
     def get_voice_mp3(self, imgpath):
-        """ return base64 string, and voice duration"""
-        amr_fpath = self.speak_data[imgpath]
-        assert amr_fpath.endswith('.amr')
-        mp3_file = os.path.join('/tmp',
-                                os.path.basename(amr_fpath)[:-4] + '.mp3')
+        idx = self.voice_cache_idx.get(imgpath)
+        if not idx:
+            return do_get_voice_mp3(self.speak_data[imgpath])
+        return self.voice_cache[idx].get()
 
-        infile = pysox.CSoxStream(amr_fpath)
-        outfile = pysox.CSoxStream(mp3_file, 'w', infile.get_signal())
-        chain = pysox.CEffectsChain(infile, outfile)
-        chain.flow_effects()
-        outfile.close()
-
-        signal = infile.get_signal().get_signalinfo()
-        duration = signal['length'] * 1.0 / signal['rate']
-        mp3_string = Resource.get_file_b64(mp3_file)
-        os.unlink(mp3_file)
-        return mp3_string, duration
+    def cache_voice_mp3(self, voice_paths):
+        """ for speed """
+        self.voice_cache_idx = {k: idx for idx, k in enumerate(voice_paths)}
+        pool = Pool(3)
+        self.voice_cache = [pool.apply_async(do_get_voice_mp3,
+                                             (self.speak_data[k],)) for k in voice_paths]
 
     @staticmethod
     def get_file_b64(fname):
