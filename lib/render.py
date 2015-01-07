@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
 # File: render.py
-# Date: Wed Jan 07 22:01:33 2015 +0800
+# Date: Wed Jan 07 22:03:53 2015 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
 import os
@@ -127,6 +127,9 @@ class HTMLRender(object):
                 content = u'URL:<a target="_blank" href="{0}">{0}</a>'.format(url)
                 format_dict['content'] = content
                 return template.format(**format_dict)
+        elif msg.type == TYPE_WX_VIDEO:
+            # TODO: fetch video from resource
+            return fallback()
         return fallback()
 
     def _render_partial_msgs(self, msgs):
