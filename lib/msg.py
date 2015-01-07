@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
 # File: msg.py
-# Date: Wed Jan 07 23:30:41 2015 +0800
+# Date: Wed Jan 07 23:59:45 2015 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
 import re
@@ -22,6 +22,8 @@ TYPE_VOIP = 50
 TYPE_WX_VIDEO = 62  # video took by wechat
 TYPE_SYSTEM = 10000
 TYPE_CUSTOM_EMOJI = 1048625
+TYPE_LOCATION_SHARING = -1879048186
+TYPE_APP_MSG = 16777265
 
 class WeChatMsg(object):
     FIELDS = ["msgSvrId","type","isSend","createTime","talker","content","imgPath"]
@@ -56,8 +58,6 @@ class WeChatMsg(object):
             except:
                 pass
             return "LOCATION:" + label + " ({},{})".format(loc['x'], loc['y'])
-        elif self.type == TYPE_VOIP:
-            return "REQUEST VIDEO CHAT"
         elif self.type == TYPE_LINK:
             pq = PyQuery(self.content)
             url = pq('url').text()
@@ -67,10 +67,6 @@ class WeChatMsg(object):
                         u"No title or url found in TYPE_LINK: {}".format(self.content)
                 return u"FILE:{}".format(title)
             return u"URL:{}".format(url)
-        elif self.type == TYPE_VIDEO_FILE:
-            return "VIDEO FILE"
-        elif self.type == TYPE_WX_VIDEO:
-            return "WeChat VIDEO"
         elif self.type == TYPE_NAMECARD:
             try:
                 pq = PyQuery(self.content)
@@ -87,10 +83,22 @@ class WeChatMsg(object):
             if not name:
                 name = ""
             return u"NAMECARD: {}".format(name)
+        elif self.type == TYPE_APP_MSG:
+            pq = PyQuery(self.content)
+            return pq('title').text()
+        elif self.type == TYPE_VIDEO_FILE:
+            return "VIDEO FILE"
+        elif self.type == TYPE_WX_VIDEO:
+            return "WeChat VIDEO"
+        elif self.type == TYPE_VOIP:
+            return "REQUEST VIDEO CHAT"
+        elif self.type == TYPE_LOCATION_SHARING:
+            return "LOCATION SHARING"
         elif self.type == TYPE_EMOJI:
             # TODO add emoji name
             return self.content_no_first_line
         else:
+            # TODO replace smiley with text
             return self.content_no_first_line
 
     @property

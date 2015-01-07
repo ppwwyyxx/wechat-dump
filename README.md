@@ -44,6 +44,7 @@ This tool can parse and dump WeChat chat history on a rooted android phone.
 + Skip existing files when copying android resources
 + Fix unhandled types: > 10000 and < 0
 + Better user experiences... see TODOs
++ Speed up html rendering by first loading all relevant voices in parallel
 
 ### Disclaimers
 Use this software at your own risk. The author is not responsible for any potential damage/loss/privacy

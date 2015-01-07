@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
 # File: msgslice.py
-# Date: Wed Dec 24 22:06:41 2014 +0800
+# Date: Thu Jan 08 00:15:49 2015 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
 class MessageSlicerByTime(object):

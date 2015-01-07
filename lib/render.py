@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
 # File: render.py
-# Date: Wed Jan 07 23:43:59 2015 +0800
+# Date: Thu Jan 08 00:22:33 2015 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
 import os
@@ -60,18 +60,27 @@ class HTMLRender(object):
             js = ensure_unicode(open(js).read())
             self.js_string.append(js)
 
-    def get_all_css(self):
+    @property
+    def all_css(self):
+        if hasattr(self, 'final_css'):
+            return self.final_css
         def process(css):
             css = css_compress(css)
             return u'<style type="text/css">{}</style>'.format(css)
-        return u"\n".join(map(process, self.css_string))
+        self.final_css = u"\n".join(map(process, self.css_string))
+        return self.final_css
 
-    def get_all_js(self):
+    @property
+    def all_js(self):
+        if hasattr(self, 'final_js'):
+            return self.final_js
         def process(js):
             # TODO: add js compress
             return u'<script type="text/javascript">{}</script>'.format(js)
-        return u"\n".join(map(process, self.js_string))
+        self.final_js = u"\n".join(map(process, self.js_string))
+        return self.final_js
 
+    #@timing(total=True)
     def render_msg(self, msg):
         """ render a message, return the html block"""
         # TODO for chatroom, add nickname on avatar
@@ -155,11 +164,12 @@ class HTMLRender(object):
             blocks.extend([self.render_msg(m) for m in slice])
             self.prgs.trigger(len(slice))
 
-        return self.html.format(extra_css=self.get_all_css(),
-                                extra_js=self.get_all_js(),
-                                talker=msgs[0].talker_name,
-                                messages=u''.join(blocks)
-                               )
+        # string operation is extremely slow
+        return self.html.format(extra_css=self.all_css,
+                            extra_js=self.all_js,
+                            talker=msgs[0].talker_name,
+                            messages=u''.join(blocks)
+                           )
 
     def prepare_avatar_css(self, talkers):
         avatar_tpl= ensure_unicode(open(FRIEND_AVATAR_CSS_FILE).read())
