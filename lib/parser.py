@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
 # File: parser.py
-# Date: Fri Jan 02 23:02:25 2015 +0800
+# Date: Wed Jan 07 23:29:50 2015 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
 import sqlite3
@@ -58,6 +58,8 @@ SELECT {} FROM message
             msg = WeChatMsg(row)
             if not WeChatMsg.filter_type(msg.type):
                 self.msgs_by_talker[msg.talker].append(msg)
+            #if msg.type > 10000 or msg.type < 0:
+                #print repr(msg).split('|')[0]
         self.msgs_by_talker = {self.contacts[k]: sorted(v, key=lambda x: x.createTime)
                            for k, v in self.msgs_by_talker.iteritems()}
         for k, v in self.msgs_by_talker.iteritems():

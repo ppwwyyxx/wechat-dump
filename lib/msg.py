@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
 # File: msg.py
-# Date: Wed Jan 07 22:00:37 2015 +0800
+# Date: Wed Jan 07 23:30:41 2015 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
 import re
@@ -21,13 +21,14 @@ TYPE_LINK = 49  # link share OR file from web
 TYPE_VOIP = 50
 TYPE_WX_VIDEO = 62  # video took by wechat
 TYPE_SYSTEM = 10000
+TYPE_CUSTOM_EMOJI = 1048625
 
 class WeChatMsg(object):
     FIELDS = ["msgSvrId","type","isSend","createTime","talker","content","imgPath"]
 
     @staticmethod
     def filter_type(tp):
-        if tp in [TYPE_SYSTEM] or tp > 10000 or tp < 0:
+        if tp in [TYPE_SYSTEM]:
             return True
         return False
 

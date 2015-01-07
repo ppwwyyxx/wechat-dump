@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
 # File: res.py
-# Date: Wed Jan 07 21:21:39 2015 +0800
+# Date: Wed Jan 07 22:30:40 2015 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
 import glob
@@ -34,8 +34,6 @@ class Resource(object):
         self.res_dir = res_dir
         self.img_dir = os.path.join(res_dir, IMG_DIRNAME)
         self.emoji_dir = os.path.join(res_dir, EMOJI_DIRNAME)
-        assert os.path.isdir(self.img_dir), \
-                     "No such directory: {}".format(self.img_dir)
         self.avt_reader = AvatarReader(self.res_dir)
         self.init()
 
@@ -52,7 +50,7 @@ class Resource(object):
                 full_path = os.path.join(root, f)
                 key = f[4:-4]  # msg_xxxxx.amr
                 assert len(key) == 26, \
-                    "Error interpreting the protocol, this is a bug!"
+                    "Error interpreting the protocol, this is potentially a bug!"
                 self.speak_data[key] = full_path
 
     def get_voice_mp3(self, imgpath):
@@ -163,9 +161,10 @@ class Resource(object):
         if len(candidates) > 1:
             # annimation
             candidates = [k for k in candidates if not re.match('.*_[0-9]+$', k)]
-            # only one file is the gif in need, others are frames and cover
+            # only one file is the gif in need, others are frames or cover
             if len(candidates) == 0:
                 # TODO stitch frames to gif
+                logger.warning("Cannot find emoji: {}".format(md5))
                 return None, None
         if not candidates:
             return None, None
