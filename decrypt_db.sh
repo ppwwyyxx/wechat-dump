@@ -1,6 +1,6 @@
 #!/bin/bash -e
 # File: decrypt_db.sh
-# Date: Wed Dec 31 23:38:16 2014 +0800
+# Date: Wed Jan 07 22:08:56 2015 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
 MSGDB=$1
@@ -12,6 +12,13 @@ if [[ -z "$1" || -z "$2" || -z "$3" ]]; then
 	echo "Usage: $0 <path to EnMicroMsg.db> <imei> <uin>"
 	exit
 fi
+
+if [[ -f $output ]]; then
+	echo "$output already exists. removed? (y/n)"
+	read r
+	[[ $r == "y" ]] && rm -v $output || exit 1
+fi
+
 
 KEY=$(echo -n "$imei$uin" | md5sum | cut -b 1-7)
 echo "KEY: $KEY"
