@@ -1,5 +1,8 @@
 ## Dump Wechat Messages from Android
 
+WeChat(微信), as the most popular mobile IM app in China, failed to allow users to export well-formatted chat history.
+This tool can parse and dump WeChat chat history on a rooted android phone.
+
 ### How to use:
 
 #### Install Dependencies:
@@ -40,3 +43,7 @@
 + Group message
 + Show name of emoji in text output
 + Search by uid/username..
+
+### Disclaimers
+Use this software at your own risk. The author is not responsible for any potential damage/loss/privacy
+issues related to the use of this tool.
