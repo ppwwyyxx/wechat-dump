@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
 # File: dump_html.py
-# Date: Tue Dec 23 00:01:20 2014 +0800
+# Date: Fri Jan 09 22:16:26 2015 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
 import sys
@@ -14,12 +14,13 @@ from lib.res import Resource
 from lib.render import HTMLRender
 
 db_file = sys.argv[1]
-res = Resource(sys.argv[2])
+resource_dir = sys.argv[2]
 name = ensure_unicode(sys.argv[3])
 output_file = sys.argv[4]
 
 parser = WeChatDBParser(db_file)
 msgs = parser.msgs_by_talker[name]
+res = Resource(resource_dir)
 
 render = HTMLRender(parser, res)
 htmls = render.render_msgs(msgs)

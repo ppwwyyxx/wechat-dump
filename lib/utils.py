@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
 # File: utils.py
-# Date: Thu Dec 25 16:27:39 2014 +0800
+# Date: Fri Jan 09 22:21:36 2015 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
 import sys
@@ -156,3 +156,9 @@ class timing(object):
             return ret
         return wrapper
 
+
+import hashlib
+def md5(s):
+    m = hashlib.md5()
+    m.update(s)
+    return m.hexdigest()

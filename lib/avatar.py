@@ -1,14 +1,13 @@
 #!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
 # File: avatar.py
-# Date: Wed Dec 17 00:08:06 2014 +0800
+# Date: Fri Jan 09 22:21:55 2015 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
 import os
-import hashlib
 import numpy as np
 
-from .utils import ensure_bin_str
+from .utils import ensure_bin_str, md5
 
 class AvatarReader(object):
     def __init__(self, res_dir):
@@ -16,16 +15,10 @@ class AvatarReader(object):
         assert os.path.isdir(self.avt_dir), \
             "No such directory {}".format(self.avt_dir)
 
-    @staticmethod
-    def get_filename(username):
-        m = hashlib.md5()
-        m.update(username)
-        return m.hexdigest()
-
     def get_avatar(self, username):
         """ username: `username` field in db.rcontact"""
         username = ensure_bin_str(username)
-        filename = AvatarReader.get_filename(username)
+        filename = md5(username)
         dir1, dir2 = filename[:2], filename[2:4]
         filename = os.path.join(self.avt_dir, dir1, dir2,
                                 "user_{}.png.bm".format(filename))
