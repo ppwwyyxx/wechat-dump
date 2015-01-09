@@ -1,6 +1,6 @@
 #!/bin/bash -e
 # File: android-interact.sh
-# Date: Wed Jan 07 21:57:59 2015 +0800
+# Date: Fri Jan 09 12:03:57 2015 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 PROG_NAME=`readlink -f "$0"`
 PROG_DIR=`dirname "$PROG_NAME"`
@@ -66,7 +66,7 @@ elif [[ $1 == "db" || $1 == "res" ]]; then
 			exit 1
 		}
 	fi
-elif [[ $1 == "all" ]]; then
+elif [[ $1 == "db_decrypt" ]]; then
 	echo "Getting uin..."
 	$0 uin | tail -n1 | grep -o '[0-9]*' > /tmp/uin
 	echo "Getting imei..."
@@ -76,9 +76,7 @@ elif [[ $1 == "all" ]]; then
 	echo "Decrypting db..."
 	./decrypt_db.sh EnMicroMsg.db $(</tmp/imei) $(</tmp/uin)
 	rm /tmp/{uin,imei}
-	echo "Getting res..."
-	$0 res
-	echo "Done"
+	echo "Done. See decoded.db"
 else
 	echo "Usage: $0 <imei|uin|db|res|all>"
 	exit 1
