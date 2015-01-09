@@ -1,15 +1,8 @@
 #!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
 # File: msg.py
-# Date: Wed Jan 07 23:59:45 2015 +0800
+# Date: Fri Jan 09 22:14:53 2015 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
-
-import re
-from datetime import datetime
-from pyquery import PyQuery
-
-from .utils import ensure_bin_str, ensure_unicode
-
 TYPE_MSG = 1
 TYPE_IMG = 3
 TYPE_SPEAK = 34
@@ -25,6 +18,17 @@ TYPE_CUSTOM_EMOJI = 1048625
 TYPE_LOCATION_SHARING = -1879048186
 TYPE_APP_MSG = 16777265
 
+_KNOWN_TYPES = [eval(k) for k in dir() if k.startswith('TYPE_')]
+
+import re
+from datetime import datetime
+from pyquery import PyQuery
+import logging
+logger = logging.getLogger(__name__)
+
+from .utils import ensure_bin_str, ensure_unicode
+
+
 class WeChatMsg(object):
     FIELDS = ["msgSvrId","type","isSend","createTime","talker","content","imgPath"]
 
@@ -39,6 +43,10 @@ class WeChatMsg(object):
         assert len(row) == len(WeChatMsg.FIELDS)
         for f, v in zip(WeChatMsg.FIELDS, row):
             setattr(self, f, v)
+        if self.type not in _KNOWN_TYPES:
+            logger.warn("Unhandled message type: {}".format(self.type))
+            # only to supress repeated warning:
+            _KNOWN_TYPES.append(self.type)
         self.createTime = datetime.fromtimestamp(self.createTime / 1000)
         self.talker_name = None
         if self.content:

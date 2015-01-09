@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
 # File: res.py
-# Date: Fri Jan 09 11:52:53 2015 +0800
+# Date: Fri Jan 09 22:28:54 2015 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
 import glob
@@ -12,14 +12,14 @@ import Image
 import cStringIO
 import base64
 import logging
+logger = logging.getLogger(__name__)
 import imghdr
 from multiprocessing import Pool
-logger = logging.getLogger(__name__)
 
 import pysox
 
 from .avatar import AvatarReader
-from .utils import timing
+from .utils import timing, md5
 
 LIB_PATH = os.path.dirname(os.path.abspath(__file__))
 INTERNAL_EMOJI_DIR = os.path.join(LIB_PATH, 'static', 'internal_emoji')
@@ -30,8 +30,7 @@ JPEG_QUALITY = 50
 
 def do_get_voice_mp3(amr_fpath):
     """ return base64 string, and voice duration"""
-    assert amr_fpath.endswith('.amr')
-    assert os.path.isfile(amr_fpath), amr_fpath
+    if not amr_fpath: return "", 0
     mp3_file = os.path.join('/tmp',
                             os.path.basename(amr_fpath)[:-4] + '.mp3')
 
@@ -55,37 +54,32 @@ class Resource(object):
         self.img_dir = os.path.join(res_dir, IMG_DIRNAME)
         self.emoji_dir = os.path.join(res_dir, EMOJI_DIRNAME)
         self.avt_reader = AvatarReader(self.res_dir)
-        self.init()
 
-    def init(self):
-        """ load some index in memory"""
-        self.speak_data = {}
-        for root, subdirs, files in os.walk(
-            os.path.join(self.res_dir, VOICE_DIRNAME)):
-            if subdirs:
-                continue
-            for f in files:
-                if not f.endswith('amr'):
-                    continue
-                full_path = os.path.join(root, f)
-                key = f[4:-4]  # msg_xxxxx.amr
-                assert len(key) == 26, \
-                    "Error interpreting the protocol, this is potentially a bug!"
-                self.speak_data[key] = full_path
+    def get_voice_filename(self, imgpath):
+        fname = md5(imgpath)
+        dir1, dir2 = fname[:2], fname[2:4]
+        ret = os.path.join(self.res_dir, VOICE_DIRNAME, dir1, dir2,
+                           'msg_{}.amr'.format(imgpath))
+        if not os.path.isfile(ret):
+            logger.error("Voice file not found for {}".format(imgpath))
+            return ""
+        return ret
 
     @timing(total=True)
     def get_voice_mp3(self, imgpath):
+        """ return mp3 and duration, or empty string and 0 on failure"""
         idx = self.voice_cache_idx.get(imgpath)
         if idx is None:
-            return do_get_voice_mp3(self.speak_data[imgpath])
+            return do_get_voice_mp3(
+                self.get_voice_filename(imgpath))
         return self.voice_cache[idx].get()
 
     def cache_voice_mp3(self, voice_paths):
-        """ for speed """
+        """ for speed. voice_paths: a collection of imgpath """
         self.voice_cache_idx = {k: idx for idx, k in enumerate(voice_paths)}
         pool = Pool(3)
         self.voice_cache = [pool.apply_async(do_get_voice_mp3,
-                                             (self.speak_data[k],)) for k in voice_paths]
+                                             (self.get_voice_filename(k),)) for k in voice_paths]
 
     @staticmethod
     def get_file_b64(fname):
