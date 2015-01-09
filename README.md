@@ -5,11 +5,12 @@ This tool can parse and dump WeChat chat history on a rooted android phone.
 
 ### How to use:
 
-#### Install Dependencies:
+#### Dependencies:
 + python-PIL
 + [PyQuery](https://pypi.python.org/pypi/pyquery/1.2.1)
 + [pysox](https://pypi.python.org/pypi/pysox/0.3.6.alpha)
 + python-csscompressor(optional)
++ adb and rooted android phone connected to PC
 
 #### Get Necessary Data:
 + Get decrypted WeChat database (Linux only):
