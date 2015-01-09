@@ -26,11 +26,11 @@ This tool can parse and dump WeChat chat history on a rooted android phone.
 			+ `./android-interact.sh imei`
 			+ Call `*#06#` on your phone
 			+ Find IMEI in system settings
-		+ Decrypt database, will produce decrypted.db:
+		+ Decrypt database, will produce `decrypted.db`:
 		```
 		./decrypt_db.sh <path to EnMicroMsg.db> <imei> <uin>
 		```
-+ Get WeChat user resource directory from your phone:
++ Get WeChat user resource directory from your phone to `resource` directory:
 	+ `./android-interact.sh res`		# you might need to change the resource location in this script if the default doesn't work
 
 #### Run:
@@ -40,7 +40,7 @@ This tool can parse and dump WeChat chat history on a rooted android phone.
 ```
 + Dump messages of one contact to rich-content html, containing voice messages, emojis, and images:
 ```
-./dump_html.py decrypted.db <resource directory> <contact name> output.html
+./dump_html.py decrypted.db resource <contact name> output.html
 ```
 
 ### Screenshot:
