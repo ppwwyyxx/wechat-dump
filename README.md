@@ -34,7 +34,7 @@ This tool can parse and dump WeChat chat history on a rooted android phone.
 	+ `./android-interact.sh res`		# you might need to change the resource location in this script if the default doesn't work
 
 #### Run:
-+ Parse and dump text messages of every contact:
++ Parse and dump text messages of every contact (resource directory is not required to run this):
 ```
 ./dump_msg.py decrypted.db output_dir
 ```
