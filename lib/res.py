@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
 # File: res.py
-# Date: Thu Jan 08 00:52:13 2015 +0800
+# Date: Fri Jan 09 11:52:53 2015 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
 import glob
@@ -31,6 +31,7 @@ JPEG_QUALITY = 50
 def do_get_voice_mp3(amr_fpath):
     """ return base64 string, and voice duration"""
     assert amr_fpath.endswith('.amr')
+    assert os.path.isfile(amr_fpath), amr_fpath
     mp3_file = os.path.join('/tmp',
                             os.path.basename(amr_fpath)[:-4] + '.mp3')
 
@@ -75,7 +76,7 @@ class Resource(object):
     @timing(total=True)
     def get_voice_mp3(self, imgpath):
         idx = self.voice_cache_idx.get(imgpath)
-        if not idx:
+        if idx is None:
             return do_get_voice_mp3(self.speak_data[imgpath])
         return self.voice_cache[idx].get()
 
