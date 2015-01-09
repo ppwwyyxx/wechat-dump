@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
 # File: res.py
-# Date: Fri Jan 09 22:28:54 2015 +0800
+# Date: Fri Jan 09 22:43:10 2015 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
 import glob
@@ -26,6 +26,8 @@ INTERNAL_EMOJI_DIR = os.path.join(LIB_PATH, 'static', 'internal_emoji')
 VOICE_DIRNAME = 'voice2'
 IMG_DIRNAME = 'image2'
 EMOJI_DIRNAME = 'emoji'
+AVATAR_DIRNAME = 'avatar'
+
 JPEG_QUALITY = 50
 
 def do_get_voice_mp3(amr_fpath):
@@ -49,16 +51,21 @@ def do_get_voice_mp3(amr_fpath):
 class Resource(object):
     """ multimedia resources in chat"""
     def __init__(self, res_dir):
-        assert os.path.isdir(res_dir), "No such directory: {}".format(res_dir)
+        def check(subdir):
+            assert os.path.isdir(os.path.join(res_dir, subdir)), \
+                    "No such directory: {}".format(subdir)
+        [check(k) for k in ['', AVATAR_DIRNAME, IMG_DIRNAME, EMOJI_DIRNAME, VOICE_DIRNAME]]
+
         self.res_dir = res_dir
         self.img_dir = os.path.join(res_dir, IMG_DIRNAME)
+        self.voice_dir = os.path.join(res_dir, VOICE_DIRNAME)
         self.emoji_dir = os.path.join(res_dir, EMOJI_DIRNAME)
-        self.avt_reader = AvatarReader(self.res_dir)
+        self.avt_reader = AvatarReader(os.path.join(res_dir, AVATAR_DIRNAME))
 
     def get_voice_filename(self, imgpath):
         fname = md5(imgpath)
         dir1, dir2 = fname[:2], fname[2:4]
-        ret = os.path.join(self.res_dir, VOICE_DIRNAME, dir1, dir2,
+        ret = os.path.join(self.voice_dir, dir1, dir2,
                            'msg_{}.amr'.format(imgpath))
         if not os.path.isfile(ret):
             logger.error("Voice file not found for {}".format(imgpath))

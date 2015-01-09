@@ -1,19 +1,19 @@
 #!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
 # File: avatar.py
-# Date: Fri Jan 09 22:21:55 2015 +0800
+# Date: Fri Jan 09 22:41:55 2015 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
 import os
 import numpy as np
+import logging
+logger = logging.getLogger(__name__)
 
 from .utils import ensure_bin_str, md5
 
 class AvatarReader(object):
-    def __init__(self, res_dir):
-        self.avt_dir = os.path.join(res_dir, 'avatar')
-        assert os.path.isdir(self.avt_dir), \
-            "No such directory {}".format(self.avt_dir)
+    def __init__(self, avt_dir):
+        self.avt_dir = avt_dir
 
     def get_avatar(self, username):
         """ username: `username` field in db.rcontact"""
@@ -23,7 +23,7 @@ class AvatarReader(object):
         filename = os.path.join(self.avt_dir, dir1, dir2,
                                 "user_{}.png.bm".format(filename))
         if not os.path.isfile(filename):
-            # avatar not found!
+            logger.warn("Avatar not found for {}".format(username))
             return None
         else:
             img = AvatarReader.read_bm(filename)
