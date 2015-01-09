@@ -50,8 +50,8 @@ An example html:
 ### TODO
 + Search by uid/username
 + Skip existing files when copying android resources
-+ Fix more unhandled types: > 10000 and < 0
-+ Better user experiences... see TODOs
++ Fix rare unhandled types: > 10000 and < 0
++ Better user experiences... see `grep 'TODO' lib -R`
 
 ### Disclaimers
 This tool is still under development and testing, therefore it might not work very well on every device.
