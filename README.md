@@ -12,24 +12,27 @@ This tool can parse and dump WeChat chat history on a rooted android phone.
 + python-csscompressor(optional)
 
 #### Get Necessary Data:
-+ Get /data/data/com.tencent.mm/MicroMsg/long-long-name/EnMicroMsg.db from *root* filesystem, possible ways are:
-	+ `./android-interact.sh db`
-	+ Use your rooted file system manager app
++ Get decrypted WeChat database (Linux only):
+	+ Automatic: `./android-interact.sh db_decrypt`
+	+ Manual:
+		+ Get /data/data/com.tencent.mm/MicroMsg/long-long-name/EnMicroMsg.db from *root* filesystem, possible ways are:
+			+ `./android-interact.sh db`
+			+ Use your rooted file system manager app
+		+ Get WeChat uin, possible ways are:
+			+ `./android-interact.sh uin`
+			+ Login to [web wechat](https://wx.qq.com), get wxuin=1234567 from `document.cookie`
+		+ Get your phone IMEI number, possible ways are:
+			+ `./android-interact.sh imei`
+			+ Call `*#06#` on your phone
+			+ Find IMEI in system settings
+		+ Decrypt database, will produce decrypted.db:
+		```
+		./decrypt_db.sh <path to EnMicroMsg.db> <imei> <uin>
+		```
 + Get WeChat user resource directory from your phone:
 	+ `./android-interact.sh res`		# you might need to change the resource location in this script if the default doesn't work
-+ Get WeChat uin, possible ways are:
-	+ `./android-interact.sh uin`
-	+ Login to [web wechat](https://wx.qq.com), get wxuin=1234567 from `document.cookie`
-+ Get your phone IMEI number, possible ways are:
-	+ `./android-interact.sh imei`
-	+ Call `*#06#` on your phone
-	+ Find IMEI in system settings
 
 #### Run:
-+ Decrypt database, will produce decrypted.db (for now, Linux only):
-```
-./decrypt_db.sh <path to EnMicroMsg.db> <imei> <uin>
-```
 + Parse and dump text messages of every contact:
 ```
 ./dump_msg.py decrypted.db output_dir
