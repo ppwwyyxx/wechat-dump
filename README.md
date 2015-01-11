@@ -43,9 +43,10 @@ This tool can parse and dump WeChat chat history on a rooted android phone.
 ./dump_html.py decrypted.db resource <contact name> output.html
 ```
 
-### Screenshot:
-An example html (very similar to web wechat):
+### Examples:
 ![byvoid](https://github.com/ppwwyyxx/wechat-dump/raw/master/screenshots/byvoid.jpg)
+
+[An example html](http://ppwwyyxx.com/static/wechat/example.html)
 
 ### TODO
 + Search by uid/username
