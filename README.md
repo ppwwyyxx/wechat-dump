@@ -44,9 +44,11 @@ This tool can parse and dump WeChat chat history on a rooted android phone.
 ```
 
 ### Examples:
-![byvoid](https://github.com/ppwwyyxx/wechat-dump/raw/master/screenshots/byvoid.jpg)
+See [here](http://ppwwyyxx.com/static/wechat/example.html) for an example html.
 
-[An example html](http://ppwwyyxx.com/static/wechat/example.html)
+Screenshots:
+
+![byvoid](https://github.com/ppwwyyxx/wechat-dump/raw/master/screenshots/byvoid.jpg)
 
 ### TODO
 + Search by uid/username
