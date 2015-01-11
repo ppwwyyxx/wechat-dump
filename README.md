@@ -55,6 +55,8 @@ Screenshots:
 + Skip existing files when copying android resources
 + Fix rare unhandled types: > 10000 and < 0
 + Better user experiences... see `grep 'TODO' lib -R`
++ mac support (For now you will have to compile sqlcipher 2.1.1 by yourself. Also, shell script might work on BSD)
++ more easy-to-use for non-programmers (GUI?)
 
 ### Disclaimers
 This tool is still under development and testing, therefore it might not work very well on every device.
