@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
 # File: utils.py
-# Date: Fri Jan 09 22:21:36 2015 +0800
+# Date: Sun Jan 11 23:38:16 2015 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
 import sys
@@ -158,7 +158,12 @@ class timing(object):
 
 
 import hashlib
+import base64
 def md5(s):
     m = hashlib.md5()
     m.update(s)
     return m.hexdigest()
+
+def get_file_b64(fname):
+    data = open(fname, 'rb').read()
+    return base64.b64encode(data)
