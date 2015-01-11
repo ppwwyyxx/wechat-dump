@@ -1,6 +1,6 @@
 #!/bin/bash -e
 # File: decrypt_db.sh
-# Date: Wed Jan 07 22:34:45 2015 +0800
+# Date: Sun Jan 11 22:30:50 2015 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
 MSGDB=$1
@@ -14,7 +14,7 @@ if [[ -z "$1" || -z "$2" || -z "$3" ]]; then
 fi
 
 if [[ -f $output ]]; then
-	echo "$output already exists. removed? (y/n)"
+	echo -n "$output already exists. removed? (y/n)"
 	read r
 	[[ $r == "y" ]] && rm -v $output || exit 1
 fi

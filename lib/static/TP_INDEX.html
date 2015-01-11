@@ -22,21 +22,5 @@
       </div>
     </div>
   </div>
-<script type='text/javascript'>
-var playVoice = function(event) {{
-  var target = event.target;
-  while (!target.classList.contains('cloud'))
-    target = target.parentElement;
-  var audio = target.getElementsByTagName('audio')[0];
-  audio.play();
-}};
-
-$(document).ready(function() {{
-    $(".fancybox").fancybox({{
-    // fancybox will otherwise scroll page to top
-    helpers: {{ overlay : {{ locked : false}}}}
-   }});
- }});
-</script>
 </body>
 </html>

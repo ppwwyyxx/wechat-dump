@@ -1,20 +1,38 @@
 #!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
 # File: smiley.py
-# Date: Wed Dec 31 23:33:07 2014 +0800
+# Date: Sun Jan 11 23:40:50 2015 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
 import os
 import re
 import json
-LIB_PATH = os.path.dirname(os.path.abspath(__file__))
 
-UNICODE_SMILEY_FILE = os.path.join(LIB_PATH, 'static', 'unicode-smiley.json')
-TENCENT_SMILEY_FILE = os.path.join(LIB_PATH, 'static', 'tencent-smiley.json')
-TENCENT_EXTRASMILEY_FILE = os.path.join(LIB_PATH,
-                                       'static', 'tencent-smiley-extra.json')
+from .utils import get_file_b64
+
+STATIC_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static')
+
+UNICODE_SMILEY_FILE = os.path.join(STATIC_PATH, 'unicode-smiley.json')
+TENCENT_SMILEY_FILE = os.path.join(STATIC_PATH, 'tencent-smiley.json')
+TENCENT_EXTRASMILEY_FILE = os.path.join(STATIC_PATH, 'tencent-smiley-extra.json')
 UNICODE_SMILEY_RE = re.compile(
     u'[\U00010000-\U0010ffff]|[\u2600-\u2764]|\u2122|\u00a9|\u00ae|[\ue000-\ue5ff]')
+
+HEAD = """.smiley {
+    padding: 1px;
+    background-position: -1px -1px;
+    background-repeat: no-repeat;
+    width: 20px;
+    height: 20px;
+    display: inline-block;
+    vertical-align: top;
+    zoom: 1;
+}
+"""
+
+TEMPLATE = """.smiley{name} {{
+    background-image: url("data:image/png;base64,{b64}");
+}}"""
 
 class SmileyProvider(object):
     def __init__(self, html_replace=True):
@@ -56,7 +74,7 @@ class SmileyProvider(object):
             return msg
         for k, v in self.unicode_smiley.iteritems():
             if k in msg:
-                self.used_smiley_id.add(v)
+                self.used_smiley_id.add(str(v))
                 msg = msg.replace(k, self.gen_replace_elem(v))
         return msg
 
@@ -66,7 +84,7 @@ class SmileyProvider(object):
             return msg
         for k, v in self.tencent_smiley.iteritems():
             if k in msg:
-                self.used_smiley_id.add(v)
+                self.used_smiley_id.add(str(v))
                 msg = msg.replace(k, self.gen_replace_elem(v))
         return msg
 
@@ -78,8 +96,17 @@ class SmileyProvider(object):
         msg = self._replace_tencent(msg)
         return msg
 
+    def gen_used_smiley_css(self):
+        ret = HEAD
+        for sid in self.used_smiley_id:
+            fname = os.path.join(STATIC_PATH, 'smileys', '{}.png'.format(sid))
+            b64 = get_file_b64(fname)
+            ret = ret + TEMPLATE.format(name=sid, b64=b64)
+        return ret
+
 if __name__ == '__main__':
     smiley = SmileyProvider()
     msg = u"[挥手]哈哈呵呵ｈｉｈｉ\U0001f684\u2728\u0001 /::<\ue415"
     msg = smiley.replace_smileycode(msg)
-    print msg
+    #print msg
+    smiley.gen_used_smiley_css()

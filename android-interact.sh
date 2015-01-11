@@ -1,6 +1,6 @@
 #!/bin/bash -e
 # File: android-interact.sh
-# Date: Fri Jan 09 12:03:57 2015 +0800
+# Date: Sun Jan 11 23:05:58 2015 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 PROG_NAME=`readlink -f "$0"`
 PROG_DIR=`dirname "$PROG_NAME"`
@@ -78,7 +78,7 @@ elif [[ $1 == "db_decrypt" ]]; then
 	rm /tmp/{uin,imei}
 	echo "Done. See decoded.db"
 else
-	echo "Usage: $0 <imei|uin|db|res|all>"
+	echo "Usage: $0 <res|db_decrypt>"
 	exit 1
 fi
 

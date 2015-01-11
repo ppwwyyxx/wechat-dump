@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
 # File: res.py
-# Date: Fri Jan 09 22:43:10 2015 +0800
+# Date: Sun Jan 11 23:38:31 2015 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
 import glob
@@ -19,7 +19,7 @@ from multiprocessing import Pool
 import pysox
 
 from .avatar import AvatarReader
-from .utils import timing, md5
+from .utils import timing, md5, get_file_b64
 
 LIB_PATH = os.path.dirname(os.path.abspath(__file__))
 INTERNAL_EMOJI_DIR = os.path.join(LIB_PATH, 'static', 'internal_emoji')
@@ -44,7 +44,7 @@ def do_get_voice_mp3(amr_fpath):
 
     signal = infile.get_signal().get_signalinfo()
     duration = signal['length'] * 1.0 / signal['rate']
-    mp3_string = Resource.get_file_b64(mp3_file)
+    mp3_string = get_file_b64(mp3_file)
     os.unlink(mp3_file)
     return mp3_string, duration
 
@@ -72,7 +72,6 @@ class Resource(object):
             return ""
         return ret
 
-    @timing(total=True)
     def get_voice_mp3(self, imgpath):
         """ return mp3 and duration, or empty string and 0 on failure"""
         idx = self.voice_cache_idx.get(imgpath)
@@ -87,11 +86,6 @@ class Resource(object):
         pool = Pool(3)
         self.voice_cache = [pool.apply_async(do_get_voice_mp3,
                                              (self.get_voice_filename(k),)) for k in voice_paths]
-
-    @staticmethod
-    def get_file_b64(fname):
-        data = open(fname, 'rb').read()
-        return base64.b64encode(data)
 
     def get_avatar(self, username):
         """ return base64 string"""
@@ -158,7 +152,7 @@ class Resource(object):
                 buf = cStringIO.StringIO()
                 im.save(buf, 'JPEG', quality=JPEG_QUALITY)
                 return base64.b64encode(buf.getvalue())
-            return Resource.get_file_b64(img_file)
+            return get_file_b64(img_file)
         big_file = get_jpg_b64(big_file)
         small_file = get_jpg_b64(small_file)
 
@@ -185,10 +179,10 @@ class Resource(object):
         if not candidates:
             return None, None
         fname = candidates[0]
-        return Resource.get_file_b64(fname), imghdr.what(fname)
+        return get_file_b64(fname), imghdr.what(fname)
 
     def get_internal_emoji(self, fname):
         f = os.path.join(INTERNAL_EMOJI_DIR, fname)
-        return Resource.get_file_b64(f), imghdr.what(f)
+        return get_file_b64(f), imghdr.what(f)
 
 
