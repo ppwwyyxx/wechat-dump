@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
 # File: render.py
-# Date: Sun Jan 11 23:43:03 2015 +0800
+# Date: Sun Jan 11 23:46:06 2015 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
 import os
@@ -154,6 +154,7 @@ class HTMLRender(object):
 
     def _render_partial_msgs(self, msgs):
         """ return single html"""
+        self.smiley.used_smiley_id.clear()
         slicer = MessageSlicerByTime()
         slices = slicer.slice(msgs)
 
