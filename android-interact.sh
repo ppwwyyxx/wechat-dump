@@ -2,7 +2,10 @@
 # File: android-interact.sh
 # Date: Sun Jan 11 23:05:58 2015 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
-PROG_NAME=`readlink -f "$0"`
+
+source compatibility.sh
+
+PROG_NAME=`$REALPATH "$0"`
 PROG_DIR=`dirname "$PROG_NAME"`
 cd "$PROG_DIR"
 
@@ -15,7 +18,7 @@ adb root
 
 if [[ $1 == "uin" ]]; then
 	adb pull $MM_DIR/shared_prefs/system_config_prefs.xml 2>/dev/null
-	uin=$(grep 'default_uin' system_config_prefs.xml | grep -o 'value="[0-9]*' | cut -c 8-)
+	uin=$(grep 'default_uin' system_config_prefs.xml | $GREP -o 'value="[0-9]*' | cut -c 8-)
 	[[ -n $uin ]] || {
 		echo "Failed to get wechat uin. You can try other methods, or report a bug."
 		exit 1
@@ -23,7 +26,7 @@ if [[ $1 == "uin" ]]; then
 	rm system_config_prefs.xml
 	echo "Got wechat uin: $uin"
 elif [[ $1 == "imei" ]]; then
-	imei=$(adb shell dumpsys iphonesubinfo | grep 'Device ID' | grep -o '[0-9]*')
+	imei=$(adb shell dumpsys iphonesubinfo | grep 'Device ID' | $GREP -o '[0-9]+')
 	[[ -n $imei ]] || {
 		echo "Failed to get imei. You can try other methods, or report a bug."
 		exit 1

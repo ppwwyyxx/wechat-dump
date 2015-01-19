@@ -3,6 +3,8 @@
 # Date: Sun Jan 11 22:30:50 2015 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
+source compatibility.sh
+
 MSGDB=$1
 imei=$2
 uin=$3
@@ -20,7 +22,7 @@ if [[ -f $output ]]; then
 fi
 
 
-KEY=$(echo -n "$imei$uin" | md5sum | cut -b 1-7)
+KEY=$(echo -n "$imei$uin" | $MD5SUM | cut -b 1-7)
 echo "KEY: $KEY"
 
 uname -m | grep x86_64 > /dev/null || version=32bit && version=64bit
