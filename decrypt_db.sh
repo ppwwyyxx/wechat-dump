@@ -3,6 +3,8 @@
 # Date: Sun Jan 11 22:30:50 2015 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
+source compatibility.sh
+
 MSGDB=$1
 imei=$2
 uin=$3
@@ -20,17 +22,18 @@ if [[ -f $output ]]; then
 fi
 
 
-KEY=$(echo -n "$imei$uin" | md5sum | cut -b 1-7)
+KEY=$(echo -n "$imei$uin" | $MD5SUM | cut -b 1-7)
 echo "KEY: $KEY"
 
+uname | grep Darwin > /dev/null || os=linux && os=darwin
 uname -m | grep x86_64 > /dev/null || version=32bit && version=64bit
-echo "Use $version sqlcipher."
+echo "Use $version sqlcipher of $os."
 
 echo "Dump decoded database... "
 echo "Don't worry about libcrypt.so version warning."
 
 
-SQLCIPHER=./sqlcipher/$version
+SQLCIPHER=./sqlcipher/$os/$version
 export LD_LIBRARY_PATH=$SQLCIPHER
 $SQLCIPHER/sqlcipher $MSGDB << EOF
 PRAGMA key='$KEY';
