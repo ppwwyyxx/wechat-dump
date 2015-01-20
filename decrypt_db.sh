@@ -25,14 +25,15 @@ fi
 KEY=$(echo -n "$imei$uin" | $MD5SUM | cut -b 1-7)
 echo "KEY: $KEY"
 
+uname | grep Darwin > /dev/null || os=linux && os=darwin
 uname -m | grep x86_64 > /dev/null || version=32bit && version=64bit
-echo "Use $version sqlcipher."
+echo "Use $version sqlcipher of $os."
 
 echo "Dump decrypted database... "
 echo "Don't worry about libcrypt.so version warning."
 
 
-SQLCIPHER=./sqlcipher/$version
+SQLCIPHER=./sqlcipher/$os/$version
 export LD_LIBRARY_PATH=$SQLCIPHER
 $SQLCIPHER/sqlcipher $MSGDB << EOF
 PRAGMA key='$KEY';
