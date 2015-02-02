@@ -1,6 +1,6 @@
 #!/bin/bash -e
 # File: android-interact.sh
-# Date: Sun Jan 11 23:05:58 2015 +0800
+# Date: Sun Feb 01 17:26:48 2015 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
 source compatibility.sh
@@ -13,8 +13,8 @@ cd "$PROG_DIR"
 RES_DIR="/mnt/sdcard/tencent/MicroMsg"
 MM_DIR="/data/data/com.tencent.mm"
 
-echo "Starting rooted adb server..."
-adb root
+#echo "Starting rooted adb server..."
+#adb root
 
 if [[ $1 == "uin" ]]; then
 	adb pull $MM_DIR/shared_prefs/system_config_prefs.xml 2>/dev/null
@@ -26,7 +26,7 @@ if [[ $1 == "uin" ]]; then
 	rm system_config_prefs.xml
 	echo "Got wechat uin: $uin"
 elif [[ $1 == "imei" ]]; then
-	imei=$(adb shell dumpsys iphonesubinfo | grep 'Device ID' | $GREP -o '[0-9]+')
+	imei=$(adb shell dumpsys iphonesubinfo | grep 'Device ID' | $GREP -o '[0-9]\+')
 	[[ -n $imei ]] || {
 		echo "Failed to get imei. You can try other methods, or report a bug."
 		exit 1
@@ -34,6 +34,7 @@ elif [[ $1 == "imei" ]]; then
 	echo "Got imei: $imei"
 elif [[ $1 == "db" || $1 == "res" ]]; then
 	echo "Looking for user dir name..."
+	sleep 1	# sometimes adb complains: device not found
 	userList=$(adb ls $RES_DIR | cut -f 4 -d ' ' \
 		| awk '{if (length() == 32) print}')
 	numUser=$(echo $userList | wc -l)
@@ -71,9 +72,9 @@ elif [[ $1 == "db" || $1 == "res" ]]; then
 	fi
 elif [[ $1 == "db_decrypt" ]]; then
 	echo "Getting uin..."
-	$0 uin | tail -n1 | grep -o '[0-9]*' > /tmp/uin
+	$0 uin | tail -n1 | grep -o '[0-9]*' | tee /tmp/uin
 	echo "Getting imei..."
-	$0 imei | tail -n1 | grep -o '[0-9]*' > /tmp/imei
+	$0 imei | tail -n1 | grep -o '[0-9]*' | tee /tmp/imei
 	echo "Getting db..."
 	$0 db
 	echo "Decrypting db..."

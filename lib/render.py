@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
 # File: render.py
-# Date: Sun Jan 11 23:46:06 2015 +0800
+# Date: Sun Feb 01 17:46:57 2015 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
 import os
@@ -66,15 +66,15 @@ class HTMLRender(object):
     def all_css(self):
         # call after processing all messages,
         # because smiley css need to be included only when necessary
-        if hasattr(self, 'final_css'):
-            return self.final_css
-
-        self.css_string.append(self.smiley.gen_used_smiley_css())
         def process(css):
             css = css_compress(css)
             return u'<style type="text/css">{}</style>'.format(css)
+
+        if hasattr(self, 'final_css'):
+            return self.final_css + process(self.smiley.gen_used_smiley_css())
+
         self.final_css = u"\n".join(map(process, self.css_string))
-        return self.final_css
+        return self.final_css + process(self.smiley.gen_used_smiley_css())
 
     @property
     def all_js(self):

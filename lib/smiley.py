@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
 # File: smiley.py
-# Date: Sun Jan 11 23:40:50 2015 +0800
+# Date: Sun Feb 01 17:47:07 2015 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
 import os
@@ -66,6 +66,7 @@ class SmileyProvider(object):
 
 
     def gen_replace_elem(self, smiley_id):
+        self.used_smiley_id.add(str(smiley_id))
         return '<span class="smiley smiley{}"></span>'.format(smiley_id)
 
     def _replace_unicode(self, msg):
@@ -74,7 +75,6 @@ class SmileyProvider(object):
             return msg
         for k, v in self.unicode_smiley.iteritems():
             if k in msg:
-                self.used_smiley_id.add(str(v))
                 msg = msg.replace(k, self.gen_replace_elem(v))
         return msg
 
@@ -84,7 +84,6 @@ class SmileyProvider(object):
             return msg
         for k, v in self.tencent_smiley.iteritems():
             if k in msg:
-                self.used_smiley_id.add(str(v))
                 msg = msg.replace(k, self.gen_replace_elem(v))
         return msg
 
