@@ -1,6 +1,6 @@
 #!/bin/bash -e
 # File: decrypt_db.sh
-# Date: Sun Jan 11 22:30:50 2015 +0800
+# Date: Sun Feb 01 17:30:29 2015 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
 source compatibility.sh
@@ -12,7 +12,7 @@ output=decoded.db
 
 if [[ -z "$1" || -z "$2" || -z "$3" ]]; then
 	echo "Usage: $0 <path to EnMicroMsg.db> <imei> <uin>"
-	exit
+	exit 1
 fi
 
 if [[ -f $output ]]; then
@@ -25,8 +25,8 @@ fi
 KEY=$(echo -n "$imei$uin" | $MD5SUM | cut -b 1-7)
 echo "KEY: $KEY"
 
-uname | grep Darwin > /dev/null || os=linux && os=darwin
-uname -m | grep x86_64 > /dev/null || version=32bit && version=64bit
+uname | grep Darwin > /dev/null && os=darwin || os=linux
+uname -m | grep x86_64 > /dev/null && version=64bit || version=32bit
 echo "Use $version sqlcipher of $os."
 
 echo "Dump decoded database... "
