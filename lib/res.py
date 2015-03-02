@@ -8,7 +8,7 @@ import glob
 import os
 import re
 # TODO: perhaps we don't need to introduce PIL and numpy. libjpeg might be enough
-import Image
+from PIL import Image
 import cStringIO
 import base64
 import logging
