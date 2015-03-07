@@ -43,7 +43,10 @@ This tool can parse and dump WeChat chat history on a rooted android phone.
 ```
 ./dump_html.py decrypted.db resource <contact name> output.html
 ```
-
++ Generate statistical report on text messages:
+```
+./report.sh message_dir
+```
 ### Examples:
 See [here](http://ppwwyyxx.com/static/wechat/example.html) for an example html.
 
