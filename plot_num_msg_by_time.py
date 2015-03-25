@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
 # File: plot_num_msg_by_time.py
-# Date: Thu Dec 25 00:35:57 2014 +0800
+# Date: Tue Feb 03 21:12:30 2015 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
 from lib.parser import WeChatDBParser
@@ -17,7 +17,7 @@ if len(sys.argv) != 3:
 
 db_file = sys.argv[1]
 name = ensure_unicode(sys.argv[2])
-every_k_days = 3
+every_k_days = 2
 
 parser = WeChatDBParser(db_file)
 msgs = parser.msgs_by_talker[name]
@@ -26,7 +26,7 @@ start_time = times[0]
 diffs = [(x - start_time).days for x in times]
 max_day = diffs[-1]
 
-width = 30
+width = 20
 numbers = range((max_day / width + 1) * width + 1)[::width]
 labels = [(start_time + timedelta(x)).strftime("%m/%d") for x in numbers]
 plt.xticks(numbers, labels)

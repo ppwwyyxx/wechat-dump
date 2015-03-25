@@ -55,6 +55,7 @@ Screenshots:
 ![byvoid](https://github.com/ppwwyyxx/wechat-dump/raw/master/screenshots/byvoid.jpg)
 
 ### TODO
++ Export all messages to libchat, and render messages from libchat
 + Search by uid/username
 + Skip existing files when copying android resources
 + Fix rare unhandled types: > 10000 and < 0
