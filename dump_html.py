@@ -1,17 +1,17 @@
 #!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
 # File: dump_html.py
-# Date: Fri Jan 09 22:16:26 2015 +0800
+# Date: Wed Mar 25 17:44:20 2015 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
 import sys
 if len(sys.argv) != 5:
     sys.exit("Usage: {0} <path to decoded_database.db> <path to resource> <name> <output html>".format(sys.argv[0]))
 
-from lib.utils import ensure_unicode
-from lib.parser import WeChatDBParser
-from lib.res import Resource
-from lib.render import HTMLRender
+from wechat.utils import ensure_unicode
+from wechat.parser import WeChatDBParser
+from wechat.res import Resource
+from wechat.render import HTMLRender
 
 db_file = sys.argv[1]
 resource_dir = sys.argv[2]

@@ -1,11 +1,11 @@
 #!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
 # File: plot_num_msg_by_time.py
-# Date: Tue Feb 03 21:12:30 2015 +0800
+# Date: Wed Mar 25 17:44:39 2015 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
-from lib.parser import WeChatDBParser
-from lib.utils import ensure_unicode
+from wechat.parser import WeChatDBParser
+from wechat.utils import ensure_unicode
 
 from datetime import timedelta, datetime
 import numpy as np
