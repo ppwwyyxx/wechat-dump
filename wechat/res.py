@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
 # File: res.py
-# Date: Sun Jan 11 23:38:31 2015 +0800
+# Date: Wed Mar 25 22:39:59 2015 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
 import glob
@@ -57,6 +57,7 @@ class Resource(object):
         [check(k) for k in ['', AVATAR_DIRNAME, IMG_DIRNAME, EMOJI_DIRNAME, VOICE_DIRNAME]]
 
         self.res_dir = res_dir
+        self.voice_cache_idx = {}
         self.img_dir = os.path.join(res_dir, IMG_DIRNAME)
         self.voice_dir = os.path.join(res_dir, VOICE_DIRNAME)
         self.emoji_dir = os.path.join(res_dir, EMOJI_DIRNAME)
@@ -154,12 +155,9 @@ class Resource(object):
                 return base64.b64encode(buf.getvalue())
             return get_file_b64(img_file)
         big_file = get_jpg_b64(big_file)
-        small_file = get_jpg_b64(small_file)
-
-        if big_file and not small_file:
-            # TODO resize big to a thumbnail
-            pass
-        return (big_file, small_file)
+        if big_file:
+            return big_file
+        return get_jpg_b64(small_file)
 
     def get_emoji(self, md5, pack_id):
         path = self.emoji_dir

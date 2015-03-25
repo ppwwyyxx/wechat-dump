@@ -1,14 +1,14 @@
 #!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
 # File: render.py
-# Date: Sun Feb 01 17:46:57 2015 +0800
+# Date: Wed Mar 25 22:24:53 2015 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
 import os
 import base64
 import glob
-import logging
 from pyquery import PyQuery
+import logging
 logger = logging.getLogger(__name__)
 
 LIB_PATH = os.path.dirname(os.path.abspath(__file__))
@@ -113,11 +113,10 @@ class HTMLRender(object):
                 return fallback()
             bigimgpath = self.parser.imginfo.get(msg.msgSvrId)
             fnames = [k for k in [imgpath, bigimgpath] if k]
-            bigimg, smallimg = self.res.get_img(fnames)
-            if not smallimg:
+            img = self.res.get_img(fnames)
+            if not img:
                 logger.warn("No image thumbnail found for {}".format(imgpath))
                 return fallback()
-            img = bigimg if bigimg else smallimg
             # TODO do not show fancybox when no bigimg found
             format_dict['img'] = (img, 'jpeg')
             return template.format(**format_dict)
