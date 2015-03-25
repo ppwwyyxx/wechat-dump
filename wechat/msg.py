@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
 # File: msg.py
-# Date: Fri Jan 09 22:14:53 2015 +0800
+# Date: Wed Mar 25 22:27:58 2015 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 TYPE_MSG = 1
 TYPE_IMG = 3
@@ -138,6 +138,12 @@ class WeChatMsg(object):
         if not self.is_chatroom():
             return self.talker
         return self.content[:self.content.find(':')]
+
+    def get_chatroom(self):
+        if self.is_chatroom():
+            return self.talker[:-9]
+        else:
+            return ''
 
     def get_emoji_product_id(self):
         assert self.type == TYPE_EMOJI, "Wrong call to get_emoji_product_id()!"
