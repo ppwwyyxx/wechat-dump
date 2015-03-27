@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
 # File: res.py
-# Date: Wed Mar 25 22:39:59 2015 +0800
+# Date: Fri Mar 27 23:42:16 2015 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
 import glob
@@ -20,6 +20,7 @@ import pysox
 
 from .avatar import AvatarReader
 from .utils import timing, md5, get_file_b64
+from .msg import TYPE_SPEAK
 
 LIB_PATH = os.path.dirname(os.path.abspath(__file__))
 INTERNAL_EMOJI_DIR = os.path.join(LIB_PATH, 'static', 'internal_emoji')
@@ -81,8 +82,10 @@ class Resource(object):
                 self.get_voice_filename(imgpath))
         return self.voice_cache[idx].get()
 
-    def cache_voice_mp3(self, voice_paths):
-        """ for speed. voice_paths: a collection of imgpath """
+    def cache_voice_mp3(self, msgs):
+        """ for speed.
+        msgs: a collection of WeChatMsg, to cache for later fetch"""
+        voice_paths = [msg.imgPath for msg in msgs if msg.type == TYPE_SPEAK]
         self.voice_cache_idx = {k: idx for idx, k in enumerate(voice_paths)}
         pool = Pool(3)
         self.voice_cache = [pool.apply_async(do_get_voice_mp3,

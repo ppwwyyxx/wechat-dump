@@ -1,10 +1,12 @@
 #!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
 # File: libchat.py
-# Date: Wed Mar 25 22:46:51 2015 +0800
+# Date: Sat Mar 28 00:08:29 2015 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 import sqlite3
 import os
+from datetime import datetime
+import time
 from collections import namedtuple
 
 SOURCE_ID = {'wechat': 0}
@@ -13,7 +15,7 @@ ChatMsgBase = namedtuple('ChatMsgBase',
           ['source', 'time', 'sender', 'chatroom',
            'text', 'image', 'sound', 'extra_data'])
 class ChatMsg(ChatMsgBase):
-    def __repr__(self):
+    def __repr__(self): # repr must return str?
         return "Msg@{}/{}-{}/{}/{}/{}/{}".format(
             self.time, self.sender, self.chatroom,
             self.text.encode('utf-8'), 'IMG' if self.image else '',
@@ -24,14 +26,19 @@ class SqliteLibChat(object):
 
     def __init__(self, db_file):
         self.db_file = db_file
+        exist = os.path.isfile(db_file)
         self.conn = sqlite3.connect(db_file)
+        self.conn.text_factory = str    # to allow use of raw-byte string
         self.c = self.conn.cursor()
+
+        if not exist:
+            self.create()
 
     def create(self):
         self.c.execute("""
           CREATE TABLE message (
           source SMALLINT,
-          time INTEGER,
+          time TEXT,
           sender TEXT,
           chatroom TEXT,
           text TEXT,
@@ -52,15 +59,24 @@ class SqliteLibChat(object):
         self.c = self.conn.cursor()
         for m in msgs:
             self._add_msg(SqliteLibChat.prefilter(m))
-            self.conn.commit()
+        self.conn.commit()
 
     @staticmethod
     def prefilter(msg):
         source = msg.source
         if isinstance(source, basestring):
             source = SOURCE_ID[source]
-        return ChatMsg(source, *msg[1:])
+        tm = int(time.mktime(msg[1].timetuple()))
+        return ChatMsg(source, tm, *msg[2:])
 
+    @staticmethod
+    def postfilter(msg):
+        # source
+        text = msg[4].decode('utf-8')
+        time = datetime.fromtimestamp(int(msg[1]))
+        return ChatMsg(msg[0], time, msg[2], msg[3],
+                       text=text, image=msg[5],
+                       sound=msg[6], extra_data=msg[7])
 
     def iterate_all_msg(self, predicate=None):
         """ predicate: a dict used as SELECT filter
@@ -73,18 +89,17 @@ class SqliteLibChat(object):
                 ' AND '.join(["{} = {}".format(k, v)
                               for k, v in predicate.iteritems()])))
         for row in self.c.fetchall():
-            yield ChatMsg(
-                *row[:5],
-                image=str(row[5]),
-                sound=str(row[6]),
-                extra_data=str(row[7])
-            )   # use str to get raw bytes
+            yield ChatMsg(*SqliteLibChat.postfilter(row))
 
 
 if __name__ == '__main__':
-    msg = ChatMsg(-1, 1000, 'me', 'room', 'hello', '\x01\x02\x03', '', '')
-    db = SqliteLibChat('./message.db')
+    db = SqliteLibChat(os.path.join(
+        os.path.dirname(__file__), './message.db'))
+
+    #msg = ChatMsg(-1, 1000, 'me', 'room', 'hello', '\x01\x02\x03', '', '')
     #db.add_msgs([msg])
-    for k in db.get_all_msg():
+
+    for k in db.iterate_all_msg():
+        from IPython import embed; embed()
         print k
 
