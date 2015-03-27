@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
 # File: libchathelper.py
-# Date: Wed Mar 25 23:01:59 2015 +0800
+# Date: Fri Mar 27 22:25:14 2015 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
 import base64
@@ -12,10 +12,13 @@ logger = logging.getLogger(__name__)
 
 from libchat.libchat import SqliteLibChat, ChatMsg
 from .msg import *
+from .utils import timing, ProgressReporter
 
 class LibChatHelper(object):
     """ Build LibChat messages from WeChat Msg"""
 
+    """ Types of message whose contents are fully parsed.
+    No need to save extra data for them. """
     FullyParsed = [TYPE_MSG, TYPE_SPEAK, TYPE_EMOJI,
                     TYPE_CUSTOM_EMOJI, TYPE_IMG]
 
@@ -63,7 +66,7 @@ class LibChatHelper(object):
     def _get_sound(self, msg):
         if msg.type == TYPE_SPEAK:
             audio_str, duration = self.res.get_voice_mp3(msg.imgPath)
-            return '{}:{}'.format(duration, audio_str)
+            return '{}:{}'.format(duration, base64.b64decode(audio_str))
         return ''
 
     def _get_extra(self, msg):
@@ -84,9 +87,14 @@ class LibChatHelper(object):
 # TODO do we need to save format?
         sound = self._get_sound(msg)
         extra = self._get_extra(msg)
+
+        self.prgs.trigger()
         return ChatMsg(
             'wechat', msg.createTime, sender, chatroom,
             text, img, sound, extra)
 
     def convert_msgs(self, msgs):
-        return [self._convert_msg(m) for m in msgs]
+        self.prgs = ProgressReporter("Convert", total=len(msgs))
+        ret = [self._convert_msg(m) for m in msgs]
+        self.prgs.finish()
+        return ret

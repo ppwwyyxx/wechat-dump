@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
 # File: render.py
-# Date: Wed Mar 25 22:24:53 2015 +0800
+# Date: Fri Mar 27 23:41:46 2015 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
 import os
@@ -197,8 +197,7 @@ class HTMLRender(object):
             talkers = set([talker_id])
         self.prepare_avatar_css(talkers)
 
-        voice_paths = [msg.imgPath for msg in msgs if msg.type == TYPE_SPEAK]
-        self.res.cache_voice_mp3(voice_paths)
+        self.res.cache_voice_mp3(msgs)
 
         logger.info(u"Rendering {} messages of {}({})".format(
             len(msgs), self.parser.contacts[talker_id], talker_id))
