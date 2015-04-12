@@ -1,6 +1,6 @@
 #!/bin/bash -e
 # File: android-interact.sh
-# Date: Sun Feb 01 17:26:48 2015 +0800
+# Date: Sun Apr 12 21:19:07 2015 +0900
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
 source compatibility.sh

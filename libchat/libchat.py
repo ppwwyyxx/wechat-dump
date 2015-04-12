@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
 # File: libchat.py
-# Date: Sat Mar 28 00:08:29 2015 +0800
+# Date: Sun Apr 12 21:08:51 2015 +0900
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 import sqlite3
 import os
@@ -14,6 +14,16 @@ NUM_FIELDS = 8
 ChatMsgBase = namedtuple('ChatMsgBase',
           ['source', 'time', 'sender', 'chatroom',
            'text', 'image', 'sound', 'extra_data'])
+""" source: unicode,
+    time: datetime,
+    sender: unicode,
+    chatroom: unicode,
+    text: unicode,
+    image: string,
+    sound: string,
+    extra_data: string
+"""
+
 class ChatMsg(ChatMsgBase):
     def __repr__(self): # repr must return str?
         return "Msg@{}/{}-{}/{}/{}/{}/{}".format(
@@ -56,6 +66,7 @@ class SqliteLibChat(object):
               ','.join(['?']*NUM_FIELDS)), tp)
 
     def add_msgs(self, msgs):
+        """ each message is a ChatMsg instance"""
         self.c = self.conn.cursor()
         for m in msgs:
             self._add_msg(SqliteLibChat.prefilter(m))

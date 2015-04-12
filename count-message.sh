@@ -1,16 +1,16 @@
 #!/bin/bash -e
-# File: android-interact.sh
-# Date: Sat Mar  7 20:57:51 2015 +0800
+# File: count-message.sh
+# Date: Sun Apr 12 21:01:01 2015 +0900
 # Author: Kangjing Huang <huangkangjing@gmail.com>
 
 
 if [[ -z $1 ]]
-then 
+then
     echo "Usage: $0 [Directory of text messages]"
     exit 1
 fi
 
-echo -e "Filename\tCounts of message\tCounts of chars\tCounts of words" 
+echo -e "Filename\tCounts of message\tCounts of chars\tCounts of words"
 
 SAVEIFS=$IFS
 IFS=$(echo -en "\n\b")
