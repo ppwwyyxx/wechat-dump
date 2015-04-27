@@ -19,8 +19,12 @@ name = ensure_unicode(sys.argv[3])
 output_file = sys.argv[4]
 
 parser = WeChatDBParser(db_file)
-msgs = parser.msgs_by_talker[name]
 res = Resource(resource_dir)
+
+try:
+    msgs = parser.msgs_by_talker[name]
+except:
+    sys.exit("Couldn't find that contact: valid contacts: " . parser.msgs_by_talker.keys);
 
 render = HTMLRender(parser, res)
 htmls = render.render_msgs(msgs)
