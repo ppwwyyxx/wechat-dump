@@ -10,12 +10,17 @@ This tool can parse and dump WeChat chat history on a rooted android phone.
 + [PyQuery](https://pypi.python.org/pypi/pyquery/1.2.1)
 + [pysox](https://pypi.python.org/pypi/pysox/0.3.6.alpha)
 + [dill](https://pypi.python.org/pypi/dill)
++ numpy
 + python-csscompressor(optional)
 + adb and rooted android phone connected to PC
++ gnu-sed
 
 #### Get Necessary Data:
+
+
 + Get decrypted WeChat database (Linux & Mac Only):
 	+ Automatic: `./android-interact.sh db_decrypt`
+                + Requires rooted adb. Available at https://play.google.com/store/apps/details?id=eu.chainfire.adbd&hl=en
 	+ Manual:
 		+ Get /data/data/com.tencent.mm/MicroMsg/long-long-name/EnMicroMsg.db from *root* filesystem, possible ways are:
 			+ `./android-interact.sh db`
