@@ -26,7 +26,7 @@ from pyquery import PyQuery
 import logging
 logger = logging.getLogger(__name__)
 
-from .utils import ensure_bin_str, ensure_unicode
+from .utils import ensure_unicode
 
 
 class WeChatMsg(object):
@@ -56,7 +56,7 @@ class WeChatMsg(object):
 
     def msg_str(self):
         if self.type == TYPE_LOCATION:
-            pq = PyQuery(self.content)
+            pq = PyQuery(self.content_xml_ready, parser='xml')
             loc = pq('location').attr
             label = loc['label']
             try:
@@ -67,7 +67,7 @@ class WeChatMsg(object):
                 pass
             return "LOCATION:" + label + " ({},{})".format(loc['x'], loc['y'])
         elif self.type == TYPE_LINK:
-            pq = PyQuery(self.content)
+            pq = PyQuery(self.content_xml_ready, parser='xml')
             url = pq('url').text()
             if not url:
                 title = pq('title').text()
@@ -76,14 +76,7 @@ class WeChatMsg(object):
                 return u"FILE:{}".format(title)
             return u"URL:{}".format(url)
         elif self.type == TYPE_NAMECARD:
-            try:
-                pq = PyQuery(self.content)
-            except ValueError:
-                # pq doesn't support xml
-                pat = re.compile('<msg.*<\/msg>', re.DOTALL)
-                msg = pat.search(self.content).group()
-                pq = PyQuery(msg)
-
+            pq = PyQuery(self.content_xml_ready, parser='xml')
             msg = pq('msg').attr
             name = msg['nickname']
             if not name:
@@ -92,7 +85,7 @@ class WeChatMsg(object):
                 name = ""
             return u"NAMECARD: {}".format(name)
         elif self.type == TYPE_APP_MSG:
-            pq = PyQuery(self.content)
+            pq = PyQuery(self.content_xml_ready, parser='xml')
             return pq('title').text()
         elif self.type == TYPE_VIDEO_FILE:
             return "VIDEO FILE"
@@ -114,6 +107,13 @@ class WeChatMsg(object):
         if not self.is_chatroom():
             return self.content
         return self.content[self.content.find('\n')+1:]
+
+    @property
+    def content_xml_ready(self):
+        # remove xml headers to avoid possible errors it may create
+        header = re.compile(r'<\?.*\?>')
+        msg = header.sub("", self.content_no_first_line)
+        return msg
 
     def __repr__(self):
         ret = u"{}|{}:{}:{}".format(
@@ -147,7 +147,7 @@ class WeChatMsg(object):
 
     def get_emoji_product_id(self):
         assert self.type == TYPE_EMOJI, "Wrong call to get_emoji_product_id()!"
-        pq = PyQuery(self.content)
+        pq = PyQuery(self.content_xml_ready, parser='xml')
         emoji = pq('emoji')
         if not emoji:
             return None
