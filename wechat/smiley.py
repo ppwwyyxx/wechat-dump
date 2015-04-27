@@ -7,6 +7,7 @@
 import os
 import re
 import json
+import struct
 
 from .utils import get_file_b64
 
@@ -15,8 +16,17 @@ STATIC_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static')
 UNICODE_SMILEY_FILE = os.path.join(STATIC_PATH, 'unicode-smiley.json')
 TENCENT_SMILEY_FILE = os.path.join(STATIC_PATH, 'tencent-smiley.json')
 TENCENT_EXTRASMILEY_FILE = os.path.join(STATIC_PATH, 'tencent-smiley-extra.json')
-UNICODE_SMILEY_RE = re.compile(
-    u'[\U00010000-\U0010ffff]|[\u2600-\u2764]|\u2122|\u00a9|\u00ae|[\ue000-\ue5ff]')
+
+try:
+    UNICODE_SMILEY_RE = re.compile(
+        u'[\U00010000-\U0010ffff]|[\u2600-\u2764]|\u2122|\u00a9|\u00ae|[\ue000-\ue5ff]'
+    )
+except re.error:
+    # UCS-2 build
+    UNICODE_SMILEY_RE = re.compile(
+        u'[\uD800-\uDBFF][\uDC00-\uDFFF]|[\u2600-\u2764]|\u2122|\u00a9|\u00ae|[\ue000-\ue5ff]'
+    )
+
 
 HEAD = """.smiley {
     padding: 1px;
@@ -58,12 +68,17 @@ class SmileyProvider(object):
         # u'\U0001f35c' -> "e340"   # for iphone
         # u'\ue415' -> 'e415'       # for android
         unicode_smiley_dict = json.load(open(UNICODE_SMILEY_FILE))
-        self.unicode_smiley = {unichr(int(k, 16)): hex(ord(v))[2:] for k, v in
+        self.unicode_smiley = {(self.unichar(int(k, 16))): hex(ord(v))[2:] for k, v in
                                 unicode_smiley_dict.iteritems()}
         self.unicode_smiley.update({v: hex(ord(v))[2:] for _, v in
                                 unicode_smiley_dict.iteritems()})
         self.used_smiley_id = set()
 
+    def unichar(self, i):
+        try:
+            return unichr(i)
+        except ValueError:
+            return struct.pack('i', i).decode('utf-32')
 
     def gen_replace_elem(self, smiley_id):
         self.used_smiley_id.add(str(smiley_id))
