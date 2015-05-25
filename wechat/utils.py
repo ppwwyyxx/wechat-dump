@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
 # File: utils.py
-# Date: Mon May 25 15:16:14 2015 +0800
+# Date: Mon May 25 15:21:06 2015 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
 import sys
@@ -169,5 +169,6 @@ def get_file_b64(fname):
     return base64.b64encode(data)
 
 def safe_filename(fname):
+    filename = ensure_unicode(fname)
     return "".join(
         [c for c in filename if c.isalpha() or c.isdigit() or c==' ']).rstrip()
