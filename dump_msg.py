@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
 # File: dump_msg.py
-# Date: Mon May 25 15:16:31 2015 +0800
+# Date: Mon May 25 15:23:05 2015 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
 from wechat.parser import WeChatDBParser
@@ -24,6 +24,7 @@ parser = WeChatDBParser(db_file)
 
 for name, msgs in parser.msgs_by_talker.iteritems():
     print u"Writing msgs for {}".format(name)
-    with open(os.path.join(output_dir, safe_filename(name) + '.txt'), 'w') as f:
+    safe_name = safe_filename(name)
+    with open(os.path.join(output_dir, safe_name + '.txt'), 'w') as f:
         for m in msgs:
             print >> f, m
