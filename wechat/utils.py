@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
 # File: utils.py
-# Date: Sun Jan 11 23:38:16 2015 +0800
+# Date: Mon May 25 15:16:14 2015 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
 import sys
@@ -167,3 +167,7 @@ def md5(s):
 def get_file_b64(fname):
     data = open(fname, 'rb').read()
     return base64.b64encode(data)
+
+def safe_filename(fname):
+    return "".join(
+        [c for c in filename if c.isalpha() or c.isdigit() or c==' ']).rstrip()

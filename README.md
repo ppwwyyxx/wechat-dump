@@ -60,6 +60,7 @@ Screenshots:
 + Search by uid/username
 + Skip existing files when copying android resources
 + Fix rare unhandled types: > 10000 and < 0
++ Use alias name in group chat, instead of id
 + Better user experiences... see `grep 'TODO' lib -R`
 + more easy-to-use for non-programmers (GUI?)
 
