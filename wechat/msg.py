@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
 # File: msg.py
-# Date: Wed Mar 25 22:27:58 2015 +0800
+# Date: Wed May 06 10:47:57 2015 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 TYPE_MSG = 1
 TYPE_IMG = 3
@@ -83,7 +83,7 @@ class WeChatMsg(object):
                 name = msg['alias']
             if not name:
                 name = ""
-            return u"NAMECARD: {}".format(name)
+            return u"NAMECARD: {}".format(self.content_xml_ready)
         elif self.type == TYPE_APP_MSG:
             pq = PyQuery(self.content_xml_ready, parser='xml')
             return pq('title').text()
