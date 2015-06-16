@@ -1,6 +1,6 @@
 #!/bin/bash -e
 # File: decrypt_db.sh
-# Date: Tue Jun 16 22:18:40 2015 +0800
+# Date: Tue Jun 16 22:23:13 2015 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
 source compatibility.sh
