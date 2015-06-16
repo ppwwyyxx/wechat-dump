@@ -162,7 +162,7 @@ class HTMLRender(object):
             nowtime = slice[0].createTime
             if idx == 0 or \
                slices[idx - 1][0].createTime.date() != nowtime.date():
-                timestr = nowtime.strftime("%Y-%m-%d %H:%M:%S")
+                timestr = nowtime.strftime("%m/%d %H:%M:%S")
             else:
                 timestr = nowtime.strftime("%H:%M:%S")
             blocks.append(self.time_html.format(time=timestr))

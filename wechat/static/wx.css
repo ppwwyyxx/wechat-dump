@@ -137,7 +137,7 @@ table {
 /* Elements */
 html,
 body {
-  /* height: 100%; */
+  height: 100%;
   background: #4e5359 repeat 0 0;
   color: #666;
   font: 14px/1.5 Helvetica, Arial, Tahoma;
@@ -1233,7 +1233,7 @@ a.btnSecondary:active {
   box-shadow: 0 2px 6px #313131;
   z-index: 20;
   /*ie hack*/
-  /* _height: 400px; */
+  _height: 400px;
 }
 .chatPanel {
   /*background:#fff;*/
@@ -1242,7 +1242,7 @@ a.btnSecondary:active {
   -webkit-border-radius: 2px 2px 6px 6px;
   -moz-border-radius: 2px 2px 6px 6px;
   border: 1px solid #424448;
-  /* _height: 400px; */
+  _height: 400px;
   overflow: hidden;
 }
 /*çª—ä½“å¤´éƒ¨æ ‡é¢˜*/
@@ -1278,11 +1278,11 @@ a.btnSecondary:active {
 }
 /*ä¼šè¯å†…å®¹çª—ä½“*/
 .chatPanel .chatScorll {
-  /* height: 100%; */
+  height: 100%;
   width: 100%;
   min-height: 200px;
-  /* overflow: hidden; */
-  /* overflow-y: auto; */
+  overflow: hidden;
+  overflow-y: auto;
   /*border-bottom:1px solid #bebebe;*/
   background-color: #EFF3F7;
 }
