@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
 # File: render.py
-# Date: Fri Mar 27 23:41:46 2015 +0800
+# Date: Tue Jun 16 23:47:52 2015 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
 import os
@@ -55,7 +55,7 @@ class HTMLRender(object):
 
         js_files = glob.glob(os.path.join(LIB_PATH, 'static/*.js'))
         # to load jquery before other js
-        js_files = sorted(js_files, key=lambda f: 'jquery' in f, reverse=True)
+        js_files = sorted(js_files, key=lambda f: 'jquery-latest' in f, reverse=True)
         self.js_string = []
         for js in js_files:
             logger.info("Loading {}".format(os.path.basename(js)))
