@@ -1,6 +1,6 @@
 #!/bin/bash -e
 # File: decrypt_db.sh
-# Date: Sun Feb 01 17:30:29 2015 +0800
+# Date: Tue Jun 16 22:18:40 2015 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
 source compatibility.sh
@@ -33,9 +33,9 @@ echo "Dump decoded database... "
 echo "Don't worry about libcrypt.so version warning."
 
 
-SQLCIPHER=./sqlcipher/$os/$version
+SQLCIPHER=./third-party/sqlcipher/$os/$version
 export LD_LIBRARY_PATH=$SQLCIPHER
-$SQLCIPHER/sqlcipher $MSGDB << EOF
+"$SQLCIPHER"/sqlcipher "$MSGDB" << EOF
 PRAGMA key='$KEY';
 PRAGMA cipher_use_hmac = off;
 ATTACH DATABASE "$output" AS db KEY "";
