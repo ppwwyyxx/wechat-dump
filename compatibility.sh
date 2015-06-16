@@ -1,6 +1,6 @@
 #!/bin/bash -e
 # $File: compatibility.sh
-# $Date: Sun Feb 01 17:22:34 2015 +0800
+# $Date: Tue Jun 16 22:23:36 2015 +0800
 # Author: Vury Leo <i[at]vuryleo[dot]com>
 
 realpath() {
