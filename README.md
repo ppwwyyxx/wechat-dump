@@ -3,6 +3,8 @@
 WeChat(微信), as the most popular mobile IM app in China, failed to allow users to export well-formatted chat history.
 This tool can parse and dump WeChat chat history on a rooted android phone.
 
+NEWS: WeChat 6.0+ use silk to encode audio. The code is updated.
+
 ### How to use:
 
 #### Dependencies:
@@ -14,9 +16,9 @@ This tool can parse and dump WeChat chat history on a rooted android phone.
 + python-csscompressor(optional)
 + adb and rooted android phone connected to PC
 + gnu-sed
++ Silk audio decoder (just run `./third-party/compile_silk.sh`)
 
 #### Get Necessary Data:
-
 
 + Get decrypted WeChat database (Linux & Mac Only):
 	+ Automatic: `./android-interact.sh db-decrypt`
@@ -60,7 +62,6 @@ Screenshots:
 ![byvoid](https://github.com/ppwwyyxx/wechat-dump/raw/master/screenshots/byvoid.jpg)
 
 ### TODO
-+ (IMPORTANT) Audio file encryption method for latest version of wechat.
 + Export all messages to libchat, and render messages from libchat
 + Search by uid/username
 + Skip existing files when copying android resources
