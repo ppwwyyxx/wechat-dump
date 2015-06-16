@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
 # File: res.py
-# Date: Sun Apr 19 17:11:07 2015 +0800
+# Date: Tue Jun 16 22:30:08 2015 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
 import glob
@@ -16,11 +16,11 @@ logger = logging.getLogger(__name__)
 import imghdr
 from multiprocessing import Pool
 
-import pysox
 
 from .avatar import AvatarReader
 from .utils import timing, md5, get_file_b64
 from .msg import TYPE_SPEAK
+from .audio import parse_wechat_audio_file
 
 LIB_PATH = os.path.dirname(os.path.abspath(__file__))
 INTERNAL_EMOJI_DIR = os.path.join(LIB_PATH, 'static', 'internal_emoji')
@@ -30,28 +30,6 @@ EMOJI_DIRNAME = 'emoji'
 AVATAR_DIRNAME = 'avatar'
 
 JPEG_QUALITY = 50
-
-def do_get_voice_mp3(amr_fpath):
-    """ return base64 string, and voice duration"""
-    try:
-        if not amr_fpath: return "", 0
-        mp3_file = os.path.join('/tmp',
-                                os.path.basename(amr_fpath)[:-4] + '.mp3')
-
-        infile = pysox.CSoxStream(amr_fpath)
-        outfile = pysox.CSoxStream(mp3_file, 'w', infile.get_signal())
-        chain = pysox.CEffectsChain(infile, outfile)
-        chain.flow_effects()
-        outfile.close()
-
-        signal = infile.get_signal().get_signalinfo()
-        duration = signal['length'] * 1.0 / signal['rate']
-        mp3_string = get_file_b64(mp3_file)
-        os.unlink(mp3_file)
-    except:
-        logger.warn("Failed to prepare voice file. Wechat changed their protocol!")
-        return 'fail', 0.1
-    return mp3_string, duration
 
 class Resource(object):
     """ multimedia resources in chat"""
@@ -82,7 +60,7 @@ class Resource(object):
         """ return mp3 and duration, or empty string and 0 on failure"""
         idx = self.voice_cache_idx.get(imgpath)
         if idx is None:
-            return do_get_voice_mp3(
+            return parse_wechat_audio_file(
                 self.get_voice_filename(imgpath))
         return self.voice_cache[idx].get()
 
@@ -92,10 +70,10 @@ class Resource(object):
         voice_paths = [msg.imgPath for msg in msgs if msg.type == TYPE_SPEAK]
         self.voice_cache_idx = {k: idx for idx, k in enumerate(voice_paths)}
         pool = Pool(3)
-        self.voice_cache = [pool.apply_async(do_get_voice_mp3,
+        self.voice_cache = [pool.apply_async(parse_wechat_audio_file,
                                              (self.get_voice_filename(k),)) for k in voice_paths]
 # single-threaded version, for debug
-        #self.voice_cache = map(do_get_voice_mp3,
+        #self.voice_cache = map(parse_wechat_audio_file,
                              #(self.get_voice_filename(k) for k in voice_paths))
 
     def get_avatar(self, username):
