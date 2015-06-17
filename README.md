@@ -61,7 +61,7 @@ because things behave differently on different phones.
 ```
 + Generate statistical report on text messages:
 ```
-./report.sh message_dir
+./count-message.sh message_dir
 ```
 ### Examples:
 See [here](http://ppwwyyxx.com/static/wechat/example.html) for an example html.
