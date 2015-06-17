@@ -1,9 +1,11 @@
 ## Dump WeChat Messages from Android
 
 WeChat(微信), as the most popular mobile IM app in China, failed to allow users to export well-formatted chat history.
-This tool can parse and dump WeChat chat history on a rooted android phone.
+This tool can parse and export WeChat message history on a rooted android phone.
 
-NEWS: WeChat 6.0+ use silk to encode audio. The code is updated.
+It can generate single-file html containing all the messages, including voice message, image, emoji, etc.
+
+__NEWS__: WeChat 6.0+ use silk to encode audio. The code is updated.
 
 ### How to use:
 
@@ -38,8 +40,15 @@ NEWS: WeChat 6.0+ use silk to encode audio. The code is updated.
 		```
 		./decrypt-db.sh <path to EnMicroMsg.db> <imei> <uin>
 		```
+
+NOTE: you may need to try different ways to getting imei & uin,
+because things behave differently on different phones.
+
+
 + Get WeChat user resource directory from your phone to `resource` directory:
-	+ `./android-interact.sh res`		# you might need to change the resource location in this script if the default doesn't work
+	+ `./android-interact.sh res`
+	+ You might need to change the resource location in this script if the default doesn't work
+	+ This takes a long time.
 
 #### Run:
 + Parse and dump text messages of every contact (resource directory is not required to run this):
@@ -57,17 +66,17 @@ NEWS: WeChat 6.0+ use silk to encode audio. The code is updated.
 ### Examples:
 See [here](http://ppwwyyxx.com/static/wechat/example.html) for an example html.
 
-Screenshots:
+Screenshots of generated html:
 
 ![byvoid](https://github.com/ppwwyyxx/wechat-dump/raw/master/screenshots/byvoid.jpg)
 
 ### TODO
-+ Export all messages to libchat, and render messages from libchat
++ Use libchat as unified backend. Export all messages to libchat, and render messages from libchat
 + Search by uid/username
 + Skip existing files when copying android resources
 + Fix rare unhandled types: > 10000 and < 0
 + Use alias name in group chat, instead of id
-+ Better user experiences... see `grep 'TODO' lib -R`
++ Better user experiences... see `grep 'TODO' wechat -R`
 + more easy-to-use for non-programmers (GUI?)
 
 ### Disclaimers
