@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
 # File: audio.py
-# Date: Tue Jun 16 23:16:11 2015 +0800
+# Date: Thu Jun 18 00:01:49 2015 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
 import os
@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 
 import pysox
 
-from .utils import get_file_b64
+from common.textutil import get_file_b64
 
 SILK_DECODER = os.path.join(os.path.dirname(__file__),
                             '../third-party/silk/decoder')

@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
 # File: msg.py
-# Date: Wed May 06 10:47:57 2015 +0800
+# Date: Thu Jun 18 00:01:00 2015 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 TYPE_MSG = 1
 TYPE_IMG = 3
@@ -26,7 +26,7 @@ from pyquery import PyQuery
 import logging
 logger = logging.getLogger(__name__)
 
-from .utils import ensure_unicode
+from common.textutil import ensure_unicode
 
 
 class WeChatMsg(object):

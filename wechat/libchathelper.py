@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
 # File: libchathelper.py
-# Date: Fri Mar 27 22:25:14 2015 +0800
+# Date: Thu Jun 18 00:02:35 2015 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
 import base64
@@ -12,7 +12,8 @@ logger = logging.getLogger(__name__)
 
 from libchat.libchat import SqliteLibChat, ChatMsg
 from .msg import *
-from .utils import timing, ProgressReporter
+from common.timer import timing
+from common.progress import ProgressReporter
 
 class LibChatHelper(object):
     """ Build LibChat messages from WeChat Msg"""

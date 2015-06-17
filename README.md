@@ -13,7 +13,6 @@ __NEWS__: WeChat 6.0+ use silk to encode audio. The code is updated.
 + python-PIL
 + [PyQuery](https://pypi.python.org/pypi/pyquery/1.2.1)
 + [pysox](https://pypi.python.org/pypi/pysox/0.3.6.alpha)
-+ [dill](https://pypi.python.org/pypi/dill)
 + numpy
 + python-csscompressor(optional)
 + adb and rooted android phone connected to PC

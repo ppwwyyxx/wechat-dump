@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
 # File: res.py
-# Date: Tue Jun 16 22:30:08 2015 +0800
+# Date: Thu Jun 18 00:02:21 2015 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
 import glob
@@ -18,7 +18,8 @@ from multiprocessing import Pool
 
 
 from .avatar import AvatarReader
-from .utils import timing, md5, get_file_b64
+from common.textutil import md5, get_file_b64
+from common.timer import timing
 from .msg import TYPE_SPEAK
 from .audio import parse_wechat_audio_file
 

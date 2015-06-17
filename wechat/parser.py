@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
 # File: parser.py
-# Date: Wed Jan 07 23:29:50 2015 +0800
+# Date: Thu Jun 18 00:03:53 2015 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
 import sqlite3
@@ -11,7 +11,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 from .msg import WeChatMsg
-from .utils import ensure_unicode
+from common.textutil import ensure_unicode
 
 """ tables in concern:
 emojiinfo
