@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
 # File: smiley.py
-# Date: Sun Feb 01 17:47:07 2015 +0800
+# Date: Thu Jun 18 00:02:43 2015 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
 import os
@@ -9,7 +9,7 @@ import re
 import json
 import struct
 
-from .utils import get_file_b64
+from common.textutil import get_file_b64
 
 STATIC_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static')
 

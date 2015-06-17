@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
 # File: avatar.py
-# Date: Fri Jan 09 22:41:55 2015 +0800
+# Date: Thu Jun 18 00:02:07 2015 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
 import os
@@ -9,7 +9,7 @@ import numpy as np
 import logging
 logger = logging.getLogger(__name__)
 
-from .utils import ensure_bin_str, md5
+from common.textutil import ensure_bin_str, md5
 
 class AvatarReader(object):
     def __init__(self, avt_dir):
