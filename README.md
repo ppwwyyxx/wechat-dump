@@ -1,5 +1,7 @@
 ## Dump WeChat Messages from Android
 
+## 导出安卓微信聊天数据
+
 WeChat(微信), as the most popular mobile IM app in China, failed to allow users to export well-formatted chat history.
 This tool can parse and export WeChat message history on a rooted android phone.
 
