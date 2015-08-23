@@ -1,11 +1,11 @@
 #!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
-# File: dump_msg.py
+# File: dump-msg.py
 # Date: Mon May 25 15:23:05 2015 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
 from wechat.parser import WeChatDBParser
-from wechat.utils import safe_filename
+from common.textutil import safe_filename
 import sys, os
 
 if len(sys.argv) != 3:
