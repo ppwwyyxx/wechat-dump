@@ -1,6 +1,6 @@
 #!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
-# File: dump_html.py
+# File: dump-html.py
 # Date: Wed Mar 25 17:44:20 2015 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
@@ -8,7 +8,7 @@ import sys
 if len(sys.argv) != 5:
     sys.exit("Usage: {0} <path to decoded_database.db> <path to resource> <name> <output html>".format(sys.argv[0]))
 
-from wechat.utils import ensure_unicode
+from common.textutil import ensure_unicode
 from wechat.parser import WeChatDBParser
 from wechat.res import Resource
 from wechat.render import HTMLRender
@@ -24,7 +24,9 @@ res = Resource(resource_dir)
 try:
     msgs = parser.msgs_by_talker[name]
 except:
-    sys.exit("Couldn't find that contact: valid contacts: " . parser.msgs_by_talker.keys);
+    sys.stderr.write(u"Valid Contacts: {}\n".format(u'\n'.join(parser.msgs_by_talker.keys())))
+    sys.stderr.write(u"Couldn't find that contact {}.".format(name));
+    sys.exit(1)
 
 render = HTMLRender(parser, res)
 htmls = render.render_msgs(msgs)

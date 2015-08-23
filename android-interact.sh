@@ -1,6 +1,6 @@
 #!/bin/bash -e
 # File: android-interact.sh
-# Date: Sun Apr 12 21:19:07 2015 +0900
+# Date: Fri Jun 26 10:38:07 2015 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
 source compatibility.sh
@@ -78,7 +78,7 @@ elif [[ $1 == "db_decrypt" ]]; then
 	echo "Getting db..."
 	$0 db
 	echo "Decrypting db..."
-	./decrypt_db.sh EnMicroMsg.db $(</tmp/imei) $(</tmp/uin)
+	./decrypt-db.sh EnMicroMsg.db $(</tmp/imei) $(</tmp/uin)
 	rm /tmp/{uin,imei}
 	echo "Done. See decoded.db"
 else
