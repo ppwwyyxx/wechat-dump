@@ -13,8 +13,8 @@ cd "$PROG_DIR"
 RES_DIR="/mnt/sdcard/tencent/MicroMsg"
 MM_DIR="/data/data/com.tencent.mm"
 
-#echo "Starting rooted adb server..."
-#adb root
+echo "Starting rooted adb server..."
+adb root
 
 if [[ $1 == "uin" ]]; then
 	adb pull $MM_DIR/shared_prefs/system_config_prefs.xml 2>/dev/null
@@ -47,7 +47,7 @@ elif [[ $1 == "db" || $1 == "res" ]]; then
 	echo "Found $numUser user(s). User chosen: $chooseUser"
 
 	if [[ $1 == "res" ]]; then
-		echo "Pulling resources... this might take a long time..."
+		echo "Pulling resources... this might take a long time, because adb sucks..."
 		mkdir -p resource; cd resource
 		for d in image2 voice2 emoji avatar video; do
 			mkdir -p $d; cd $d
