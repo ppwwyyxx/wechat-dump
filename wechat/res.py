@@ -28,7 +28,7 @@ INTERNAL_EMOJI_DIR = os.path.join(LIB_PATH, 'static', 'internal_emoji')
 VOICE_DIRNAME = 'voice2'
 IMG_DIRNAME = 'image2'
 EMOJI_DIRNAME = 'emoji'
-AVATAR_DIRNAME = 'avatar'
+AVATAR_DIRNAME = 'sfs'
 
 JPEG_QUALITY = 50
 
