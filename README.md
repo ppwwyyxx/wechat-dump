@@ -18,8 +18,8 @@ __NEWS__: WeChat 6.0+ use silk to encode audio. The code is updated.
 + numpy
 + python-csscompressor(optional)
 + adb and rooted android phone connected to PC
-+ gnu-sed
 + Silk audio decoder (just run `./third-party/compile_silk.sh`)
++ gnu-sed
 
 #### Get Necessary Data:
 
@@ -27,7 +27,7 @@ __NEWS__: WeChat 6.0+ use silk to encode audio. The code is updated.
 	+ Automatic: `./android-interact.sh db-decrypt`
 		+ Requires rooted adb. Available at https://play.google.com/store/apps/details?id=eu.chainfire.adbd&hl=en
 	+ Manual:
-		+ Get /data/data/com.tencent.mm/MicroMsg/long-long-name/EnMicroMsg.db from *root* filesystem, possible ways are:
+		+ Get /data/data/com.tencent.mm/MicroMsg/long-long-name/{EnMicroMsg.db,sfs/avatar.index} from __root__ filesystem, possible ways are:
 			+ `./android-interact.sh db`
 			+ Use your rooted file system manager app
 		+ Get WeChat uin, possible ways are:
@@ -49,7 +49,7 @@ because things behave differently on different phones.
 + Get WeChat user resource directory from your phone to `resource` directory:
 	+ `./android-interact.sh res`
 	+ You might need to change the resource location in this script if the default doesn't work
-	+ This takes a long time.
+	+ This takes a __long__ time.
 
 #### Run:
 + Parse and dump text messages of every contact (resource directory is not required to run this):
@@ -58,7 +58,7 @@ because things behave differently on different phones.
 ```
 + Dump messages of one contact to rich-content html, containing voice messages, emojis, and images:
 ```
-./dump-html.py decrypted.db resource <contact name> output.html
+./dump-html.py decrypted.db avatar.index resource <contact name> output.html
 ```
 + Generate statistical report on text messages:
 ```
@@ -72,6 +72,7 @@ Screenshots of generated html:
 ![byvoid](https://github.com/ppwwyyxx/wechat-dump/raw/master/screenshots/byvoid.jpg)
 
 ### TODO
++ Parse group messages. It doesn't work for now.
 + Use libchat as unified backend. Export all messages to libchat, and render messages from libchat
 + Search by uid/username
 + Skip existing files when copying android resources
@@ -83,13 +84,3 @@ Screenshots of generated html:
 ### Donate!
 Paypal:
 <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=7BC299GRDLEDU&lc=US&item_name=wechat%2ddump&item_number=wechat%2ddump&currency_code=USD&bn=PP%2dDonationsBF%3abtn_donate_SM%2egif%3aNonHosted"><img src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif" alt="[paypal]" /></a>
-
-<!--
-   -Alipay:
-   -
-   -<form action="https://shenghuo.alipay.com/send/payment/fill.htm" method="POST" target="_blank" accept-charset="GBK">
-   -    <input name="optEmail" type="hidden" value="ppwwyyxxc@gmail.com" />
-   -    <input id="title" name="title" type="hidden" value="wechat-dump" />
-   -    <input name="pay" type="image" value="轉賬" src="https://img.alipay.com/sys/personalprod/style/mc/btn-index.png" width="100"/>
-   -</form>
-   -->
