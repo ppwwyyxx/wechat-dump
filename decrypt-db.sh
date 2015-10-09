@@ -1,5 +1,5 @@
 #!/bin/bash -e
-# File: decrypt_db.sh
+# File: decrypt-db.sh
 # Date: Tue Jun 16 22:23:13 2015 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
@@ -29,8 +29,7 @@ uname | grep Darwin > /dev/null && os=darwin || os=linux
 uname -m | grep x86_64 > /dev/null && version=64bit || version=32bit
 echo "Use $version sqlcipher of $os."
 
-echo "Dump decoded database... "
-echo "Don't worry about libcrypt.so version warning."
+echo "Dump decoded database... (Don't worry about libcrypt.so version warning.)"
 
 
 SQLCIPHER=./third-party/sqlcipher/$os/$version

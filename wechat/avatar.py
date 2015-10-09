@@ -34,21 +34,19 @@ class AvatarReader(object):
             return img
 
     def read_bm_block(self, pos):
-        hex_pos = hex(pos)
-        fname = os.path.join(self.avt_dir, 
-                'avatar.block.0000' + hex_pos[2])
-        f = open(fname, 'rb')
-        start_pos = pos - 2 ** 34
-        f.seek(start_pos+30)
-        while f.read(1) != b"\x00":
-            continue
-
-        size = (96, 96, 3)
-        img = np.zeros(size, dtype='uint8')
-        for i in range(96):
-            for j in range(96):
-                r, g, b, a = map(ord, f.read(4))
-                img[i,j] = (r, g, b)
+        file_idx = 0
+        fname = os.path.join(self.avt_dir,
+                'avatar.block.0000' + str(file_idx))
+        with open(fname, 'rb') as f:
+            start_pos = pos + 16 + 51
+            # 51 = len('xx/xx/user_this-is-md5-of-length-32.png.bm\x00')
+            f.seek(start_pos)
+            size = (96, 96, 3)
+            img = np.zeros(size, dtype='uint8')
+            for i in range(96):
+                for j in range(96):
+                    r, g, b, a = map(ord, f.read(4))
+                    img[i,j] = (r, g, b)
         return img
 
     def query_index(self, filename):

@@ -49,7 +49,7 @@ elif [[ $1 == "db" || $1 == "res" ]]; then
 	if [[ $1 == "res" ]]; then
 		echo "Pulling resources... this might take a long time, because adb sucks..."
 		mkdir -p resource; cd resource
-		for d in image2 voice2 emoji avatar video; do
+		for d in image2 voice2 emoji avatar video sfs; do
 			mkdir -p $d; cd $d
 			adb pull $RES_DIR/$chooseUser/$d
 			cd ..
@@ -62,11 +62,17 @@ elif [[ $1 == "db" || $1 == "res" ]]; then
 		echo "Resource pulled at ./resource"
 		echo "Total size: $(du -sh resource | cut -f1)"
 	else
-		echo "Pulling database file..."
+		echo "Pulling database and avatar index file..."
 		adb pull $MM_DIR/MicroMsg/$chooseUser/EnMicroMsg.db
 		[[ -f EnMicroMsg.db ]] && \
-			echo "File successfully downloaded to EnMicroMsg.db" || {
-			>&2 echo "Failed to pull database from adb"
+			echo "Database successfully downloaded to EnMicroMsg.db" || {
+			>&2 echo "Failed to pull database by adb"
+			exit 1
+		}
+		adb pull $MM_DIR/MicroMsg/$chooseUser/sfs/avatar.index
+		[[ -f avatar.index ]] && \
+			echo "Avatar index successfully downloaded to avatar.index" || {
+			>&2 echo "Failed to pull avatar index by adb, are you using latest version of wechat?"
 			exit 1
 		}
 	fi
