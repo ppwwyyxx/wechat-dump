@@ -5,8 +5,8 @@
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
 import sys
-if len(sys.argv) != 5:
-    sys.exit("Usage: {0} <path to decrypted_database.db> <path to resource> <name> <output html>".format(sys.argv[0]))
+if len(sys.argv) != 6:
+    sys.exit("Usage: {0} <path to decrypted_database.db> <avt_db> <path to resource>  <name> <output html>".format(sys.argv[0]))
 
 from common.textutil import ensure_unicode
 from wechat.parser import WeChatDBParser
@@ -14,12 +14,13 @@ from wechat.res import Resource
 from wechat.render import HTMLRender
 
 db_file = sys.argv[1]
-resource_dir = sys.argv[2]
-name = ensure_unicode(sys.argv[3])
-output_file = sys.argv[4]
+avt_db = sys.argv[2]
+resource_dir = sys.argv[3]
+name = ensure_unicode(sys.argv[4])
+output_file = sys.argv[5]
 
 parser = WeChatDBParser(db_file)
-res = Resource(resource_dir)
+res = Resource(resource_dir, avt_db)
 
 try:
     msgs = parser.msgs_by_talker[name]

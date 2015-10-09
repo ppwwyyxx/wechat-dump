@@ -34,7 +34,7 @@ JPEG_QUALITY = 50
 
 class Resource(object):
     """ multimedia resources in chat"""
-    def __init__(self, res_dir):
+    def __init__(self, res_dir, avt_db):
         def check(subdir):
             assert os.path.isdir(os.path.join(res_dir, subdir)), \
                     "No such directory: {}".format(subdir)
@@ -45,7 +45,7 @@ class Resource(object):
         self.img_dir = os.path.join(res_dir, IMG_DIRNAME)
         self.voice_dir = os.path.join(res_dir, VOICE_DIRNAME)
         self.emoji_dir = os.path.join(res_dir, EMOJI_DIRNAME)
-        self.avt_reader = AvatarReader(os.path.join(res_dir, AVATAR_DIRNAME))
+        self.avt_reader = AvatarReader(os.path.join(res_dir, AVATAR_DIRNAME), avt_db)
 
     def get_voice_filename(self, imgpath):
         fname = md5(imgpath)
@@ -140,7 +140,7 @@ class Resource(object):
                imghdr.what(img_file) != 'jpeg':
                 im = Image.open(open(img_file, 'rb'))
                 buf = cStringIO.StringIO()
-                im.save(buf, 'JPEG', quality=JPEG_QUALITY)
+                im.convert('RGB').save(buf, 'JPEG', quality=JPEG_QUALITY)
                 return base64.b64encode(buf.getvalue())
             return get_file_b64(img_file)
         big_file = get_jpg_b64(big_file)
