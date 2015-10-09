@@ -6,7 +6,7 @@
 
 import sys
 if len(sys.argv) != 6:
-    sys.exit("Usage: {0} <path to decrypted_database.db> <avt_db> <path to resource>  <name> <output html>".format(sys.argv[0]))
+    sys.exit("Usage: {0} <path to decrypted_database.db> <path to avatar.index> <path to resource> <name> <output html>".format(sys.argv[0]))
 
 from common.textutil import ensure_unicode
 from wechat.parser import WeChatDBParser
