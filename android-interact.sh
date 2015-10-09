@@ -49,7 +49,7 @@ elif [[ $1 == "db" || $1 == "res" ]]; then
 	if [[ $1 == "res" ]]; then
 		echo "Pulling resources... this might take a long time, because adb sucks..."
 		mkdir -p resource; cd resource
-		for d in image2 voice2 emoji avatar video sfs; do
+		for d in image2 voice2 emoji video sfs; do
 			mkdir -p $d; cd $d
 			adb pull $RES_DIR/$chooseUser/$d
 			cd ..

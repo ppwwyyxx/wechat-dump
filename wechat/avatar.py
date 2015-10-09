@@ -57,14 +57,3 @@ class AvatarReader(object):
             return index_avatar
         except:
             return -1
-
-    @staticmethod
-    def read_bm(fname):
-        size = (96, 96, 3)
-        img = np.zeros(size, dtype='uint8')
-        with open(fname, 'rb') as f:
-            for i in range(96):
-                for j in range(96):
-                    r, g, b, a = map(ord, f.read(4))
-                    img[i,j] = (r, g, b)
-        return img
