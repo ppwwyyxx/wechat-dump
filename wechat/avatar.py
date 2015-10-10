@@ -34,12 +34,14 @@ class AvatarReader(object):
             return img
 
     def read_bm_block(self, pos):
-        file_idx = 0
+        file_idx = pos >> 32 
         fname = os.path.join(self.avt_dir,
-                'avatar.block.0000' + str(file_idx))
+                'avatar.block.' + '{:05d}'.format(file_idx))
+        # 16 is unknown prefix
+        # 51 = len('xx/xx/user_this-is-md5-of-length-32.png.bm\x00')
+        # file_idx * (2**32) is offset between block files
+        start_pos = pos - file_idx * (2**32) + 16 + 51
         with open(fname, 'rb') as f:
-            start_pos = pos + 16 + 51
-            # 51 = len('xx/xx/user_this-is-md5-of-length-32.png.bm\x00')
             f.seek(start_pos)
             size = (96, 96, 3)
             img = np.zeros(size, dtype='uint8')
