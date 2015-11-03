@@ -32,11 +32,13 @@ echo "Use $version sqlcipher of $os."
 echo "Dump decrypted database... (Don't worry about libcrypt.so version warning.)"
 
 
-SQLCIPHER=./third-party/sqlcipher/$os/$version
+SQLCIPHER=./sqlcipher/$os/$version
 export LD_LIBRARY_PATH=$SQLCIPHER
 "$SQLCIPHER"/sqlcipher "$MSGDB" << EOF
 PRAGMA key='$KEY';
 PRAGMA cipher_use_hmac = off;
+PRAGMA cipher_page_size = 1024;
+PRAGMA kdf_iter = 4000;
 ATTACH DATABASE "$output" AS db KEY "";
 SELECT sqlcipher_export("db");
 DETACH DATABASE db;

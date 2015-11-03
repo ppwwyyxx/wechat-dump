@@ -15,6 +15,7 @@ __NEWS__: WeChat 6.0+ use silk to encode audio. The code is updated.
 + python-PIL
 + [PyQuery](https://pypi.python.org/pypi/pyquery/1.2.1)
 + [pysox](https://pypi.python.org/pypi/pysox/0.3.6.alpha)
++ [pysqlcipher](https://pypi.python.org/pypi/pysqlcipher)
 + numpy
 + python-csscompressor(optional)
 + adb and rooted android phone connected to PC
@@ -39,11 +40,14 @@ __NEWS__: WeChat 6.0+ use silk to encode audio. The code is updated.
 			+ Find IMEI in system settings
 		+ Decrypt database, will produce `decrypted.db`:
 		```
-		./decrypt-db.sh <path to EnMicroMsg.db> <imei> <uin>
+		./decrypt-db.py <path to EnMicroMsg.db> <imei> <uin>
 		```
+
 
 NOTE: you may need to try different ways to getting imei & uin,
 because things behave differently on different phones.
+
+Also, if the decryption doesn't work with pysqlcipher, maybe try the version of sqlcipher in `legacy`.
 
 
 + Get WeChat user resource directory from your phone to `resource` directory:
