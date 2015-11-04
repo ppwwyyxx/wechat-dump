@@ -10,13 +10,14 @@ from hashlib import md5
 import sys
 import os
 
+DEFAULT_OUTPUT_DB_NAME = 'decrypted.db'
 def get_args():
     parser = ArgumentParser()
     parser.add_argument('db', help='path to EnMicroMsg.db')
     parser.add_argument('imei', help='15 digit IMEI of your phone')
     parser.add_argument('uin', help='WeChat UIN')
     parser.add_argument('--output', help='output decrypted database',
-                        default='decrypted.db')
+                        default=DEFAULT_OUTPUT_DB_NAME)
     args = parser.parse_args()
     return args
 
@@ -28,17 +29,21 @@ if __name__ == '__main__':
     args = get_args()
 
     output = args.output
+    if os.path.abspath(os.path.dirname(output)) != os.path.abspath('.'):
+        print "Output file must be in current directory"
+        sys.exit(1)
     if os.path.isfile(output):
         print "{} already exists. Remove? (y/n)".format(args.output),
         ans = raw_input()
         if ans not in ['y', 'Y']:
             print "Bye!"
             sys.exit()
-        os.unlink(argsos.output)
+        os.unlink(output)
+
     key = get_key(args.imei, args.uin)
     print "KEY: {}".format(key)
 
-    print "Dump decrypted database... "
+    print "Decrypt and dump database to {} ... ".format(output)
     conn = sqlite.connect(args.db)
     c = conn.cursor()
     c.execute("PRAGMA key = '" + key + "';")
