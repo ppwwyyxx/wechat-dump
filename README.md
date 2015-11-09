@@ -2,10 +2,10 @@
 
 ## 导出安卓微信聊天数据
 
-WeChat(微信), as the most popular mobile IM app in China, failed to allow users to export well-formatted chat history.
-This tool can parse and export WeChat message history on a rooted android phone.
+WeChat(微信), as the most popular mobile IM app in China, doesn't give users any method to export well-formatted history message.
+This tool can parse and export WeChat messages on a rooted android phone.
 
-It can generate single-file html containing all the messages, including voice message, image, emoji, etc.
+It can generate single-file html containing all the messages, including voice messages, images, emoji, etc.
 
 __NEWS__: WeChat 6.0+ use silk to encode audio. The code is updated.
 
@@ -17,8 +17,8 @@ __NEWS__: WeChat 6.0+ use silk to encode audio. The code is updated.
 + [pysox](https://pypi.python.org/pypi/pysox/0.3.6.alpha)
 + [pysqlcipher](https://pypi.python.org/pypi/pysqlcipher)
 + numpy
-+ python-csscompressor(optional)
-+ adb and rooted android phone connected to PC
++ python-csscompressor (suggested, optional)
++ adb and rooted android phone connected to a Linux/Mac OS.
 + Silk audio decoder (just run `./third-party/compile_silk.sh`)
 + gnu-sed
 

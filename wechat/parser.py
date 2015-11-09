@@ -58,10 +58,11 @@ SELECT {} FROM message
             msg = WeChatMsg(row)
             if not WeChatMsg.filter_type(msg.type):
                 self.msgs_by_talker[msg.talker].append(msg)
-            #if msg.type > 10000 or msg.type < 0:
-                #print repr(msg).split('|')[0]
+
+        # It's possible that messages are kept in database after contacts been deleted
+        # TODO handle this with a random contact name
         self.msgs_by_talker = {self.contacts[k]: sorted(v, key=lambda x: x.createTime)
-                           for k, v in self.msgs_by_talker.iteritems()}
+                           for k, v in self.msgs_by_talker.iteritems() if k in self.contacts}
         for k, v in self.msgs_by_talker.iteritems():
             for msg in v:
                 msg.talker_name = ensure_unicode(k)
