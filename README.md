@@ -75,7 +75,7 @@ Screenshots of generated html:
 
 ![byvoid](https://github.com/ppwwyyxx/wechat-dump/raw/master/screenshots/byvoid.jpg)
 
-### TODO
+### TODO List
 + Parse group messages. It doesn't work for now.
 + Use libchat as unified backend. Export all messages to libchat, and render messages from libchat
 + Search by uid/username
