@@ -1,4 +1,4 @@
-#!/bin/bash -e
+#!/bin/bash
 # File: android-interact.sh
 # Date: Fri Jun 26 10:38:07 2015 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
@@ -18,7 +18,7 @@ adb root
 
 if [[ $1 == "uin" ]]; then
 	adb pull $MM_DIR/shared_prefs/system_config_prefs.xml 2>/dev/null
-	uin=$($GREP 'default_uin' system_config_prefs.xml | $GREP -o 'value="-\?[0-9]*' | cut -c 8-)
+	uin=$($GREP 'default_uin' system_config_prefs.xml | $GREP -o 'value="\-?[0-9]*' | cut -c 8-)
 	[[ -n $uin ]] || {
 		>&2 echo "Failed to get wechat uin. You can try other methods, or report a bug."
 		exit 1
@@ -26,7 +26,7 @@ if [[ $1 == "uin" ]]; then
 	rm system_config_prefs.xml
 	echo "Got wechat uin: $uin"
 elif [[ $1 == "imei" ]]; then
-	imei=$(adb shell dumpsys iphonesubinfo | $GREP 'Device ID' | $GREP -o '[0-9]\+')
+	imei=$(adb shell dumpsys iphonesubinfo | $GREP 'Device ID' | $GREP -o '[0-9]+')
 	[[ -n $imei ]] || {
 		>&2 echo "Failed to get imei. You can try other methods, or report a bug."
 		exit 1
@@ -78,7 +78,7 @@ elif [[ $1 == "db" || $1 == "res" ]]; then
 	fi
 elif [[ $1 == "db-decrypt" ]]; then
 	echo "Getting uin..."
-	$0 uin | tail -n1 | $GREP -o '-\?[0-9]*' | tee /tmp/uin
+	$0 uin | tail -n1 | $GREP -o '\-?[0-9]*' | tee /tmp/uin
 	echo "Getting imei..."
 	$0 imei | tail -n1 | $GREP -o '[0-9]*' | tee /tmp/imei
 	echo "Getting db..."

@@ -13,7 +13,7 @@ if [ `uname` = 'Darwin' ]; then
   MD5SUM='md5'
 else
   REALPATH='readlink -f'
-  GREP=grep
+  GREP='grep -E'
   MD5SUM='md5sum'
 fi
 

@@ -19,7 +19,7 @@ class LibChatHelper(object):
     """ Build LibChat messages from WeChat Msg"""
 
     """ Types of message whose contents are fully parsed.
-    No need to save extra data for them. """
+        No need to save extra data for them. """
     FullyParsed = [TYPE_MSG, TYPE_SPEAK, TYPE_EMOJI,
                     TYPE_CUSTOM_EMOJI, TYPE_IMG]
 

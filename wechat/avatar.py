@@ -25,16 +25,21 @@ class AvatarReader(object):
         filename = os.path.join(dir1, dir2,
                                 "user_{}.png.bm".format(filename))
 
-        index_avatar = self.query_index(filename)
-        if index_avatar == -1:
-            logger.warn("Avatar not found for {}".format(username))
+        try:
+            index_avatar = self.query_index(filename)
+            if index_avatar == -1:
+                logger.warn("Avatar not found for {}".format(username))
+                return None
+            else:
+                img = self.read_bm_block(index_avatar)
+                return img
+        except:
+            logger.warn("Failed to retrieve avatar!")
             return None
-        else:
-            img = self.read_bm_block(index_avatar)
-            return img
+
 
     def read_bm_block(self, pos):
-        file_idx = pos >> 32 
+        file_idx = pos >> 32
         fname = os.path.join(self.avt_dir,
                 'avatar.block.' + '{:05d}'.format(file_idx))
         # 16 is unknown prefix
@@ -45,8 +50,8 @@ class AvatarReader(object):
             f.seek(start_pos)
             size = (96, 96, 3)
             img = np.zeros(size, dtype='uint8')
-            for i in range(96):
-                for j in range(96):
+            for i in xrange(96):
+                for j in xrange(96):
                     r, g, b, a = map(ord, f.read(4))
                     img[i,j] = (r, g, b)
         return img

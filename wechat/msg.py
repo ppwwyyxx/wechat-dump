@@ -67,7 +67,7 @@ class WeChatMsg(object):
                 pass
             return "LOCATION:" + label + " ({},{})".format(loc['x'], loc['y'])
         elif self.type == TYPE_LINK:
-            pq = PyQuery(self.content_xml_ready, parser='xml')
+            pq = PyQuery(self.content_xml_ready)
             url = pq('url').text()
             if not url:
                 title = pq('title').text()
