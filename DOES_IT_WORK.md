@@ -1,3 +1,5 @@
+Currently this tools may not work sometimes. It's now not known what's the reason. Please share your experience whether it works or not with your device.
+
 ## What shouldn't work:
 avatar on latest version of WeChat
 
