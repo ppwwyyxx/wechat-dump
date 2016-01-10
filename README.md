@@ -12,7 +12,7 @@ __NEWS__: WeChat 6.0+ use silk to encode audio. The code is updated.
 __NEWS__: The latest version of WeChat uses a new avatar storage. Currently I don't have time investigating that. You're expected to
 see generated htmls without avatars. Contributions welcomed!
 
-If this tools works for you, please take a moment to __add your phone/OS to__ [this file](https://github.com/ppwwyyxx/wechat-dump/blob/master/DOES_IT_WORK.md).
+If this tools works for you, please take a moment to __add your phone/OS to__ [the wiki](https://github.com/ppwwyyxx/wechat-dump/wiki).
 If it doesn't work, please leave an issue together with your phone/OS/wechat version.
 
 ### How to use:
