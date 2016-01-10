@@ -7,4 +7,4 @@ avatar on latest version of WeChat
 
 
 ## What doesn't work:
-+ Cannot get IMEI automatically with android 5.0 (see #9). You can obtain it manually.
++ Cannot get IMEI automatically with android 5.0 (see [#9](https://github.com/ppwwyyxx/wechat-dump/issues/9)). You can obtain it manually.
