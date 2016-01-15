@@ -5,7 +5,7 @@
 WeChat(微信), as the most popular mobile IM app in China, doesn't give users any method to export well-formatted history message.
 This tool can parse and export WeChat messages on a rooted android phone.
 
-It can generate single-file html containing all the messages, including voice messages, images, emoji, etc.
+Right now it can dump messages in text-only mode, or generate a single-file html containing voice messages, images, emoji, etc.
 
 __NEWS__: WeChat 6.0+ use silk to encode audio. The code is updated.
 
@@ -62,18 +62,19 @@ Also, if the decryption doesn't work with pysqlcipher, maybe try the version of 
 	+ This takes a __long__ time.
 
 #### Run:
-+ Parse and dump text messages of every contact (resource directory is not required to run this):
++ Parse and dump text messages of __every__ contact (resource directory is not needed to run this):
 ```
 ./dump-msg.py decrypted.db output_dir
 ```
-+ Dump messages of one contact to rich-content html, containing voice messages, emojis, and images:
++ Generate statistical report on text messages:
+```
+./count-message.sh output_dir
+```
++ Dump messages of one contact to html, containing voice messages, emojis, and images:
 ```
 ./dump-html.py decrypted.db avatar.index resource <contact name> output.html
 ```
-+ Generate statistical report on text messages:
-```
-./count-message.sh message_dir
-```
+
 ### Examples:
 See [here](http://ppwwyyxx.com/static/wechat/example.html) for an example html.
 
@@ -82,10 +83,9 @@ Screenshots of generated html:
 ![byvoid](https://github.com/ppwwyyxx/wechat-dump/raw/master/screenshots/byvoid.jpg)
 
 ### TODO List
-+ Parse group messages. It doesn't work for now.
-+ Use libchat as unified backend. Export all messages to libchat, and render messages from libchat
++ Parse group messages. Doesn't work very well for now.
 + Search by uid/username
-+ Skip existing files when copying android resources
++ Faster way to copy a directory from android (I don't know..).
 + Fix rare unhandled types: > 10000 and < 0
 + Use alias name in group chat, instead of id
 + Better user experiences... see `grep 'TODO' wechat -R`
