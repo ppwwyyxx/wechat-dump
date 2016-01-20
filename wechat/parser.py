@@ -7,6 +7,7 @@
 import sqlite3
 from collections import defaultdict
 import itertools
+from datetime import datetime
 import logging
 logger = logging.getLogger(__name__)
 
@@ -23,13 +24,15 @@ rcontact
 """
 
 class WeChatDBParser(object):
+    FIELDS = ["msgSvrId","type","isSend","createTime","talker","content","imgPath"]
+
     def __init__(self, db_fname):
         """ db_fname: EnMicroMsg.db"""
         self.db_fname = db_fname
         self.db_conn = sqlite3.connect(self.db_fname)
         self.cc = self.db_conn.cursor()
         self.contacts = {}
-        self.msgs_by_talker = defaultdict(list)
+        self.msgs_by_chat = defaultdict(list)
         self.emojis = {}
         self.internal_emojis = {}
         self._parse()
@@ -46,6 +49,7 @@ SELECT username,conRemark,nickname FROM rcontact
             else:
                 self.contacts[username] = ensure_unicode(nickname)
 
+        self.contacts_rev = {v: k for k, v in self.contacts.iteritems()}
         logger.info("Found {} contacts.".format(len(self.contacts)))
 
     def _parse_msg(self):
@@ -53,19 +57,18 @@ SELECT username,conRemark,nickname FROM rcontact
         db_msgs = self.cc.execute(
 """
 SELECT {} FROM message
-""".format(','.join(WeChatMsg.FIELDS)))
+""".format(','.join(WeChatDBParser.FIELDS)))
         for row in db_msgs:
-            msg = WeChatMsg(row)
+            values = self._parse_row(row)
+            if not values:
+                continue
+            msg = WeChatMsg(values)
+            # TODO keep system message?
             if not WeChatMsg.filter_type(msg.type):
-                self.msgs_by_talker[msg.talker].append(msg)
+                self.msgs_by_chat[msg.chat].append(msg)
 
-        # It's possible that messages are kept in database after contacts been deleted
-        # TODO handle this with a random contact name
-        self.msgs_by_talker = {self.contacts[k]: sorted(v, key=lambda x: x.createTime)
-                           for k, v in self.msgs_by_talker.iteritems() if k in self.contacts}
-        for k, v in self.msgs_by_talker.iteritems():
-            for msg in v:
-                msg.talker_name = ensure_unicode(k)
+        for k, v in self.msgs_by_chat.iteritems():
+            self.msgs_by_chat[k] = sorted(v, key=lambda x: x.createTime)
             msgs_tot_cnt += len(v)
         logger.info("Found {} message records.".format(msgs_tot_cnt))
 
@@ -84,7 +87,7 @@ SELECT {} FROM message
     def _find_msg_by_type(self, msgs=None):
         ret = []
         if msgs is None:
-            msgs = itertools.chain.from_iterable(self.msgs_by_talker.itervalues())
+            msgs = itertools.chain.from_iterable(self.msgs_by_chat.itervalues())
         for msg in msgs:
             if msg.type == 34:
                 ret.append(msg)
@@ -114,3 +117,33 @@ SELECT {} FROM message
         self._parse_msg()
         self._parse_imginfo()
         self._parse_emoji()
+
+    # process the values in a row
+    def _parse_row(self, row):
+        values = dict(zip(WeChatDBParser.FIELDS, row))
+        if values['content']:
+            values['content'] = ensure_unicode(values['content'])
+        else:
+            values['content'] = u''
+        values['createTime'] = datetime.fromtimestamp(values['createTime']/ 1000)
+        values['chat'] = values['talker']
+        try:
+            if values['chat'].endswith('@chatroom'):
+                values['chat'] = self.contacts[values['chat']]
+                content = values['content']
+                talker = content[:content.find(':')]
+                try:
+                    values['talker'] = self.contacts[talker]
+                    values['content'] = content[content.find('\n') + 1:]
+                except KeyError:
+                    # system messages have no talker
+                    values['talker'] = u''
+            else:
+                tk_id = values['talker']
+                values['chat'] = self.contacts[tk_id]
+                values['talker'] = self.contacts[tk_id]
+        except KeyError:
+            # It's possible that messages are kept in database after contacts been deleted
+            logger.warn("Unknown contact, probably deleted: {}".format(tk_id))
+            return None
+        return values

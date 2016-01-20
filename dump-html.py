@@ -23,9 +23,9 @@ parser = WeChatDBParser(db_file)
 res = Resource(resource_dir, avt_db)
 
 try:
-    msgs = parser.msgs_by_talker[name]
+    msgs = parser.msgs_by_chat[name]
 except:
-    sys.stderr.write(u"Valid Contacts: {}\n".format(u'\n'.join(parser.msgs_by_talker.keys())))
+    sys.stderr.write(u"Valid Contacts: {}\n".format(u'\n'.join(parser.msgs_by_chat.keys())))
     sys.stderr.write(u"Couldn't find that contact {}.".format(name));
     sys.exit(1)
 

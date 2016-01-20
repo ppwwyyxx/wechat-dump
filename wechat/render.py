@@ -92,7 +92,7 @@ class HTMLRender(object):
     def render_msg(self, msg):
         """ render a message, return the html block"""
         # TODO for chatroom, add nickname on avatar
-        sender = u'you ' + msg.get_msg_talker_id() if not msg.isSend else 'me'
+        sender = u'you ' + msg.talker if not msg.isSend else 'me'
         format_dict = {'sender_label': sender,
                        'time': msg.createTime }
         def fallback():
@@ -174,7 +174,7 @@ class HTMLRender(object):
         # string operation is extremely slow
         return self.html.format(extra_css=self.all_css,
                             extra_js=self.all_js,
-                            talker=msgs[0].talker_name,
+                            chat=msgs[0].chat,
                             messages=u''.join(blocks)
                            )
 
@@ -184,25 +184,25 @@ class HTMLRender(object):
         css = avatar_tpl.format(name='me', avatar=my_avatar)
 
         for talker in talkers:
-            avatar = self.res.get_avatar(talker)
+            avatar = self.res.get_avatar(self.parser.contacts_rev[talker])
             css += avatar_tpl.format(name=talker, avatar=avatar)
         self.css_string.append(css)
 
     def render_msgs(self, msgs):
-        """ render msgs of one friend, return a list of html"""
-        talker_id = msgs[0].talker
+        """ render msgs of one chat, return a list of html"""
+        chat = msgs[0].chat
         if msgs[0].is_chatroom():
             talkers = set()
             for msg in msgs:
-                talkers.add(msg.get_msg_talker_id())
+                talkers.add(msg.talker)
         else:
-            talkers = set([talker_id])
+            talkers = set([chat])
         self.prepare_avatar_css(talkers)
 
         self.res.cache_voice_mp3(msgs)
 
-        logger.info(u"Rendering {} messages of {}({})".format(
-            len(msgs), self.parser.contacts[talker_id], talker_id))
+        logger.info(u"Rendering {} messages of {}".format(
+            len(msgs), chat))
 
         self.prgs = ProgressReporter("Render", total=len(msgs))
         slice_by_size = MessageSlicerBySize().slice(msgs)

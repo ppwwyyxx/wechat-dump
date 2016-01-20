@@ -1,6 +1,6 @@
 #!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
-# File: plot_num_msg_by_time.py
+# File: plot-num-msg-by-time.py
 # Date: Wed Mar 25 17:44:39 2015 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
@@ -20,7 +20,7 @@ name = ensure_unicode(sys.argv[2])
 every_k_days = 2
 
 parser = WeChatDBParser(db_file)
-msgs = parser.msgs_by_talker[name]
+msgs = parser.msgs_by_chat[name]
 times = [x.createTime for x in msgs]
 start_time = times[0]
 diffs = [(x - start_time).days for x in times]

@@ -78,9 +78,9 @@ class LibChatHelper(object):
         return json.dumps(ret)
 
     def _convert_msg(self, msg):
-        sender = 'me' if msg.isSend else msg.get_msg_talker_id()
+        sender = 'me' if msg.isSend else msg.talker
         chatroom = msg.get_chatroom()
-        text = msg.content_no_first_line if msg.type == TYPE_MSG else ''
+        text = msg.content if msg.type == TYPE_MSG else ''
         img, format = self._get_image(msg)
         if img:
             # TODO don't use b64, directly return image content
