@@ -21,7 +21,6 @@ TYPE_APP_MSG = 16777265
 _KNOWN_TYPES = [eval(k) for k in dir() if k.startswith('TYPE_')]
 
 import re
-from datetime import datetime
 from pyquery import PyQuery
 import logging
 logger = logging.getLogger(__name__)
@@ -30,7 +29,6 @@ from common.textutil import ensure_unicode
 
 
 class WeChatMsg(object):
-    FIELDS = ["msgSvrId","type","isSend","createTime","talker","content","imgPath"]
 
     @staticmethod
     def filter_type(tp):
@@ -38,21 +36,13 @@ class WeChatMsg(object):
             return True
         return False
 
-    def __init__(self, row):
-        """ row: a tuple corresponding to FIELDS"""
-        assert len(row) == len(WeChatMsg.FIELDS)
-        for f, v in zip(WeChatMsg.FIELDS, row):
-            setattr(self, f, v)
+    def __init__(self, values):
+        for k, v in values.iteritems():
+            setattr(self, k, v)
         if self.type not in _KNOWN_TYPES:
             logger.warn("Unhandled message type: {}".format(self.type))
             # only to supress repeated warning:
             _KNOWN_TYPES.append(self.type)
-        self.createTime = datetime.fromtimestamp(self.createTime / 1000)
-        self.talker_name = None
-        if self.content:
-            self.content = ensure_unicode(self.content)
-        else:
-            self.content = u""
 
     def msg_str(self):
         if self.type == TYPE_LOCATION:
@@ -97,29 +87,22 @@ class WeChatMsg(object):
             return "LOCATION SHARING"
         elif self.type == TYPE_EMOJI:
             # TODO add emoji name
-            return self.content_no_first_line
+            return self.content
         else:
             # TODO replace smiley with text
-            return self.content_no_first_line
-
-    @property
-    def content_no_first_line(self):
-        if not self.is_chatroom():
             return self.content
-        return self.content[self.content.find('\n')+1:]
 
     @property
     def content_xml_ready(self):
         # remove xml headers to avoid possible errors it may create
         header = re.compile(r'<\?.*\?>')
-        msg = header.sub("", self.content_no_first_line)
+        msg = header.sub("", self.content)
         return msg
 
     def __repr__(self):
         ret = u"{}|{}:{}:{}".format(
             self.type,
-            (self.talker if not self.talker_name else self.talker_name) \
-                if not self.isSend else 'me',
+            self.talker if not self.isSend else 'me',
             self.createTime,
             ensure_unicode(self.msg_str())).encode('utf-8')
         if self.imgPath:
@@ -132,16 +115,11 @@ class WeChatMsg(object):
         return self.createTime < r.createTime
 
     def is_chatroom(self):
-        return self.talker.endswith('@chatroom')
-
-    def get_msg_talker_id(self):
-        if not self.is_chatroom():
-            return self.talker
-        return self.content[:self.content.find(':')]
+        return self.talker != self.chat
 
     def get_chatroom(self):
         if self.is_chatroom():
-            return self.talker[:-9]
+            return self.chat
         else:
             return ''
 

@@ -22,7 +22,7 @@ if not os.path.isdir(output_dir):
 
 parser = WeChatDBParser(db_file)
 
-for name, msgs in parser.msgs_by_talker.iteritems():
+for name, msgs in parser.msgs_by_chat.iteritems():
     print u"Writing msgs for {}".format(name)
     safe_name = safe_filename(name)
     with open(os.path.join(output_dir, safe_name + '.txt'), 'w') as f:

@@ -83,11 +83,9 @@ Screenshots of generated html:
 ![byvoid](https://github.com/ppwwyyxx/wechat-dump/raw/master/screenshots/byvoid.jpg)
 
 ### TODO List
-+ Parse group messages. Doesn't work very well for now.
 + Search by uid/username
 + Faster way to copy a directory from android (I don't know..).
 + Fix rare unhandled types: > 10000 and < 0
-+ Use alias name in group chat, instead of id
 + Better user experiences... see `grep 'TODO' wechat -R`
 + more easy-to-use for non-programmers (GUI?)
 
