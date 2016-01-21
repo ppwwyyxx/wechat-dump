@@ -79,10 +79,9 @@ class Resource(object):
 
     def get_avatar(self, username):
         """ return base64 string"""
-        ret = self.avt_reader.get_avatar(username)
-        if ret is None:
+        im = self.avt_reader.get_avatar(username)
+        if im is None:
             return ""
-        im = Image.fromarray(ret)
         buf = cStringIO.StringIO()
         im.save(buf, 'JPEG', quality=JPEG_QUALITY)
         jpeg_str = buf.getvalue()
