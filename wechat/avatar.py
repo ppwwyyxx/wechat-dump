@@ -4,6 +4,8 @@
 # Date: Thu Jun 18 00:02:07 2015 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
+from PIL import Image
+import cStringIO
 import os
 import numpy as np
 import logging
@@ -23,44 +25,36 @@ class AvatarReader(object):
         filename = md5(username)
         dir1, dir2 = filename[:2], filename[2:4]
         filename = os.path.join(dir1, dir2,
-                                "user_{}.png.bm".format(filename))
+                                "user_{}.png".format(filename))
 
         try:
-            index_avatar = self.query_index(filename)
-            if index_avatar == -1:
-                logger.warn("Avatar not found for {}".format(username))
+            try:
+                pos, size = self.query_index(filename)
+            except TypeError:
+                logger.warn("Avatar for {} not found in avatar database.".format(username))
                 return None
-            else:
-                img = self.read_bm_block(index_avatar)
-                return img
-        except:
+            return self.read_img(pos, size)
+        except Exception as e:
+            raise
+            print e
             logger.warn("Failed to retrieve avatar!")
             return None
 
 
-    def read_bm_block(self, pos):
+    def read_img(self, pos, size):
         file_idx = pos >> 32
         fname = os.path.join(self.avt_dir,
                 'avatar.block.' + '{:05d}'.format(file_idx))
-        # 16 is unknown prefix
-        # 51 = len('xx/xx/user_this-is-md5-of-length-32.png.bm\x00')
-        # file_idx * (2**32) is offset between block files
-        start_pos = pos - file_idx * (2**32) + 16 + 51
+        # a 64-byte offset of each block file
+        start_pos = pos - file_idx * (2**32) + 64
         with open(fname, 'rb') as f:
             f.seek(start_pos)
-            size = (96, 96, 3)
-            img = np.zeros(size, dtype='uint8')
-            for i in xrange(96):
-                for j in xrange(96):
-                    r, g, b, a = map(ord, f.read(4))
-                    img[i,j] = (r, g, b)
-        return img
+            data = f.read(size)
+            im = Image.open(cStringIO.StringIO(data))
+            return im
 
     def query_index(self, filename):
         conn = sqlite3.connect(self.avt_db)
-        try:
-            cursor = conn.execute("select Offset from Index_avatar where FileName='{}'".format(filename))
-            index_avatar = cursor.fetchone()[0]
-            return index_avatar
-        except:
-            return -1
+        cursor = conn.execute("select Offset,Size from Index_avatar where FileName='{}'".format(filename))
+        pos, size = cursor.fetchone()
+        return pos, size

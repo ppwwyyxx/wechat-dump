@@ -27,7 +27,7 @@ class WeChatDBParser(object):
     FIELDS = ["msgSvrId","type","isSend","createTime","talker","content","imgPath"]
 
     def __init__(self, db_fname):
-        """ db_fname: EnMicroMsg.db"""
+        """ db_fname: a decoded EnMicroMsg.db"""
         self.db_fname = db_fname
         self.db_conn = sqlite3.connect(self.db_fname)
         self.cc = self.db_conn.cursor()
