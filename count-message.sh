@@ -9,6 +9,7 @@ then
     echo "Usage: $0 [Directory of text messages]"
     exit 1
 fi
+# TODO work on db directly
 
 echo -e "Filename\tCounts of message\tCounts of chars\tCounts of words"
 

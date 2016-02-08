@@ -61,9 +61,13 @@ Also, if the decryption doesn't work with pysqlcipher, maybe try the version of 
 	+ This takes a __long__ time.
 
 #### Run:
-+ Parse and dump text messages of __every__ contact (resource directory is not needed to run this):
++ Parse and dump text messages of __every__ chat (resource directory is not needed to run this):
 ```
 ./dump-msg.py decrypted.db output_dir
+```
++ List all chats:
+```
+./list-chats.py decrypted.db
 ```
 + Generate statistical report on text messages:
 ```
