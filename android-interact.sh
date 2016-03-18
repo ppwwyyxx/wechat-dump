@@ -28,6 +28,9 @@ if [[ $1 == "uin" ]]; then
 elif [[ $1 == "imei" ]]; then
 	imei=$(adb shell dumpsys iphonesubinfo | $GREP 'Device ID' | $GREP -o '[0-9]+')
 	[[ -n $imei ]] || {
+		imei=$(adb shell service call iphonesubinfo 1 | awk -F "'" '{print $2}' | sed 's/[^0-9A-F]*//g' | tr -d '\n')
+	}
+	[[ -n $imei ]] || {
 		>&2 echo "Failed to get imei. You can try other methods, or report a bug."
 		exit 1
 	}
