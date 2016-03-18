@@ -3,11 +3,11 @@
 # Date: Fri Jun 26 10:38:07 2015 +0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
-source compatibility.sh
-
-PROG_NAME=`$REALPATH "$0"`
+PROG_NAME=`python -c "import os, sys; print(os.path.realpath(sys.argv[1]))" "$0"`
 PROG_DIR=`dirname "$PROG_NAME"`
 cd "$PROG_DIR"
+
+source compatibility.sh
 
 # Please check that your path is the same, since this might be different among devices
 RES_DIR="/mnt/sdcard/tencent/MicroMsg"
