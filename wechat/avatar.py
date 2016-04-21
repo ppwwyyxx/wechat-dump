@@ -17,10 +17,17 @@ from common.textutil import ensure_bin_str, md5
 class AvatarReader(object):
     def __init__(self, avt_dir, avt_db="avatar.index"):
         self.avt_dir = avt_dir
+
         self.avt_db = avt_db
+        if self.avt_db is None or not os.path.isfile(self.avt_db):
+            logger.warn(
+                    "Avatar database {} not found. Will not use avatar!".format(avt_db))
+            self.avt_db = None
 
     def get_avatar(self, username):
         """ username: `username` field in db.rcontact"""
+        if self.avt_db is None: return None
+
         username = ensure_bin_str(username)
         filename = md5(username)
         dir1, dir2 = filename[:2], filename[2:4]

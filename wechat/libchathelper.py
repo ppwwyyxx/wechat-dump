@@ -95,7 +95,7 @@ class LibChatHelper(object):
             text, img, sound, extra)
 
     def convert_msgs(self, msgs):
-        self.prgs = ProgressReporter("Convert", total=len(msgs))
+        self.prgs = ProgressReporter("Parse Messages", total=len(msgs))
         ret = [self._convert_msg(m) for m in msgs]
         self.prgs.finish()
         return ret
