@@ -5,10 +5,13 @@
 
 from wechat.parser import WeChatDBParser
 import sys
+if len(sys.argv) != 2:
+    print "Usage: {} db_file".format(sys.argv[0])
+    sys.exit(1)
 
 db_file = sys.argv[1]
 
 parser = WeChatDBParser(db_file)
 chats = parser.msgs_by_chat.keys()
 for k in chats:
-    print k.encode('utf-8'), parser.contacts_rev[k].encode('utf-8')
+    print k.encode('utf-8'),  '\t', parser.contacts_rev[k].encode('utf-8')

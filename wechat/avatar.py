@@ -30,10 +30,10 @@ class AvatarReader(object):
         try:
             try:
                 pos, size = self.query_index(filename)
+                return self.read_img(pos, size)
             except TypeError:
                 logger.warn("Avatar for {} not found in avatar database.".format(username))
                 return None
-            return self.read_img(pos, size)
         except Exception as e:
             raise
             print e
@@ -47,11 +47,15 @@ class AvatarReader(object):
                 'avatar.block.' + '{:05d}'.format(file_idx))
         # a 64-byte offset of each block file
         start_pos = pos - file_idx * (2**32) + 64
-        with open(fname, 'rb') as f:
-            f.seek(start_pos)
-            data = f.read(size)
-            im = Image.open(cStringIO.StringIO(data))
-            return im
+        try:
+            with open(fname, 'rb') as f:
+                f.seek(start_pos)
+                data = f.read(size)
+                im = Image.open(cStringIO.StringIO(data))
+                return im
+        except IOError as e:
+            logger.warn("Cannot read avatar from {}: {}".format(fname, str(e)))
+            return None
 
     def query_index(self, filename):
         conn = sqlite3.connect(self.avt_db)

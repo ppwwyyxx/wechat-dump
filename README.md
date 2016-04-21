@@ -22,7 +22,7 @@ If it doesn't work, please leave an issue together with your phone/OS/wechat ver
 + [pysox](https://pypi.python.org/pypi/pysox/0.3.6.alpha)
 + [pysqlcipher](https://pypi.python.org/pypi/pysqlcipher)
 + numpy
-+ python-csscompressor (suggested, optional)
++ csscompressor (suggested, optional)
 + adb and rooted android phone connected to a Linux/Mac OS.
 + Silk audio decoder (included; just run `./third-party/compile_silk.sh`)
 + gnu-sed
@@ -51,7 +51,6 @@ Note that commands involving `./android-interact.sh` are meant to be run on the 
             ```
             ./decrypt-db.py <path to EnMicroMsg.db> <imei> <uin>
             ```
-
 
     NOTE: you may need to try different ways to getting imei & uin,
     because things behave differently on different phones.
