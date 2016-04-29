@@ -27,7 +27,8 @@ ChatMsgBase = namedtuple('ChatMsgBase',
 class ChatMsg(ChatMsgBase):
     def __repr__(self): # repr must return str?
         return "Msg@{}/{}-{}/{}/{}/{}/{}".format(
-            self.time, self.sender, self.chatroom,
+            self.time, self.sender.encode('utf-8'),
+            self.chatroom.encode('utf-8'),
             self.text.encode('utf-8'), 'IMG' if self.image else '',
             'AUD' if self.sound else '', self.extra_data)
 
