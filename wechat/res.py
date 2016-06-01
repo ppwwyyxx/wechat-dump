@@ -152,20 +152,23 @@ class Resource(object):
         if pack_id:
             path = os.path.join(path, pack_id)
         candidates = glob.glob(os.path.join(path, '{}*'.format(md5)))
-        candidates = [k for k in candidates if \
-                      not k.endswith('_thumb') and not k.endswith('_cover')]
-        if len(candidates) > 1:
-            # annimation
-            candidates = [k for k in candidates if not re.match('.*_[0-9]+$', k)]
-            # only one file is the gif in need, others are frames or cover
-            if len(candidates) == 0:
-                # TODO stitch frames to gif
-                logger.warning("Cannot find emoji: {}".format(md5))
-                return None, None
-        if not candidates:
-            return None, None
-        fname = candidates[0]
-        return get_file_b64(fname), imghdr.what(fname)
+        candidates = [k for k in candidates if not k.endswith('_thumb') \
+                and not re.match('.*_[0-9]+$', k)]
+
+        def try_use(f):
+            if not f: return None
+            if not imghdr.what(f[0]):   # cannot recognize file type
+                return None
+            return f[0]
+
+        f = try_use([k for k in candidates if not k.endswith('_cover')])
+        if f:
+            return get_file_b64(f), imghdr.what(f)
+
+        f = try_use([k for k in candidates if k.endswith('_cover')])
+        if f:
+            return get_file_b64(f), imghdr.what(f)
+        return None, None
 
     def get_internal_emoji(self, fname):
         f = os.path.join(INTERNAL_EMOJI_DIR, fname)
