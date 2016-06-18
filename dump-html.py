@@ -29,7 +29,7 @@ if __name__ == '__main__':
     output_file = args.output
 
     parser = WeChatDBParser(args.db)
-    res = Resource(args.res, args.avt)
+    res = Resource(parser, args.res, args.avt)
 
     if name and name in parser.msgs_by_chat:
         msgs = parser.msgs_by_chat[name]

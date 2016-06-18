@@ -44,8 +44,8 @@ class HTMLRender(object):
         self.time_html = open(TIME_HTML_FILE).read()
         self.parser = parser
         self.res = res
-        if self.res is None:
-            logger.warn("Resource Directory not given. Images / Voice Message won't be displayed.")
+        assert self.res is not None, \
+            "Resource Directory not given. Cannot render HTML."
         self.smiley = SmileyProvider()
 
         css_files = glob.glob(os.path.join(LIB_PATH, 'static/*.css'))
@@ -124,14 +124,7 @@ class HTMLRender(object):
             return template.format(**format_dict)
         elif msg.type == TYPE_EMOJI:
             md5 = msg.imgPath
-            if md5 in self.parser.internal_emojis:
-                emoji_img, format = self.res.get_internal_emoji(self.parser.internal_emojis[md5])
-            else:
-                if md5 in self.parser.emojis:
-                    group, _ = self.parser.emojis[md5]
-                else:
-                    group = None
-                emoji_img, format = self.res.get_emoji(md5, group)
+            emoji_img, format = self.res.get_emoji_by_md5(md5)
             format_dict['emoji_format'] = format
             format_dict['emoji_img'] = emoji_img
             return template.format(**format_dict)
@@ -184,7 +177,7 @@ class HTMLRender(object):
         css = avatar_tpl.format(name='me', avatar=my_avatar)
 
         for talker in talkers:
-            avatar = self.res.get_avatar(self.parser.contacts_rev[talker])
+            avatar = self.res.get_contact_avatar(talker)
             css += avatar_tpl.format(name=talker, avatar=avatar)
         self.css_string.append(css)
 

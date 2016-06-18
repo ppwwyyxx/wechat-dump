@@ -33,7 +33,8 @@ class WeChatDBParser(object):
         self.cc = self.db_conn.cursor()
         self.contacts = {}
         self.msgs_by_chat = defaultdict(list)
-        self.emojis = {}
+        self.emoji_groups = {}
+        self.emoji_url = {}
         self.internal_emojis = {}
         self._parse()
 
@@ -59,7 +60,7 @@ SELECT username,conRemark,nickname FROM rcontact
 SELECT {} FROM message
 """.format(','.join(WeChatDBParser.FIELDS)))
         for row in db_msgs:
-            values = self._parse_row(row)
+            values = self._parse_msg_row(row)
             if not values:
                 continue
             msg = WeChatMsg(values)
@@ -96,16 +97,18 @@ SELECT {} FROM message
     def _parse_emoji(self):
         # wechat provided emojis
         emojiinfo_q = self.cc.execute(
-""" SELECT md5, desc, groupid FROM EmojiInfoDesc """)
+""" SELECT md5, groupid FROM EmojiInfoDesc """)
         for row in emojiinfo_q:
-            md5, desc, group = row
-            self.emojis[md5] = (group, desc)
+            md5, group = row
+            self.emoji_groups[md5] = group
 
         NEEDED_EMOJI_CATALOG = [49, 50, 17]
         emojiinfo_q = self.cc.execute(
-""" SELECT md5, catalog, name FROM EmojiInfo WHERE name <> ''""")
+""" SELECT md5, catalog, name, cdnUrl FROM EmojiInfo""")
         for row in emojiinfo_q:
-            md5, catalog, name = row
+            md5, catalog, name, cdnUrl = row
+            if cdnUrl:
+                self.emoji_url[md5] = cdnUrl
             if catalog not in NEEDED_EMOJI_CATALOG:
                 continue
             self.internal_emojis[md5] = name
@@ -119,7 +122,8 @@ SELECT {} FROM message
         self._parse_emoji()
 
     # process the values in a row
-    def _parse_row(self, row):
+    def _parse_msg_row(self, row):
+        """ parse a record of message into my format"""
         values = dict(zip(WeChatDBParser.FIELDS, row))
         if values['content']:
             values['content'] = ensure_unicode(values['content'])

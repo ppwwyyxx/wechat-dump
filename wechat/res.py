@@ -15,7 +15,9 @@ import logging
 logger = logging.getLogger(__name__)
 import imghdr
 from multiprocessing import Pool
-
+import atexit
+import cPickle as pickle
+import requests
 
 from .avatar import AvatarReader
 from common.textutil import md5, get_file_b64
@@ -32,15 +34,47 @@ AVATAR_DIRNAME = 'sfs'
 
 JPEG_QUALITY = 50
 
+class EmojiCache(object):
+    def __init__(self, fname):
+        self.fname = fname
+        if os.path.isfile(fname):
+            self.dic = pickle.load(open(fname))
+        else:
+            self.dic = {}
+
+    def query(self, md5):
+        return self.dic.get(md5, (None, None))
+
+    def fetch(self, md5, url):
+        try:
+            logger.info("Requesting emoji {} from {} ...".format(md5, url))
+            r = requests.get(url).content
+            im = Image.open(cStringIO.StringIO(r))
+            format = im.format.lower()
+            ret = (base64.b64encode(r), format)
+            self.dic[md5] = ret
+            self.flush()
+            return ret
+        except Exception as e:
+            logger.exception("Error processing emoji from {}".format(url))
+            return None, None
+
+    def flush(self):
+        with open(self.fname, 'wb') as f:
+            pickle.dump(self.dic, f)
+
 class Resource(object):
     """ multimedia resources in chat"""
-    def __init__(self, res_dir, avt_db):
+    def __init__(self, parser, res_dir, avt_db,
+            emoji_cache_file='emoji.cache'):
         def check(subdir):
             assert os.path.isdir(os.path.join(res_dir, subdir)), \
                     "No such directory: {}".format(subdir)
         [check(k) for k in ['', AVATAR_DIRNAME, IMG_DIRNAME, EMOJI_DIRNAME, VOICE_DIRNAME]]
 
+        self.emoji_cache = EmojiCache(emoji_cache_file)
         self.res_dir = res_dir
+        self.parser = parser
         self.voice_cache_idx = {}
         self.img_dir = os.path.join(res_dir, IMG_DIRNAME)
         self.voice_dir = os.path.join(res_dir, VOICE_DIRNAME)
@@ -71,6 +105,7 @@ class Resource(object):
         voice_paths = [msg.imgPath for msg in msgs if msg.type == TYPE_SPEAK]
         self.voice_cache_idx = {k: idx for idx, k in enumerate(voice_paths)}
         pool = Pool(3)
+        atexit.register(lambda x: x.terminate(), pool)
         self.voice_cache = [pool.apply_async(parse_wechat_audio_file,
                                              (self.get_voice_filename(k),)) for k in voice_paths]
 # single-threaded version, for debug
@@ -86,6 +121,9 @@ class Resource(object):
         im.save(buf, 'JPEG', quality=JPEG_QUALITY)
         jpeg_str = buf.getvalue()
         return base64.b64encode(jpeg_str)
+
+    def get_contact_avatar(self, nickname):
+        return self.get_avatar(self.parser.contacts_rev[nickname])
 
     def _get_img_file(self, fnames):
         """ fnames: a list of filename to search for
@@ -128,7 +166,10 @@ class Resource(object):
 
 
     def get_img(self, fnames):
-        """ return two base64 jpg string"""
+        """
+        :params fnames: possible file paths
+        :returns: two base64 jpg string
+        """
         fnames = [k for k in fnames if k]   # filter out empty string
         big_file, small_file = self._get_img_file(fnames)
 
@@ -147,7 +188,7 @@ class Resource(object):
             return big_file
         return get_jpg_b64(small_file)
 
-    def get_emoji(self, md5, pack_id):
+    def _get_res_emoji(self, md5, pack_id):
         path = self.emoji_dir
         if pack_id:
             path = os.path.join(path, pack_id)
@@ -170,8 +211,31 @@ class Resource(object):
             return get_file_b64(f), imghdr.what(f)
         return None, None
 
-    def get_internal_emoji(self, fname):
+    def _get_internal_emoji(self, fname):
         f = os.path.join(INTERNAL_EMOJI_DIR, fname)
         return get_file_b64(f), imghdr.what(f)
+
+    def get_emoji_by_md5(self, md5):
+        """ :returns: (b64 img, format)"""
+        if md5 in self.parser.internal_emojis:
+            emoji_img, format = self._get_internal_emoji(self.parser.internal_emojis[md5])
+            logger.warn("Cannot get emoji {}".format(md5))
+            return None, None
+        else:
+            img, format = self.emoji_cache.query(md5)
+            if format:
+                return img, format
+            group = self.parser.emoji_groups.get(md5, None)
+            emoji_img, format = self._get_res_emoji(md5, group)
+            if format:
+                return emoji_img, format
+            url = self.parser.emoji_url.get(md5, None)
+            if url:
+                emoji_img, format = self.emoji_cache.fetch(md5, url)
+                if format:
+                    return emoji_img, format
+
+            logger.warn("Cannot get emoji {} in {}".format(md5, group))
+            return None, None
 
 
