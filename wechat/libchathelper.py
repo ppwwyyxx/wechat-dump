@@ -46,15 +46,7 @@ class LibChatHelper(object):
             return img, 'jpeg'
         elif msg.type == TYPE_EMOJI:
             md5 = msg.imgPath
-            if md5 in self.parser.internal_emojis:
-                emoji_img, format = self.res.get_internal_emoji(
-                    self.parser.internal_emojis[md5])
-            else:
-                if md5 in self.parser.emojis:
-                    group, _ = self.parser.emojis[md5]
-                else:
-                    group = None
-                emoji_img, format = self.res.get_emoji(md5, group)
+            emoji_img, format = self.res.get_emoji_by_md5(md5)
             return emoji_img, format
         elif msg.type == TYPE_CUSTOM_EMOJI:
             pq = PyQuery(msg.content)
