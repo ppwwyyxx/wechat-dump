@@ -72,6 +72,8 @@ Note that commands involving `./android-interact.sh` are meant to be run on the 
                 base64 -di | tar xzf -
             ```
 
++ (Optional) Download the emoji cache from [here](https://github.com/ppwwyyxx/wechat-dump/releases/download/0.1/emoji.cache) and put it in 'wechat-dump'. This will avoid downloading lots of emojis.
+
 #### Run:
 + Parse and dump text messages of __every__ chat (requires `decrypted.db`):
 

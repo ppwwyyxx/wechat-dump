@@ -65,14 +65,15 @@ class EmojiCache(object):
 
 class Resource(object):
     """ multimedia resources in chat"""
-    def __init__(self, parser, res_dir, avt_db,
-            emoji_cache_file='emoji.cache'):
+    def __init__(self, parser, res_dir, avt_db):
         def check(subdir):
             assert os.path.isdir(os.path.join(res_dir, subdir)), \
                     "No such directory: {}".format(subdir)
         [check(k) for k in ['', AVATAR_DIRNAME, IMG_DIRNAME, EMOJI_DIRNAME, VOICE_DIRNAME]]
 
-        self.emoji_cache = EmojiCache(emoji_cache_file)
+        self.emoji_cache = EmojiCache(
+                os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                    '..', 'emoji.cache'))
         self.res_dir = res_dir
         self.parser = parser
         self.voice_cache_idx = {}
@@ -118,7 +119,14 @@ class Resource(object):
         if im is None:
             return ""
         buf = cStringIO.StringIO()
-        im.save(buf, 'JPEG', quality=JPEG_QUALITY)
+        try:
+            im.save(buf, 'JPEG', quality=JPEG_QUALITY)
+        except IOError:
+            try:
+                # sometimes it works the second time...
+                im.save(buf, 'JPEG', quality=JPEG_QUALITY)
+            except IOError:
+                return ""
         jpeg_str = buf.getvalue()
         return base64.b64encode(jpeg_str)
 

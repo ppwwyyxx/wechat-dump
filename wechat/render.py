@@ -131,7 +131,7 @@ class HTMLRender(object):
         elif msg.type == TYPE_CUSTOM_EMOJI:
             pq = PyQuery(msg.content)
             md5 = pq('emoticonmd5').text()
-            format_dict['img'] = self.res.get_emoji(md5, None)
+            format_dict['img'] = self.res.get_emoji_by_md5(md5)
             return template.format(**format_dict)
         elif msg.type == TYPE_LINK:
             content = msg.msg_str()
