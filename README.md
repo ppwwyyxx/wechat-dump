@@ -11,8 +11,10 @@ __NEWS__: WeChat 6.0+ uses silk to encode audio. The code is updated.
 
 __NEWS__: WeChat 6.3 uses a new avatar storage. The code is updated.
 
-__HELP NEEDED__: The first 1KB of all emojis in `resource/emoji` are encrypted, so right now I'm using URL to download the emojis. If you are good at cryptography / reverse engineereing, or you work at Tencent, help me take a look.
-It is also possible to recover the image without knowing the first 1KB (usually just metadata), but I don't have time to do that either.
+__HELP NEEDED__: Starting from May 2016, the first 1KB of all emojis in `resource/emoji` are encrypted. Right now I'm using emoji URL which covers most of them.
+
+If you are good at cryptography / reverse engineereing, or you work at Tencent, feel free to contact me and help take a look.
+It is also possible to recover the image without knowing the first 1KB (just have to detect chunks without knowing metadata), but I don't have time to do that either.
 
 If this tools works for you, please take a moment to __add your phone/OS to__ [the wiki](https://github.com/ppwwyyxx/wechat-dump/wiki).
 If it doesn't work, please leave an issue together with your phone/OS/wechat version.
