@@ -214,9 +214,10 @@ class Resource(object):
         if f:
             return get_file_b64(f), imghdr.what(f)
 
-        f = try_use([k for k in candidates if k.endswith('_cover')])
-        if f:
-            return get_file_b64(f), imghdr.what(f)
+        # don't try do use cover anymore. cover is not animated
+        #f = try_use([k for k in candidates if k.endswith('_cover')])
+        #if f:
+            #return get_file_b64(f), imghdr.what(f)
         return None, None
 
     def _get_internal_emoji(self, fname):
