@@ -65,19 +65,22 @@ Note that commands involving `./android-interact.sh` are meant to be run on the 
 
 + Copy the WeChat user resource directory `/mnt/sdcard/tencent/MicroMsg/${userid}/{emoji,image2,sfs,video,voice2}` from the phone's SD card to the `resource` directory:
 	+ `./android-interact.sh res`
-	+ You might need to tweak `RES_DIR` in the script if the default doesn't work
-	+ This can take a __long__ time. Some ways to do this faster:
-        + If there's enough free space on the SD card, you can combine all the files via `busybox tar` without compression in the `adb shell`, use `adb pull` to copy the `tar` archive to the computer, and then extract it. BusyBox is needed as the Android system's `tar` may choke on long paths.
-        + Alternatively, you can use pipes.  This is slower, but doesn't require any free space on the SD card:
+	+ You might need to change `RES_DIR` in the script if the default is incorrect on your phone.
+	+ This can take a __very long__ time. Some manual ways to do it faster:
+        + If there's enough free space on your phone, you can archive all required files via `busybox tar` with or without compression in `adb shell`,
+				and use `adb pull` to copy the archive. Note that busyBox is needed as the Android system's `tar` may choke on long paths.
+        + Alternatively, you can use pipes. This is slower, but doesn't require any free space on your phone.
 
             ```sh
-            # copy MicroMsg to the current directory
+            # This will copy the whole 'MicroMsg' to the current directory:
             adb shell 'cd /mnt/sdcard/tencent &&
                        busybox tar czf - MicroMsg 2>/dev/null | busybox base64' |
                 base64 -di | tar xzf -
             ```
+				+ What you'll need in the end is a `resource` directory with the following subdir: `emoji,image2,sfs,video,voice2`.
 
-+ (Optional) Download the emoji cache from [here](https://github.com/ppwwyyxx/wechat-dump/releases/download/0.1/emoji.cache) and put it in 'wechat-dump'. This will avoid downloading lots of emojis.
++ (Optional) Download the emoji cache from [here](https://github.com/ppwwyyxx/wechat-dump/releases/download/0.1/emoji.cache)
+	and put it under `wechat-dump`. This will avoid downloading lots of emojis in rendering.
 
 #### Run:
 + Parse and dump text messages of __every__ chat (requires `decrypted.db`):
@@ -113,7 +116,8 @@ Screenshots of generated html:
 
 ### TODO List
 + Search by uid/username
-+ Faster way to copy a directory from android (I don't know..).
++ Attack the emoji encryption problem
++ Use pipes by default to copy a directory from android
 + Fix rare unhandled types: > 10000 and < 0
 + Better user experiences... see `grep 'TODO' wechat -R`
 + more easy-to-use for non-programmers (GUI?)

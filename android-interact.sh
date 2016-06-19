@@ -18,7 +18,7 @@ adb root
 
 if [[ $1 == "uin" ]]; then
 	adb pull $MM_DIR/shared_prefs/system_config_prefs.xml 2>/dev/null
-	uin=$($GREP 'default_uin' system_config_prefs.xml | $GREP -o 'value="\-?[0-9]*' | cut -c 8-)
+	uin=$($GREP 'default_uin' system_config_prefs.xml | $GREP -o 'value=\"\-?[0-9]*' | cut -c 8-)
 	[[ -n $uin ]] || {
 		>&2 echo "Failed to get wechat uin. You can try other methods, or report a bug."
 		exit 1
@@ -37,12 +37,13 @@ elif [[ $1 == "imei" ]]; then
 	echo "Got imei: $imei"
 elif [[ $1 == "db" || $1 == "res" ]]; then
 	echo "Looking for user dir name..."
-	sleep 1	# sometimes adb complains: device not found
-	userList=$(adb ls $RES_DIR | cut -f 4 -d ' ' \
+	sleep 1  	# sometimes adb complains: device not found
+	# look for dirname which looks like md5 (32 alpha-numeric chars)
+	userList=$(adb ls $RES_DIR | cut -f 4 -d ' ' | sed 's/[^0-9a-z]//g' \
 		| awk '{if (length() == 32) print}')
-	numUser=$(echo $userList | wc -l)
+	numUser=$(echo "$userList" | wc -l)
 	# choose the first user.
-	chooseUser=$(echo $userList | head -n1)
+	chooseUser=$(echo "$userList" | head -n1)
 	[[ -n $chooseUser ]] || {
 		>&2 echo "Could not find user. Please check whether your resource dir is $RES_DIR"
 		exit 1
@@ -54,7 +55,7 @@ elif [[ $1 == "db" || $1 == "res" ]]; then
 		mkdir -p resource; cd resource
 		for d in image2 voice2 emoji video sfs; do
 			mkdir -p $d; cd $d
-			adb pull $RES_DIR/$chooseUser/$d
+			adb pull "$RES_DIR/$chooseUser/$d"
 			cd ..
 			[[ -d $d ]] || {
 				>&2 echo "Failed to download resource directory: $RES_DIR/$chooseUser/$d"
@@ -75,11 +76,12 @@ elif [[ $1 == "db" || $1 == "res" ]]; then
 		adb pull $MM_DIR/MicroMsg/$chooseUser/sfs/avatar.index
 		[[ -f avatar.index ]] && \
 			echo "Avatar index successfully downloaded to avatar.index" || {
-			>&2 echo "Failed to pull avatar index by adb, are you using latest version of wechat?"
-			exit 1
-		}
+				>&2 echo "Failed to pull avatar index by adb, are you using latest version of wechat?"
+				exit 1
+			}
 	fi
 elif [[ $1 == "db-decrypt" ]]; then
+	set -e
 	echo "Getting uin..."
 	$0 uin | tail -n1 | $GREP -o '\-?[0-9]*' | tee /tmp/uin
 	echo "Getting imei..."
