@@ -70,14 +70,14 @@ Note that commands involving `./android-interact.sh` are meant to be run on the 
         + If there's enough free space on your phone, you can archive all required files via `busybox tar` with or without compression in `adb shell`,
 				and use `adb pull` to copy the archive. Note that busyBox is needed as the Android system's `tar` may choke on long paths.
         + Alternatively, you can use pipes. This is slower, but doesn't require any free space on your phone.
-
             ```sh
             # This will copy the whole 'MicroMsg' to the current directory:
             adb shell 'cd /mnt/sdcard/tencent &&
                        busybox tar czf - MicroMsg 2>/dev/null | busybox base64' |
                 base64 -di | tar xzf -
             ```
-				+ What you'll need in the end is a `resource` directory with the following subdir: `emoji,image2,sfs,video,voice2`.
+
+		+ What you'll need in the end is a `resource` directory with the following subdir: `emoji,image2,sfs,video,voice2`.
 
 + (Optional) Download uncompress the emoji cache from [here](https://github.com/ppwwyyxx/wechat-dump/releases/download/0.1/emoji.cache)
 	and put it under `wechat-dump`. This will avoid downloading lots of emojis in rendering.
