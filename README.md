@@ -90,7 +90,11 @@ Note that commands involving `./android-interact.sh` are meant to be run on the 
 		+ What you'll need in the end is a `resource` directory with the following subdir: `emoji,image2,sfs,video,voice2`.
 
 + (Optional) Download uncompress the emoji cache from [here](https://github.com/ppwwyyxx/wechat-dump/releases/download/0.1/emoji.cache.tar.bz2)
-	and put it under `wechat-dump`. This will avoid downloading lots of emojis in rendering.
+	and put it under `resource/emoji`. This will avoid downloading lots of emojis in rendering.
+
+        wget -c https://github.com/ppwwyyxx/wechat-dump/releases/download/0.1/emoji.cache.tar.bz2
+        tar xf emoji.cache.tar.bz2
+        ./emoji-cache-tool.py unpack resource/emoji/
 
 #### Run:
 + Parse and dump text messages of __every__ chat (requires `decrypted.db`):
