@@ -94,7 +94,6 @@ Note that commands involving `./android-interact.sh` are meant to be run on the 
 
         wget -c https://github.com/ppwwyyxx/wechat-dump/releases/download/0.1/emoji.cache.tar.bz2
         tar xf emoji.cache.tar.bz2
-        ./emoji-cache-tool.py unpack resource/emoji/
 
 #### Run:
 + Parse and dump text messages of __every__ chat (requires `decrypted.db`):
