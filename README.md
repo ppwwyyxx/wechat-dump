@@ -117,8 +117,12 @@ Note that commands involving `./android-interact.sh` are meant to be run on the 
 + Dump messages of one contact to html, containing voice messages, emojis, and images (requires `decrypted.db`, `avatar.index`, and `resource`):
 
     ```
-    ./dump-html.py decrypted.db avatar.index resource "<contact_name>" output.html
+    ./dump-html.py "<contact_display_name>"
     ```
+
+    The output file is `output.html`.
+
+    Check `./dump-html.py -h` for using different paths.
 
 ### Examples:
 See [here](http://ppwwyyxx.com/static/wechat/example.html) for an example html.
