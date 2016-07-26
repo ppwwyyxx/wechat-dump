@@ -22,6 +22,8 @@ If it doesn't work, please leave an issue together with your phone/OS/wechat ver
 ### How to use:
 
 #### Dependencies:
+
++ requests
 + python-PIL
 + [PyQuery](https://pypi.python.org/pypi/pyquery/1.2.1)
 + [pysox](https://pypi.python.org/pypi/pysox/0.3.6.alpha)
@@ -31,6 +33,14 @@ If it doesn't work, please leave an issue together with your phone/OS/wechat ver
 + adb and rooted android phone connected to a Linux/Mac OS.
 + Silk audio decoder (included; just run `./third-party/compile_silk.sh`)
 + gnu-sed
+
+On Debian/Ubuntu systems, these dependencies can be installed via:
+
+```sh
+sudo apt-get install python-requests python-pil python-pyquery python-numpy libsox-dev
+sudo pip install pysqlcipher csscompressor
+sudo pip install --pre pysox
+```
 
 #### Get Necessary Data:
 
@@ -79,8 +89,11 @@ Note that commands involving `./android-interact.sh` are meant to be run on the 
 
 		+ What you'll need in the end is a `resource` directory with the following subdir: `emoji,image2,sfs,video,voice2`.
 
-+ (Optional) Download uncompress the emoji cache from [here](https://github.com/ppwwyyxx/wechat-dump/releases/download/0.1/emoji.cache)
-	and put it under `wechat-dump`. This will avoid downloading lots of emojis in rendering.
++ (Optional) Download uncompress the emoji cache from [here](https://github.com/ppwwyyxx/wechat-dump/releases/download/0.1/emoji.cache.tar.bz2)
+	and put it under `resource/emoji`. This will avoid downloading lots of emojis in rendering.
+
+        wget -c https://github.com/ppwwyyxx/wechat-dump/releases/download/0.1/emoji.cache.tar.bz2
+        tar xf emoji.cache.tar.bz2
 
 #### Run:
 + Parse and dump text messages of __every__ chat (requires `decrypted.db`):
@@ -104,8 +117,12 @@ Note that commands involving `./android-interact.sh` are meant to be run on the 
 + Dump messages of one contact to html, containing voice messages, emojis, and images (requires `decrypted.db`, `avatar.index`, and `resource`):
 
     ```
-    ./dump-html.py decrypted.db avatar.index resource "<contact_name>" output.html
+    ./dump-html.py "<contact_display_name>"
     ```
+
+    The output file is `output.html`.
+
+    Check `./dump-html.py -h` for using different paths.
 
 ### Examples:
 See [here](http://ppwwyyxx.com/static/wechat/example.html) for an example html.
