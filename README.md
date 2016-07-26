@@ -22,6 +22,8 @@ If it doesn't work, please leave an issue together with your phone/OS/wechat ver
 ### How to use:
 
 #### Dependencies:
+
++ requests
 + python-PIL
 + [PyQuery](https://pypi.python.org/pypi/pyquery/1.2.1)
 + [pysox](https://pypi.python.org/pypi/pysox/0.3.6.alpha)
@@ -35,7 +37,7 @@ If it doesn't work, please leave an issue together with your phone/OS/wechat ver
 On Debian/Ubuntu systems, these dependencies can be installed via:
 
 ```sh
-sudo apt-get install python-pil python-pyquery python-numpy libsox-dev
+sudo apt-get install python-requests python-pil python-pyquery python-numpy libsox-dev
 sudo pip install pysqlcipher csscompressor
 sudo pip install --pre pysox
 ```
