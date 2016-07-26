@@ -32,6 +32,14 @@ If it doesn't work, please leave an issue together with your phone/OS/wechat ver
 + Silk audio decoder (included; just run `./third-party/compile_silk.sh`)
 + gnu-sed
 
+On Debian/Ubuntu systems, these dependencies can be installed via:
+
+```sh
+sudo apt-get install python-pil python-pyquery python-numpy libsox-dev
+sudo pip install pysqlcipher csscompressor
+sudo pip install --pre pysox
+```
+
 #### Get Necessary Data:
 
 Note that commands involving `./android-interact.sh` are meant to be run on the computer.
