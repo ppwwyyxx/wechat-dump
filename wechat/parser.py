@@ -11,7 +11,7 @@ from datetime import datetime
 import logging
 logger = logging.getLogger(__name__)
 
-from .msg import WeChatMsg
+from .msg import WeChatMsg, TYPE_SYSTEM
 from common.textutil import ensure_unicode
 
 """ tables in concern:
@@ -135,13 +135,14 @@ SELECT {} FROM message
             if values['chat'].endswith('@chatroom'):
                 values['chat'] = self.contacts[values['chat']]
                 content = values['content']
-                talker = content[:content.find(':')]
-                try:
-                    values['talker'] = self.contacts[talker]
+                if values['isSend'] == 1:
+                    values['talker'] = self.username
+                elif values['type'] == TYPE_SYSTEM:
+                    values['talker'] = u'SYSTEM'
+                else:
+                    talker = content[:content.find(':')]
+                    values['talker'] = self.contacts.get(talker, talker)
                     values['content'] = content[content.find('\n') + 1:]
-                except KeyError:
-                    # system messages have no talker
-                    values['talker'] = u''
             else:
                 tk_id = values['talker']
                 values['chat'] = self.contacts[tk_id]

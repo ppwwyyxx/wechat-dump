@@ -73,12 +73,12 @@ Note that commands involving `./android-interact.sh` are meant to be run on the 
     Also, if the decryption doesn't work with pysqlcipher, maybe try the version of sqlcipher in `legacy`.
 
 
-+ Copy the WeChat user resource directory `/mnt/sdcard/tencent/MicroMsg/${userid}/{emoji,image2,sfs,video,voice2}` from the phone's SD card to the `resource` directory:
++ Copy the WeChat user resource directory `/mnt/sdcard/tencent/MicroMsg/${userid}/{emoji,image2,sfs,video,voice2}` from the phone to the `resource` directory:
 	+ `./android-interact.sh res`
 	+ You might need to change `RES_DIR` in the script if the default is incorrect on your phone.
 	+ This can take a __very long__ time. Some manual ways to do it faster:
-        + If there's enough free space on your phone, you can archive all required files via `busybox tar` with or without compression in `adb shell`,
-				and use `adb pull` to copy the archive. Note that busyBox is needed as the Android system's `tar` may choke on long paths.
+        + If there's enough free space on your phone, you can log in and archive all required files via `busybox tar` with or without compression,
+				and use `adb pull` to copy the archive. Note that busybox is needed as the Android system's `tar` may choke on long paths.
         + Alternatively, you can use pipes. This is slower, but doesn't require any free space on your phone.
             ```sh
             # This will copy the whole 'MicroMsg' to the current directory:
@@ -89,8 +89,8 @@ Note that commands involving `./android-interact.sh` are meant to be run on the 
 
 		+ What you'll need in the end is a `resource` directory with the following subdir: `emoji,image2,sfs,video,voice2`.
 
-+ (Optional) Download uncompress the emoji cache from [here](https://github.com/ppwwyyxx/wechat-dump/releases/download/0.1/emoji.cache.tar.bz2)
-	and put it under `resource/emoji`. This will avoid downloading lots of emojis in rendering.
++ (Optional) Download the emoji cache from [here](https://github.com/ppwwyyxx/wechat-dump/releases/download/0.1/emoji.cache.tar.bz2)
+	and put it under `resource/emoji`. This will avoid downloading too many emojis during rendering.
 
         wget -c https://github.com/ppwwyyxx/wechat-dump/releases/download/0.1/emoji.cache.tar.bz2
         tar xf emoji.cache.tar.bz2
@@ -140,7 +140,6 @@ Screenshots of generated html:
 + more easy-to-use for non-programmers (GUI?)
 
 ### Donate!
-Paypal:
 <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=7BC299GRDLEDU&lc=US&item_name=wechat%2ddump&item_number=wechat%2ddump&currency_code=USD&bn=PP%2dDonationsBF%3abtn_donate_SM%2egif%3aNonHosted">
 <img src="https://img.shields.io/badge/Paypal-Buy%20a%20Drink-blue.svg" alt="[paypal]" />
 </a>
