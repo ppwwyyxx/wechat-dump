@@ -126,7 +126,9 @@ Note that commands involving `./android-interact.sh` are meant to be run on the 
 
 ### Examples:
 Screenshots of generated html:
+
 ![byvoid](https://github.com/ppwwyyxx/wechat-dump/raw/master/screenshots/byvoid.jpg)
+
 See [here](http://ppwwyyxx.com/static/wechat/example.html) for an example html.
 
 ### TODO List
