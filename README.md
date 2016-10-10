@@ -13,7 +13,7 @@ __NEWS__: WeChat 6.3 uses a new avatar storage. The code is updated.
 
 __HELP NEEDED__: Starting from May 2016, the first 1KB of all emojis in `resource/emoji` are encrypted. Right now I'm using emoji URL which covers most of them.
 
-If you are good at cryptography / reverse engineereing, or you work at Tencent, feel free to contact me and help take a look.
+If you are good at cryptography / reverse engineereing, or you work at Tencent, feel free to contact me or help take a look.
 It is also possible to recover the image without knowing the first 1KB (just have to detect chunks without knowing metadata), but I don't have time to do that either.
 
 If this tools works for you, please take a moment to __add your phone/OS to__ [the wiki](https://github.com/ppwwyyxx/wechat-dump/wiki).
@@ -30,7 +30,7 @@ If it doesn't work, please leave an issue together with your phone/OS/wechat ver
 + [pysqlcipher](https://pypi.python.org/pypi/pysqlcipher)
 + numpy
 + csscompressor (suggested, optional)
-+ adb and rooted android phone connected to a Linux/Mac OS.
++ adb and rooted android phone connected to a Linux/Mac OSX/Win10+Bash.
 + Silk audio decoder (included; just run `./third-party/compile_silk.sh`)
 + gnu-sed
 
@@ -46,7 +46,7 @@ sudo pip install --pre pysox
 
 Note that commands involving `./android-interact.sh` are meant to be run on the computer.
 
-+ (Requires Linux or Mac) Get the decrypted WeChat database and the avatar index:
++ Get the decrypted WeChat database and the avatar index:
 	+ Automatic: `./android-interact.sh db-decrypt`
 		+ Requires rooted adb. If the OS distribution does not come with adb support, you can download an app such as https://play.google.com/store/apps/details?id=eu.chainfire.adbd
 	+ Manual:
@@ -125,19 +125,18 @@ Note that commands involving `./android-interact.sh` are meant to be run on the 
     Check `./dump-html.py -h` for using different paths.
 
 ### Examples:
+Screenshots of generated html:
+![byvoid](https://github.com/ppwwyyxx/wechat-dump/raw/master/screenshots/byvoid.jpg)
 See [here](http://ppwwyyxx.com/static/wechat/example.html) for an example html.
 
-Screenshots of generated html:
-
-![byvoid](https://github.com/ppwwyyxx/wechat-dump/raw/master/screenshots/byvoid.jpg)
-
 ### TODO List
-+ Search by uid/username
 + Attack the emoji encryption problem
 + Use pipes by default to copy a directory from android
-+ Fix rare unhandled types: > 10000 and < 0
++ Fix rare unhandled message types: > 10000 and < 0
 + Better user experiences... see `grep 'TODO' wechat -R`
-+ more easy-to-use for non-programmers (GUI?)
+
+### TroubleShooting
++ Error "File is encrypted or is not a database": Your database is probably encrypted differently. You can try this [password cracker](https://github.com/chg-hou/EnMicroMsg.db-Password-Cracker) to brute-force the password.
 
 ### Donate!
 <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=7BC299GRDLEDU&lc=US&item_name=wechat%2ddump&item_number=wechat%2ddump&currency_code=USD&bn=PP%2dDonationsBF%3abtn_donate_SM%2egif%3aNonHosted">
