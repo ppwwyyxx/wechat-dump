@@ -138,7 +138,10 @@ See [here](http://ppwwyyxx.com/static/wechat/example.html) for an example html.
 + Better user experiences... see `grep 'TODO' wechat -R`
 
 ### TroubleShooting
-+ Error "File is encrypted or is not a database": Your database is probably encrypted differently. You can try this [password cracker](https://github.com/chg-hou/EnMicroMsg.db-Password-Cracker) to brute-force the password.
++ Error "File is encrypted or is not a database": Your database is probably encrypted differently. You can try:
+	+ Different manual methods to obtain IMEI and UIN, and see if they match.
+	+ [password cracker](https://github.com/chg-hou/EnMicroMsg.db-Password-Cracker) to brute-force the password.
+
 
 ### Donate!
 <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=7BC299GRDLEDU&lc=US&item_name=wechat%2ddump&item_number=wechat%2ddump&currency_code=USD&bn=PP%2dDonationsBF%3abtn_donate_SM%2egif%3aNonHosted">
