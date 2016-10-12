@@ -51,7 +51,7 @@ SELECT username,conRemark,nickname FROM rcontact
                 self.contacts[username] = ensure_unicode(nickname)
 
         self.contacts_rev = {v: k for k, v in self.contacts.iteritems()}
-        logger.info("Found {} contacts.".format(len(self.contacts)))
+        logger.info("Found {} names in `contact` table.".format(len(self.contacts)))
 
     def _parse_msg(self):
         msgs_tot_cnt = 0
@@ -149,6 +149,6 @@ SELECT {} FROM message
                 values['talker'] = self.contacts[tk_id]
         except KeyError:
             # It's possible that messages are kept in database after contacts been deleted
-            logger.warn("Unknown contact, probably deleted: {}".format(tk_id))
+            logger.warn("Unknown contact: {}".format(values.get('talker', ''))
             return None
         return values
