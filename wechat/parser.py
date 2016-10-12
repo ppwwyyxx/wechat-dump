@@ -149,6 +149,6 @@ SELECT {} FROM message
                 values['talker'] = self.contacts[tk_id]
         except KeyError:
             # It's possible that messages are kept in database after contacts been deleted
-            logger.warn("Unknown contact: {}".format(values.get('talker', ''))
+            logger.warn("Unknown contact: {}".format(values.get('talker', '')))
             return None
         return values
