@@ -69,9 +69,11 @@ Note that commands involving `./android-interact.sh` are meant to be run on the 
 
     NOTE: you may need to try different ways to getting imei & uin,
     because things behave differently on different phones.
+		Some phones may have multiple imei, you may need to try them all. See [#33](https://github.com/ppwwyyxx/wechat-dump/issues/33).
 
-    Also, if the decryption doesn't work with pysqlcipher, maybe try the version of sqlcipher in `legacy`.
-
+    If the decryption doesn't work, maybe try the version of sqlcipher in `legacy`.
+		If things still don't work, you can try the [password cracker](https://github.com/chg-hou/EnMicroMsg.db-Password-Cracker)
+		to brute-force the password.
 
 + Copy the WeChat user resource directory `/mnt/sdcard/tencent/MicroMsg/${userid}/{emoji,image2,sfs,video,voice2}` from the phone to the `resource` directory:
 	+ `./android-interact.sh res`
@@ -136,11 +138,6 @@ See [here](http://ppwwyyxx.com/static/wechat/example.html) for an example html.
 + Use pipes by default to copy a directory from android
 + Fix rare unhandled message types: > 10000 and < 0
 + Better user experiences... see `grep 'TODO' wechat -R`
-
-### TroubleShooting
-+ Error "File is encrypted or is not a database": Your database is probably encrypted differently. You can try:
-	+ Different manual methods to obtain IMEI and UIN, and see if they match.
-	+ [password cracker](https://github.com/chg-hou/EnMicroMsg.db-Password-Cracker) to brute-force the password.
 
 
 ### Donate!
