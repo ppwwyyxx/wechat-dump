@@ -135,6 +135,7 @@ SELECT {} FROM message
             if values['chat'].endswith('@chatroom'):
                 values['chat'] = self.contacts[values['chat']]
                 content = values['content']
+
                 if values['isSend'] == 1:
                     values['talker'] = self.username
                 elif values['type'] == TYPE_SYSTEM:
@@ -142,7 +143,8 @@ SELECT {} FROM message
                 else:
                     talker = content[:content.find(':')]
                     values['talker'] = self.contacts.get(talker, talker)
-                    values['content'] = content[content.find('\n') + 1:]
+
+                values['content'] = content[content.find('\n') + 1:]
             else:
                 tk_id = values['talker']
                 values['chat'] = self.contacts[tk_id]

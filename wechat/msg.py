@@ -91,6 +91,7 @@ class WeChatMsg(object):
             return self.content
         elif self.type == TYPE_REDENVELOPE:
             pq = PyQuery(self.content_xml_ready, parser='xml')
+
             title = pq('sendertitle').text()
             return u"[RED ENVELOPE]\n{}".format(title)
         else:
