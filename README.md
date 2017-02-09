@@ -38,8 +38,8 @@ On Debian/Ubuntu systems, these dependencies can be installed via:
 
 ```sh
 sudo apt-get install python-requests python-pil python-pyquery python-numpy libsox-dev
-sudo pip install pysqlcipher csscompressor
-sudo pip install --pre pysox
+pip install --user pysqlcipher csscompressor
+pip install --user --pre pysox
 ```
 
 #### Get Necessary Data:
