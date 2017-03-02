@@ -37,14 +37,12 @@ If it doesn't work, please leave an issue together with your phone/OS/wechat ver
 On Debian/Ubuntu systems, these dependencies can be installed via:
 
 ```sh
-sudo apt-get install python-requests python-pil python-pyquery python-numpy libsox-dev
+sudo apt-get install android-tools-adb python-requests python-pil python-pyquery python-numpy libsox-dev libsqlite3-dev libsqlcipher-dev
 pip install --user pysqlcipher csscompressor
 pip install --user --pre pysox
 ```
 
 #### Get Necessary Data:
-
-Note that commands involving `./android-interact.sh` are meant to be run on the computer.
 
 + Get the decrypted WeChat database and the avatar index:
 	+ Automatic: `./android-interact.sh db-decrypt`
@@ -80,7 +78,7 @@ Note that commands involving `./android-interact.sh` are meant to be run on the 
 	+ You might need to change `RES_DIR` in the script if the default is incorrect on your phone.
 	+ This can take a __very long__ time. Some manual ways to do it faster:
         + If there's enough free space on your phone, you can log in and archive all required files via `busybox tar` with or without compression,
-				and use `adb pull` to copy the archive. Note that busybox is needed as the Android system's `tar` may choke on long paths.
+				and use `adb pull` to copy the archive. Note that `busybox` is needed as the Android system's `tar` may choke on long paths.
         + Alternatively, you can use pipes. This is slower, but doesn't require any free space on your phone.
             ```sh
             # This will copy the whole 'MicroMsg' to the current directory:
