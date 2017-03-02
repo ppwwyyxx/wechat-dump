@@ -31,7 +31,8 @@ class WeChatDBParser(object):
         self.db_fname = db_fname
         self.db_conn = sqlite3.connect(self.db_fname)
         self.cc = self.db_conn.cursor()
-        self.contacts = {}
+        self.contacts = {}      # username -> nickname
+        self.contacts_rev = defaultdict(list)
         self.msgs_by_chat = defaultdict(list)
         self.emoji_groups = {}
         self.emoji_url = {}
@@ -50,7 +51,8 @@ SELECT username,conRemark,nickname FROM rcontact
             else:
                 self.contacts[username] = ensure_unicode(nickname)
 
-        self.contacts_rev = {v: k for k, v in self.contacts.iteritems()}
+        for k, v in self.contacts.iteritems():
+            self.contacts_rev[v].append(k)
         logger.info("Found {} names in `contact` table.".format(len(self.contacts)))
 
     def _parse_msg(self):
@@ -133,7 +135,7 @@ SELECT {} FROM message
         values['chat'] = values['talker']
         try:
             if values['chat'].endswith('@chatroom'):
-                values['chat'] = self.contacts[values['chat']]
+                values['chat_nickname'] = self.contacts[values['chat']]
                 content = values['content']
 
                 if values['isSend'] == 1:
@@ -142,15 +144,34 @@ SELECT {} FROM message
                     values['talker'] = u'SYSTEM'
                 else:
                     talker = content[:content.find(':')]
-                    values['talker'] = self.contacts.get(talker, talker)
+                    values['talker'] = talker
+                    values['talker_nickname'] = self.contacts.get(talker, talker)
 
                 values['content'] = content[content.find('\n') + 1:]
             else:
                 tk_id = values['talker']
-                values['chat'] = self.contacts[tk_id]
-                values['talker'] = self.contacts[tk_id]
+                values['chat'] = tk_id
+                values['chat_nickname'] = self.contacts[tk_id]
+                values['talker'] = tk_id
+                values['talker_nickname'] = self.contacts[tk_id]
         except KeyError:
             # It's possible that messages are kept in database after contacts been deleted
             logger.warn("Unknown contact: {}".format(values.get('talker', '')))
             return None
         return values
+
+    @property
+    def all_chat_ids(self):
+        return self.msgs_by_chat.keys()
+
+    @property
+    def all_chat_nicknames(self):
+        return [self.contacts[k] for k in self.all_chat_ids]
+
+    def get_id_by_nickname(self, nickname):
+        l = self.contacts_rev[nickname]
+        if len(l) == 0:
+            raise KeyError("No contacts have nickname {}".format(nickname))
+        if len(l) > 1:
+            logger.warn("More than one contacts have nickname {}! Using the first contact".format(nickname))
+        return l[0]

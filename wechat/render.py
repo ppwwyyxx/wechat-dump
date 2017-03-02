@@ -167,7 +167,7 @@ class HTMLRender(object):
         # string operation is extremely slow
         return self.html.format(extra_css=self.all_css,
                             extra_js=self.all_js,
-                            chat=msgs[0].chat,
+                            chat=msgs[0].chat_nickname,
                             messages=u''.join(blocks)
                            )
 
@@ -177,23 +177,21 @@ class HTMLRender(object):
         css = avatar_tpl.format(name='me', avatar=my_avatar)
 
         for talker in talkers:
-            avatar = self.res.get_contact_avatar(talker)
+            avatar = self.res.get_avatar(talker)
             css += avatar_tpl.format(name=talker, avatar=avatar)
         self.css_string.append(css)
 
     def render_msgs(self, msgs):
         """ render msgs of one chat, return a list of html"""
-        chat = msgs[0].chat
         if msgs[0].is_chatroom():
-            talkers = set()
-            for msg in msgs:
-                talkers.add(msg.talker)
+            talkers = set([m.talker for m in msgs])
         else:
-            talkers = set([chat])
+            talkers = set([msgs[0].talker])
         self.prepare_avatar_css(talkers)
 
         self.res.cache_voice_mp3(msgs)
 
+        chat = msgs[0].chat_nickname
         logger.info(u"Rendering {} messages of {}".format(
             len(msgs), chat))
 

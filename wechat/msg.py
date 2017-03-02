@@ -108,7 +108,7 @@ class WeChatMsg(object):
     def __repr__(self):
         ret = u"{}|{}:{}:{}".format(
             self.type,
-            self.talker if not self.isSend else 'me',
+            self.talker_nickname if not self.isSend else 'me',
             self.createTime,
             ensure_unicode(self.msg_str())).encode('utf-8')
         if self.imgPath:
