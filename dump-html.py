@@ -29,14 +29,16 @@ if __name__ == '__main__':
     output_file = args.output
 
     parser = WeChatDBParser(args.db)
-    res = Resource(parser, args.res, args.avt)
 
-    if name and name in parser.msgs_by_chat:
-        msgs = parser.msgs_by_chat[name]
-    else:
-        sys.stderr.write(u"Valid Contacts: {}\n".format(u'\n'.join(parser.msgs_by_chat.keys())))
-        sys.stderr.write(u"Couldn't find that contact {}.".format(name));
+    try:
+        chatid = parser.get_id_by_nickname(name)
+    except KeyError:
+        sys.stderr.write(u"Valid Contacts: {}\n".format(
+            u'\n'.join(parser.all_chat_nicknames)))
+        sys.stderr.write(u"Couldn't find the chat {}.".format(name));
         sys.exit(1)
+    res = Resource(parser, args.res, args.avt)
+    msgs = parser.msgs_by_chat[chatid]
     print "Number of Messages: ", len(msgs)
     assert len(msgs) > 0
 

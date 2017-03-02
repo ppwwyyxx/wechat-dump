@@ -130,9 +130,6 @@ class Resource(object):
         jpeg_str = buf.getvalue()
         return base64.b64encode(jpeg_str)
 
-    def get_contact_avatar(self, nickname):
-        return self.get_avatar(self.parser.contacts_rev[nickname])
-
     def _get_img_file(self, fnames):
         """ fnames: a list of filename to search for
             return (filename, filename) of (big, small) image.

@@ -22,9 +22,17 @@ if not os.path.isdir(output_dir):
 
 parser = WeChatDBParser(db_file)
 
-for name, msgs in parser.msgs_by_chat.iteritems():
+for chatid, msgs in parser.msgs_by_chat.iteritems():
+    name = parser.contacts[chatid]
+    if len(name) == 0:
+        print u"Chat {} doesn't have a valid display name".format(chatid)
+        name = str(id(chatid))
     print u"Writing msgs for {}".format(name)
     safe_name = safe_filename(name)
-    with open(os.path.join(output_dir, safe_name + '.txt'), 'w') as f:
+    outf = os.path.join(output_dir, safe_name + '.txt')
+    if os.path.isfile(outf):
+        print(u"File {} exists! Skip contact {}".format(outf, name))
+        continue
+    with open(outf, 'w') as f:
         for m in msgs:
             print >> f, m

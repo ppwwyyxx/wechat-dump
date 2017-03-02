@@ -26,7 +26,8 @@ class AvatarReader(object):
 
     def get_avatar(self, username):
         """ username: `username` field in db.rcontact"""
-        if self.avt_db is None: return None
+        if self.avt_db is None:
+            return None
 
         username = ensure_bin_str(username)
         filename = md5(username)
