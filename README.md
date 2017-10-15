@@ -26,7 +26,7 @@ If it doesn't work, please leave an issue together with your phone/OS/wechat ver
 + requests
 + python-PIL
 + [PyQuery](https://pypi.python.org/pypi/pyquery/1.2.1)
-+ [pysox](https://pypi.python.org/pypi/pysox/0.3.6.alpha)
++ [pysox](https://pypi.python.org/pypi/pysox/0.3.6.alpha) and sox
 + [pysqlcipher](https://pypi.python.org/pypi/pysqlcipher)
 + numpy
 + csscompressor (suggested, optional)
@@ -37,7 +37,7 @@ If it doesn't work, please leave an issue together with your phone/OS/wechat ver
 On Debian/Ubuntu systems, these dependencies can be installed via:
 
 ```sh
-sudo apt-get install android-tools-adb python-requests python-pil python-pyquery python-numpy libsox-dev libsqlite3-dev libsqlcipher-dev
+sudo apt-get install sox android-tools-adb python-requests python-pil python-pyquery python-numpy libsox-dev libsqlite3-dev libsqlcipher-dev
 pip install --user pysqlcipher csscompressor
 pip install --user --pre pysox
 ```
