@@ -95,6 +95,10 @@ class HTMLRender(object):
         sender = u'you ' + msg.talker if not msg.isSend else 'me'
         format_dict = {'sender_label': sender,
                        'time': msg.createTime }
+        if(not msg.isSend and msg.is_chatroom()):
+            format_dict['nickname'] = '>\n       <pre align=\'left\'>'+msg.talker_nickname+'</pre'
+        else:
+            format_dict['nickname'] = ' '
         def fallback():
             template = TEMPLATES[TYPE_MSG]
             content = msg.msg_str()

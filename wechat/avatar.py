@@ -48,7 +48,10 @@ class AvatarReader(object):
                     return self.read_img(pos, size)
                 else:
                     img_file = os.path.join(self.avatar, filename)
-                    return Image.open(img_file)
+                    if(os.path.exists(img_file)):
+                        return Image.open(img_file)
+                    else:
+                        return None
             except TypeError:
                 logger.warn("Avatar for {} not found in avatar database.".format(username))
                 return None
