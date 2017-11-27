@@ -73,7 +73,7 @@ pip install --user --pre pysox
 		If things still don't work, you can try the [password cracker](https://github.com/chg-hou/EnMicroMsg.db-Password-Cracker)
 		to brute-force the password.
 
-+ Copy the WeChat user resource directory `/mnt/sdcard/tencent/MicroMsg/${userid}/{emoji,image2,sfs,video,voice2}` from the phone to the `resource` directory:
++ Copy the WeChat user resource directory `/mnt/sdcard/tencent/MicroMsg/${userid}/{avatar,emoji,image2,sfs,video,voice2}` from the phone to the `resource` directory:
 	+ `./android-interact.sh res`
 	+ You might need to change `RES_DIR` in the script if the default is incorrect on your phone.
 	+ This can take a __very long__ time. Some manual ways to do it faster:
@@ -87,7 +87,7 @@ pip install --user --pre pysox
                 base64 -di | tar xzf -
             ```
 
-		+ What you'll need in the end is a `resource` directory with the following subdir: `emoji,image2,sfs,video,voice2`.
+		+ What you'll need in the end is a `resource` directory with the following subdir: `avatar,emoji,image2,sfs,video,voice2`.
 
 + (Optional) Download the emoji cache from [here](https://github.com/ppwwyyxx/wechat-dump/releases/download/0.1/emoji.cache.tar.bz2)
 	and put it under `resource/emoji`. This will avoid downloading too many emojis during rendering.

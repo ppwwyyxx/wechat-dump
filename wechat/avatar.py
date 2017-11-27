@@ -14,12 +14,18 @@ logger = logging.getLogger(__name__)
 
 from common.textutil import ensure_bin_str, md5
 
+
 class AvatarReader(object):
     def __init__(self, avt_dir, avt_db="avatar.index"):
         self.avt_dir = avt_dir
 
+        self.avatar = avt_dir[:avt_dir.find('sfs')]+'avatar' #new storage of head-image,
         self.avt_db = avt_db
-        if self.avt_db is None or not os.path.isfile(self.avt_db):
+        if self.avt_db is not None and os.path.isfile(self.avt_db):
+            self.ava_file_or_path = True
+        elif os.path.isdir(self.avatar):
+            self.ava_file_or_path = False
+        else:
             logger.warn(
                     "Avatar database {} not found. Will not use avatar!".format(avt_db))
             self.avt_db = None
@@ -37,8 +43,12 @@ class AvatarReader(object):
 
         try:
             try:
-                pos, size = self.query_index(filename)
-                return self.read_img(pos, size)
+                if(self.ava_file_or_path):
+                    pos, size = self.query_index(filename)
+                    return self.read_img(pos, size)
+                else:
+                    img_file = os.path.join(self.avatar, filename)
+                    return Image.open(img_file)
             except TypeError:
                 logger.warn("Avatar for {} not found in avatar database.".format(username))
                 return None
