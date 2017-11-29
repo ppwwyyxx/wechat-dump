@@ -55,7 +55,7 @@ pip install --user --pre pysox
 		+ Get WeChat uin (an integer), possible ways are:
 			+ `./android-interact.sh uin`, which pulls the value from `/data/data/com.tencent.mm/shared_prefs/system_config_prefs.xml`
 			+ Login to [web wechat](https://wx.qq.com), get wxuin=1234567 from `document.cookie`
-		+ Get your phone IMEI number (a positive integer), possible ways are:
+		+ Get your phone IMEI/MEID number (a positive integer), possible ways are:
 			+ `./android-interact.sh imei`
 			+ Call `*#06#` on your phone
 			+ Find IMEI in system settings
@@ -65,9 +65,9 @@ pip install --user --pre pysox
             ./decrypt-db.py <path to EnMicroMsg.db> <imei> <uin>
             ```
 
-    NOTE: you may need to try different ways to get imei,
+    NOTE: you may need to try different ways to get IMEI/MEID,
 		because things behave differently on different phones.
-		Some phones may have multiple imei, you may need to try them all.
+		Some phones may have multiple IMEIs, you may need to try them all.
 		See [#33](https://github.com/ppwwyyxx/wechat-dump/issues/33).
 
 		If decryption doesn't work, you can also try the [password cracker](https://github.com/chg-hou/EnMicroMsg.db-Password-Cracker)
@@ -116,7 +116,7 @@ pip install --user --pre pysox
 
     The output file is `output.html`.
 
-    Check `./dump-html.py -h` for using different paths.
+    Check `./dump-html.py -h` to use different paths.
 
 ### Examples:
 Screenshots of generated html:
