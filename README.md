@@ -65,29 +65,23 @@ pip install --user --pre pysox
             ./decrypt-db.py <path to EnMicroMsg.db> <imei> <uin>
             ```
 
-    NOTE: you may need to try different ways to getting imei & uin,
-    because things behave differently on different phones.
-		Some phones may have multiple imei, you may need to try them all. See [#33](https://github.com/ppwwyyxx/wechat-dump/issues/33).
+    NOTE: you may need to try different ways to get imei,
+		because things behave differently on different phones.
+		Some phones may have multiple imei, you may need to try them all.
+		See [#33](https://github.com/ppwwyyxx/wechat-dump/issues/33).
 
-    If the decryption doesn't work, maybe try the version of sqlcipher in `legacy`.
-		If things still don't work, you can try the [password cracker](https://github.com/chg-hou/EnMicroMsg.db-Password-Cracker)
+		If decryption doesn't work, you can also try the [password cracker](https://github.com/chg-hou/EnMicroMsg.db-Password-Cracker)
 		to brute-force the password.
 
 + Copy the WeChat user resource directory `/mnt/sdcard/tencent/MicroMsg/${userid}/{avatar,emoji,image2,sfs,video,voice2}` from the phone to the `resource` directory:
 	+ `./android-interact.sh res`
 	+ You might need to change `RES_DIR` in the script if the default is incorrect on your phone.
-	+ This can take a __very long__ time. Some manual ways to do it faster:
+	+ This script needs busybox and base64 on your phone.
+		If they are not available, there is a slow fallback method in the script you can use.
+	+ This can take a few minutes. One way to do it faster:
         + If there's enough free space on your phone, you can log in and archive all required files via `busybox tar` with or without compression,
 				and use `adb pull` to copy the archive. Note that `busybox` is needed as the Android system's `tar` may choke on long paths.
-        + Alternatively, you can use pipes. This is slower, but doesn't require any free space on your phone.
-            ```sh
-            # This will copy the whole 'MicroMsg' to the current directory:
-            adb shell 'cd /mnt/sdcard/tencent &&
-                       busybox tar czf - MicroMsg 2>/dev/null | busybox base64' |
-                base64 -di | tar xzf -
-            ```
-
-		+ What you'll need in the end is a `resource` directory with the following subdir: `avatar,emoji,image2,sfs,video,voice2`.
+	+ What you'll need in the end is a `resource` directory with the following subdir: `avatar,emoji,image2,sfs,video,voice2`.
 
 + (Optional) Download the emoji cache from [here](https://github.com/ppwwyyxx/wechat-dump/releases/download/0.1/emoji.cache.tar.bz2)
 	and put it under `resource/emoji`. This will avoid downloading too many emojis during rendering.

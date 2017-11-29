@@ -14,4 +14,4 @@ db_file = sys.argv[1]
 parser = WeChatDBParser(db_file)
 chats = parser.msgs_by_chat.keys()
 for k in chats:
-    print parser.contacts[k],  '\t', k
+    print parser.contacts[k], '\t', k

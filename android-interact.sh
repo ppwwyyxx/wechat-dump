@@ -1,6 +1,6 @@
 #!/bin/bash
 # File: android-interact.sh
-# Date: Fri Jun 26 10:38:07 2015 +0800
+# Date: Wed Nov 29 02:19:00 2017 -0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
 PROG_NAME=`python -c "import os, sys; print(os.path.realpath(sys.argv[1]))" "$0"`
@@ -31,7 +31,7 @@ elif [[ $1 == "imei" ]]; then
 		imei=$(adb shell service call iphonesubinfo 1 | awk -F "'" '{print $2}' | sed 's/[^0-9A-F]*//g' | tr -d '\n')
 	}
 	[[ -n $imei ]] || {
-		>&2 echo "Failed to get imei. You can try other methods, or report a bug."
+		>&2 echo "Failed to get imei. You can try other methods mentioned in README, or report a bug."
 		exit 1
 	}
 	echo "Got imei: $imei"
@@ -51,12 +51,17 @@ elif [[ $1 == "db" || $1 == "res" ]]; then
 	echo "Found $numUser user(s). User chosen: $chooseUser"
 
 	if [[ $1 == "res" ]]; then
-		echo "Pulling resources... this might take a long time, because adb sucks..."
 		mkdir -p resource; cd resource
+		echo "Pulling resources... "
 		for d in avatar image2 voice2 emoji video sfs; do
-			mkdir -p $d; cd $d
-			adb pull "$RES_DIR/$chooseUser/$d"
-			cd ..
+			adb shell "cd $RES_DIR/$chooseUser &&
+								 busybox tar czf - $d 2>/dev/null | busybox base64" |
+					base64 -di | tar xzf -
+
+			# Old Slow Way:
+			# mkdir -p $d; cd $d
+			# adb pull "$RES_DIR/$chooseUser/$d"
+			# cd ..
 			[[ -d $d ]] || {
 				>&2 echo "Failed to download resource directory: $RES_DIR/$chooseUser/$d"
 				exit 1
