@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
 # File: avatar.py
-# Date: Thu Jun 18 00:02:07 2015 +0800
+# Date: Wed Nov 29 01:33:56 2017 -0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
 from PIL import Image
@@ -14,19 +14,27 @@ logger = logging.getLogger(__name__)
 
 from common.textutil import ensure_bin_str, md5
 
+
 class AvatarReader(object):
     def __init__(self, avt_dir, avt_db="avatar.index"):
         self.avt_dir = avt_dir
 
+        # new location of avatar, see #50
+        self.avt_dir_new = avt_dir[:avt_dir.find('sfs')] + 'avatar'
         self.avt_db = avt_db
-        if self.avt_db is None or not os.path.isfile(self.avt_db):
+        self._use_avt = True
+        if self.avt_db is not None and os.path.isfile(self.avt_db):
+            self.ava_use_db = True
+        elif os.path.isdir(self.avt_dir_new):
+            self.ava_use_db = False
+        else:
             logger.warn(
                     "Avatar database {} not found. Will not use avatar!".format(avt_db))
-            self.avt_db = None
+            self._use_avt = False
 
     def get_avatar(self, username):
         """ username: `username` field in db.rcontact"""
-        if self.avt_db is None:
+        if not self._use_avt:
             return None
 
         username = ensure_bin_str(username)
@@ -37,8 +45,15 @@ class AvatarReader(object):
 
         try:
             try:
-                pos, size = self.query_index(filename)
-                return self.read_img(pos, size)
+                if self.avt_use_db:
+                    pos, size = self.query_index(filename)
+                    return self.read_img(pos, size)
+                else:
+                    img_file = os.path.join(self.avt_dir_new, filename)
+                    if os.path.exists(img_file):
+                        return Image.open(img_file)
+                    else:
+                        return None
             except TypeError:
                 logger.warn("Avatar for {} not found in avatar database.".format(username))
                 return None
