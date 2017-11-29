@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
 # File: render.py
-# Date: Thu Jun 18 00:03:10 2015 +0800
+# Date: Wed Nov 29 03:53:55 2017 -0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
 import os
@@ -33,7 +33,7 @@ TEMPLATES_FILES = {TYPE_MSG: "TP_MSG",
                    TYPE_IMG: "TP_IMG",
                    TYPE_SPEAK: "TP_SPEAK",
                    TYPE_EMOJI: "TP_EMOJI",
-                   TYPE_CUSTOM_EMOJI: "TP_IMG",
+                   TYPE_CUSTOM_EMOJI: "TP_EMOJI",
                    TYPE_LINK: "TP_MSG"}
 TEMPLATES = {k: ensure_unicode(open(os.path.join(STATIC_PATH, '{}.html'.format(v))).read())
     for k, v in TEMPLATES_FILES.iteritems()}
@@ -126,16 +126,21 @@ class HTMLRender(object):
             # TODO do not show fancybox when no bigimg found
             format_dict['img'] = (img, 'jpeg')
             return template.format(**format_dict)
-        elif msg.type == TYPE_EMOJI:
-            md5 = msg.imgPath
-            emoji_img, format = self.res.get_emoji_by_md5(md5)
-            format_dict['emoji_format'] = format
-            format_dict['emoji_img'] = emoji_img
-            return template.format(**format_dict)
-        elif msg.type == TYPE_CUSTOM_EMOJI:
-            pq = PyQuery(msg.content)
-            md5 = pq('emoticonmd5').text()
-            format_dict['img'] = self.res.get_emoji_by_md5(md5)
+        elif msg.type == TYPE_EMOJI or msg.type == TYPE_CUSTOM_EMOJI:
+            if 'emoticonmd5' in msg.content:
+                pq = PyQuery(msg.content)
+                md5 = pq('emoticonmd5').text()
+            else:
+                md5 = msg.imgPath
+                # TODO md5 could exist in both.
+                # first is emoji md5, second is image2/ md5
+                # can use fallback here.
+            if md5:
+                emoji_img, format = self.res.get_emoji_by_md5(md5)
+                format_dict['emoji_format'] = format
+                format_dict['emoji_img'] = emoji_img
+            else:
+                import IPython as IP; IP.embed()
             return template.format(**format_dict)
         elif msg.type == TYPE_LINK:
             content = msg.msg_str()

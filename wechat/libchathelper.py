@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
 # File: libchathelper.py
-# Date: Thu Jun 18 00:02:35 2015 +0800
+# Date: Wed Nov 29 03:44:54 2017 -0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
 import base64
@@ -46,13 +46,19 @@ class LibChatHelper(object):
             return img, 'jpeg'
         elif msg.type == TYPE_EMOJI:
             md5 = msg.imgPath
-            emoji_img, format = self.res.get_emoji_by_md5(md5)
-            return emoji_img, format
+            if md5:
+                emoji_img, format = self.res.get_emoji_by_md5(md5)
+                return emoji_img, format
+            else:
+                return '', ''
         elif msg.type == TYPE_CUSTOM_EMOJI:
             pq = PyQuery(msg.content)
             md5 = pq('emoticonmd5').text()
-            img, format = self.res.get_emoji(md5, None)
-            return img, format
+            if md5:
+                img, format = self.res.get_emoji(md5, None)
+                return img, format
+            else:
+                return '', ''
         else:
             return '', ''
 

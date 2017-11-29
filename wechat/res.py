@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
 # File: res.py
-# Date: Wed Nov 29 03:24:17 2017 -0800
+# Date: Wed Nov 29 03:43:50 2017 -0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
 import glob
@@ -196,10 +196,12 @@ class Resource(object):
             return big_file
         return get_jpg_b64(small_file)
 
-    def _get_res_emoji(self, md5, pack_id):
-        path = self.emoji_dir
-        if pack_id:
-            path = os.path.join(path, pack_id)
+    def _get_res_emoji(self, md5, pack_id, allow_cover=False):
+        """
+        pack_id: can be None
+        allow_cover: Cover is non-animated. Can be used as a fallback.
+        """
+        path = os.path.join(self.emoji_dir, pack_id or '')
         candidates = glob.glob(os.path.join(path, '{}*'.format(md5)))
         candidates = [k for k in candidates if not k.endswith('_thumb') \
                 and not re.match('.*_[0-9]+$', k)]
@@ -210,14 +212,11 @@ class Resource(object):
                 return None
             return f[0]
 
-        f = try_use([k for k in candidates if not k.endswith('_cover')])
-        if f:
-            return get_file_b64(f), imghdr.what(f)
+        candidates = [k for k in candidates if (allow_cover or not k.endswith('_cover'))]
 
-        # don't try do use cover anymore. cover is not animated
-        #f = try_use([k for k in candidates if k.endswith('_cover')])
-        #if f:
-            #return get_file_b64(f), imghdr.what(f)
+        for cand in candidates:
+            if imghdr.what(cand):
+                return get_file_b64(cand), imghdr.what(cand)
         return None, None
 
     def _get_internal_emoji(self, fname):
@@ -226,24 +225,36 @@ class Resource(object):
 
     def get_emoji_by_md5(self, md5):
         """ :returns: (b64 img, format)"""
+        assert md5, md5
         if md5 in self.parser.internal_emojis:
             # TODO this seems broken
             emoji_img, format = self._get_internal_emoji(self.parser.internal_emojis[md5])
             logger.warn("Cannot get emoji {}".format(md5))
             return None, None
         else:
+            # check cache
             img, format = self.emoji_cache.query(md5)
             if format:
                 return img, format
+
+            # check resource/emoji/ dir
             group = self.parser.emoji_groups.get(md5, None)
             emoji_img, format = self._get_res_emoji(md5, group)
             if format:
                 return emoji_img, format
+
+            # check url
             url = self.parser.emoji_url.get(md5, None)
             if url:
                 emoji_img, format = self.emoji_cache.fetch(md5, url)
                 if format:
                     return emoji_img, format
 
+            # check resource/emoji dir again, for cover
+            emoji_img, format = self._get_res_emoji(md5, group, allow_cover=True)
+            if format:
+                return emoji_img, format
+
+            # first 1k in emoji is encrypted
             logger.warn("Cannot get emoji {} in {}".format(md5, group))
             return None, None

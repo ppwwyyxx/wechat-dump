@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
 # File: avatar.py
-# Date: Wed Nov 29 03:26:10 2017 -0800
+# Date: Wed Nov 29 03:27:16 2017 -0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
 from PIL import Image
@@ -32,7 +32,7 @@ class AvatarReader(object):
             self.avt_use_db = True
         else:
             logger.warn(
-                    "Avatar database {} not found. Will not use avatar!".format(avt_db))
+                    "Cannot find avatar files. Will not use avatar!")
             self._use_avt = False
 
     def get_avatar(self, username):
