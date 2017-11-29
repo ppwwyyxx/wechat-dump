@@ -127,7 +127,6 @@ See [here](http://ppwwyyxx.com/static/wechat/example.html) for an example html.
 
 ### TODO List
 + Attack the emoji encryption problem
-+ Use pipes by default to copy a directory from android
 + Fix rare unhandled message types: > 10000 and < 0
 + Better user experiences... see `grep 'TODO' wechat -R`
 
