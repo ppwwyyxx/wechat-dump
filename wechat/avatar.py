@@ -1,11 +1,12 @@
 #!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
 # File: avatar.py
-# Date: Wed Nov 29 01:33:56 2017 -0800
+# Date: Wed Nov 29 03:26:10 2017 -0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
 from PIL import Image
 import cStringIO
+import glob
 import os
 import numpy as np
 import logging
@@ -16,17 +17,19 @@ from common.textutil import ensure_bin_str, md5
 
 
 class AvatarReader(object):
-    def __init__(self, avt_dir, avt_db="avatar.index"):
-        self.avt_dir = avt_dir
+    def __init__(self, res_dir, avt_db="avatar.index"):
+        self.sfs_dir = os.path.join(res_dir, 'sfs')
 
         # new location of avatar, see #50
-        self.avt_dir_new = avt_dir[:avt_dir.find('sfs')] + 'avatar'
+        self.avt_dir = os.path.join(res_dir, 'avatar')
         self.avt_db = avt_db
         self._use_avt = True
-        if self.avt_db is not None and os.path.isfile(self.avt_db):
-            self.ava_use_db = True
-        elif os.path.isdir(self.avt_dir_new):
-            self.ava_use_db = False
+        if os.path.isdir(self.avt_dir) and len(os.listdir(self.avt_dir)):
+            self.avt_use_db = False
+        elif self.avt_db is not None \
+                and os.path.isfile(self.avt_db) \
+                and glob.glob(os.path.join(self.sfs_dir, 'avatar*')):
+            self.avt_use_db = True
         else:
             logger.warn(
                     "Avatar database {} not found. Will not use avatar!".format(avt_db))
@@ -49,7 +52,7 @@ class AvatarReader(object):
                     pos, size = self.query_index(filename)
                     return self.read_img(pos, size)
                 else:
-                    img_file = os.path.join(self.avt_dir_new, filename)
+                    img_file = os.path.join(self.avt_dir, filename)
                     if os.path.exists(img_file):
                         return Image.open(img_file)
                     else:
@@ -66,7 +69,7 @@ class AvatarReader(object):
 
     def read_img(self, pos, size):
         file_idx = pos >> 32
-        fname = os.path.join(self.avt_dir,
+        fname = os.path.join(self.sfs_dir,
                 'avatar.block.' + '{:05d}'.format(file_idx))
         # a 64-byte offset of each block file
         start_pos = pos - file_idx * (2**32) + 64
