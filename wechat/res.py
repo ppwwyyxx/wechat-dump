@@ -1,13 +1,12 @@
 #!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
 # File: res.py
-# Date: Thu Jun 18 00:02:21 2015 +0800
+# Date: Wed Nov 29 03:24:17 2017 -0800
 # Author: Yuxin Wu <ppwwyyxxc@gmail.com>
 
 import glob
 import os
 import re
-# TODO: perhaps we don't need to introduce PIL and numpy. libjpeg might be enough
 from PIL import Image
 import cStringIO
 import base64
@@ -30,7 +29,6 @@ INTERNAL_EMOJI_DIR = os.path.join(LIB_PATH, 'static', 'internal_emoji')
 VOICE_DIRNAME = 'voice2'
 IMG_DIRNAME = 'image2'
 EMOJI_DIRNAME = 'emoji'
-AVATAR_DIRNAME = 'sfs'
 
 JPEG_QUALITY = 50
 
@@ -41,6 +39,8 @@ class EmojiCache(object):
             self.dic = pickle.load(open(fname))
         else:
             self.dic = {}
+
+        self._curr_size = len(self.dic)
 
     def query(self, md5):
         return self.dic.get(md5, (None, None))
@@ -53,7 +53,10 @@ class EmojiCache(object):
             format = im.format.lower()
             ret = (base64.b64encode(r), format)
             self.dic[md5] = ret
-            self.flush()
+
+            if len(self.dic) == self._curr_size + 10:
+                self._curr_size = len(self.dic)
+                self.flush()
             return ret
         except Exception as e:
             logger.exception("Error processing emoji from {}".format(url))
@@ -69,7 +72,7 @@ class Resource(object):
         def check(subdir):
             assert os.path.isdir(os.path.join(res_dir, subdir)), \
                     "No such directory: {}".format(subdir)
-        [check(k) for k in ['', AVATAR_DIRNAME, IMG_DIRNAME, EMOJI_DIRNAME, VOICE_DIRNAME]]
+        [check(k) for k in ['', IMG_DIRNAME, EMOJI_DIRNAME, VOICE_DIRNAME]]
 
         self.emoji_cache = EmojiCache(
                 os.path.join(os.path.dirname(os.path.abspath(__file__)),
@@ -80,7 +83,7 @@ class Resource(object):
         self.img_dir = os.path.join(res_dir, IMG_DIRNAME)
         self.voice_dir = os.path.join(res_dir, VOICE_DIRNAME)
         self.emoji_dir = os.path.join(res_dir, EMOJI_DIRNAME)
-        self.avt_reader = AvatarReader(os.path.join(res_dir, AVATAR_DIRNAME), avt_db)
+        self.avt_reader = AvatarReader(res_dir, avt_db)
 
     def get_voice_filename(self, imgpath):
         fname = md5(imgpath)
@@ -224,6 +227,7 @@ class Resource(object):
     def get_emoji_by_md5(self, md5):
         """ :returns: (b64 img, format)"""
         if md5 in self.parser.internal_emojis:
+            # TODO this seems broken
             emoji_img, format = self._get_internal_emoji(self.parser.internal_emojis[md5])
             logger.warn("Cannot get emoji {}".format(md5))
             return None, None
@@ -243,5 +247,3 @@ class Resource(object):
 
             logger.warn("Cannot get emoji {} in {}".format(md5, group))
             return None, None
-
-

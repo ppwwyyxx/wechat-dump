@@ -84,7 +84,7 @@ pip install --user --pre pysox
 	+ What you'll need in the end is a `resource` directory with the following subdir: `avatar,emoji,image2,sfs,video,voice2`.
 
 + (Optional) Download the emoji cache from [here](https://github.com/ppwwyyxx/wechat-dump/releases/download/0.1/emoji.cache.tar.bz2)
-	and put it under `resource/emoji`. This will avoid downloading too many emojis during rendering.
+	and decompress it under `wechat-dump`. This will avoid downloading too many emojis during rendering.
 
         wget -c https://github.com/ppwwyyxx/wechat-dump/releases/download/0.1/emoji.cache.tar.bz2
         tar xf emoji.cache.tar.bz2
