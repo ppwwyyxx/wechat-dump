@@ -2,7 +2,7 @@
 # -*- coding: UTF-8 -*-
 # File: libchat.py
 # Date: Sun Apr 12 21:08:51 2015 +0900
-# Author: Yuxin Wu <ppwwyyxxc@gmail.com>
+# Author: Yuxin Wu
 import sqlite3
 import os
 from datetime import datetime

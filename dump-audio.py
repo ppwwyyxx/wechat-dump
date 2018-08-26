@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: utf-8 -*-
 # File: dump-audio.py
-# Author: Yuxin Wu <ppwwyyxxc@gmail.com>
+# Author: Yuxin Wu
 
 import sys
 import argparse

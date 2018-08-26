@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: utf-8 -*-
 # File: emoji-cache-tool.py
-# Author: Yuxin Wu <ppwwyyxxc@gmail.com>
+# Author: Yuxin Wu
 
 import cPickle as pickle
 import sys

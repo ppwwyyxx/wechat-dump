@@ -2,7 +2,7 @@
 # -*- coding: UTF-8 -*-
 # File: utils.py
 # Date: Wed Jun 17 23:59:25 2015 +0800
-# Author: Yuxin Wu <ppwwyyxxc@gmail.com>
+# Author: Yuxin Wu
 
 import hashlib
 import base64

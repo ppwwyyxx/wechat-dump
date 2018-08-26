@@ -2,7 +2,7 @@
 # -*- coding: UTF-8 -*-
 # File: create_table.py
 # Date: Wed Mar 25 16:43:22 2015 +0800
-# Author: Yuxin Wu <ppwwyyxxc@gmail.com>
+# Author: Yuxin Wu
 
 import sys
 import os

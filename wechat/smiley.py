@@ -2,7 +2,7 @@
 # -*- coding: UTF-8 -*-
 # File: smiley.py
 # Date: Thu Jun 18 00:02:43 2015 +0800
-# Author: Yuxin Wu <ppwwyyxxc@gmail.com>
+# Author: Yuxin Wu
 
 import os
 import re

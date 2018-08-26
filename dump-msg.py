@@ -2,7 +2,7 @@
 # -*- coding: UTF-8 -*-
 # File: dump-msg.py
 # Date: Mon May 25 15:23:05 2015 +0800
-# Author: Yuxin Wu <ppwwyyxxc@gmail.com>
+# Author: Yuxin Wu
 
 from wechat.parser import WeChatDBParser
 from common.textutil import safe_filename

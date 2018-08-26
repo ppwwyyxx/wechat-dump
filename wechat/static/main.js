@@ -1,6 +1,6 @@
 //File: main.js
 //Date: Sun Jan 11 23:32:26 2015 +0800
-//Author: Yuxin Wu <ppwwyyxxc@gmail.com>
+//Author: Yuxin Wu
 
 var playVoice = function(event) {
   var target = event.target;

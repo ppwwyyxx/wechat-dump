@@ -2,7 +2,7 @@
 # -*- coding: UTF-8 -*-
 # File: res.py
 # Date: Wed Nov 29 03:43:50 2017 -0800
-# Author: Yuxin Wu <ppwwyyxxc@gmail.com>
+# Author: Yuxin Wu
 
 import glob
 import os

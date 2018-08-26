@@ -2,7 +2,7 @@
 # -*- coding: UTF-8 -*-
 # File: avatar.py
 # Date: Wed Nov 29 03:27:16 2017 -0800
-# Author: Yuxin Wu <ppwwyyxxc@gmail.com>
+# Author: Yuxin Wu
 
 from PIL import Image
 import cStringIO

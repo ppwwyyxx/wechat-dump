@@ -1,7 +1,7 @@
 #!/bin/bash
 # File: android-interact.sh
 # Date: Wed Nov 29 02:19:00 2017 -0800
-# Author: Yuxin Wu <ppwwyyxxc@gmail.com>
+# Author: Yuxin Wu
 
 PROG_NAME=`python -c "import os, sys; print(os.path.realpath(sys.argv[1]))" "$0"`
 PROG_DIR=`dirname "$PROG_NAME"`

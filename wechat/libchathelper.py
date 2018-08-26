@@ -2,7 +2,7 @@
 # -*- coding: UTF-8 -*-
 # File: libchathelper.py
 # Date: Wed Nov 29 03:44:54 2017 -0800
-# Author: Yuxin Wu <ppwwyyxxc@gmail.com>
+# Author: Yuxin Wu
 
 import base64
 from pyquery import PyQuery

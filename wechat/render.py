@@ -2,7 +2,7 @@
 # -*- coding: UTF-8 -*-
 # File: render.py
 # Date: Wed Nov 29 03:53:55 2017 -0800
-# Author: Yuxin Wu <ppwwyyxxc@gmail.com>
+# Author: Yuxin Wu
 
 import os
 import base64

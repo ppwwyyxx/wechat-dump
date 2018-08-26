@@ -1,7 +1,7 @@
 #!/bin/zsh
 # File: down1.sh
 # Date: Sat Dec 20 17:53:23 2014 +0800
-# Author: Yuxin Wu <ppwwyyxxc@gmail.com>
+# Author: Yuxin Wu
 
 # Download 105 tencent smiley
 

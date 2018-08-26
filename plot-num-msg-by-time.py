@@ -2,7 +2,7 @@
 # -*- coding: UTF-8 -*-
 # File: plot-num-msg-by-time.py
 # Date: Wed Mar 25 17:44:39 2015 +0800
-# Author: Yuxin Wu <ppwwyyxxc@gmail.com>
+# Author: Yuxin Wu
 
 from wechat.parser import WeChatDBParser
 from common.textutil import ensure_unicode
