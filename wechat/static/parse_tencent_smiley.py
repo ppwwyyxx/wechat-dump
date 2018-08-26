@@ -2,7 +2,7 @@
 # -*- coding: UTF-8 -*-
 # File: parse_tencent_smiley.py
 # Date: Sat Dec 27 00:15:14 2014 +0800
-# Author: Yuxin Wu <ppwwyyxxc@gmail.com>
+# Author: Yuxin Wu
 
 import xml.etree.ElementTree as ET
 import os

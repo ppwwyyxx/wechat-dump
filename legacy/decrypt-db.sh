@@ -1,7 +1,7 @@
 #!/bin/bash -e
 # File: decrypt-db.sh
 # Date: Tue Jun 16 22:23:13 2015 +0800
-# Author: Yuxin Wu <ppwwyyxxc@gmail.com>
+# Author: Yuxin Wu
 
 source compatibility.sh
 

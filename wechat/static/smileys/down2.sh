@@ -1,7 +1,7 @@
 #!/bin/bash -e
 # File: down2.sh
 # Date: Wed Dec 24 22:31:37 2014 +0800
-# Author: Yuxin Wu <ppwwyyxxc@gmail.com>
+# Author: Yuxin Wu
 
 # This script is used to download unicode emoji
 

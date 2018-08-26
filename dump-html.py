@@ -2,7 +2,7 @@
 # -*- coding: UTF-8 -*-
 # File: dump-html.py
 # Date: Wed Mar 25 17:44:20 2015 +0800
-# Author: Yuxin Wu <ppwwyyxxc@gmail.com>
+# Author: Yuxin Wu
 
 import sys
 import argparse

@@ -2,7 +2,7 @@
 # -*- coding: UTF-8 -*-
 # File: audio.py
 # Date: Fri Jun 26 10:42:41 2015 +0800
-# Author: Yuxin Wu <ppwwyyxxc@gmail.com>
+# Author: Yuxin Wu
 
 import os
 from subprocess import PIPE, Popen, call

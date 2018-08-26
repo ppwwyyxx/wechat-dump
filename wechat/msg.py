@@ -2,7 +2,7 @@
 # -*- coding: UTF-8 -*-
 # File: msg.py
 # Date: Thu Jun 18 00:01:00 2015 +0800
-# Author: Yuxin Wu <ppwwyyxxc@gmail.com>
+# Author: Yuxin Wu
 TYPE_MSG = 1
 TYPE_IMG = 3
 TYPE_SPEAK = 34
