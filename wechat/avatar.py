@@ -55,8 +55,13 @@ class AvatarReader(object):
                     img_file = os.path.join(self.avt_dir, filename)
                     if os.path.exists(img_file):
                         return Image.open(img_file)
+                    elif os.path.exists(img_file + ".bm"):
+                        img = self.read_bm(img_file + ".bm")
+                        return Image.fromarray(img)
                     else:
-                        return None
+                        pos, size = self.query_index(filename)
+                        return self.read_img(pos, size)
+                    return None
             except TypeError:
                 logger.warn("Avatar for {} not found in avatar database.".format(username))
                 return None
@@ -66,6 +71,16 @@ class AvatarReader(object):
             logger.warn("Failed to retrieve avatar!")
             return None
 
+    @staticmethod
+    def read_bm(fname):
+        size = (96, 96, 3)
+        img = np.zeros(size, dtype='uint8')
+        with open(fname, 'rb') as f:
+            for i in range(96):
+                for j in range(96):
+                    r, g, b, a = map(ord, f.read(4))
+                    img[i,j] = (r, g, b)
+        return img
 
     def read_img(self, pos, size):
         file_idx = pos >> 32

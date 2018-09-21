@@ -47,7 +47,7 @@ class WeChatMsg(object):
 
     def msg_str(self):
         if self.type == TYPE_LOCATION:
-            pq = PyQuery(self.content_xml_ready, parser='xml')
+            pq = PyQuery(self.content_xml_ready.replace('poiname', ' poiname'), parser='xml')
             loc = pq('location').attr
             label = loc['label']
             try:

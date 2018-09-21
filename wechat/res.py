@@ -186,10 +186,13 @@ class Resource(object):
                 return None
             if not img_file.endswith('jpg') and \
                imghdr.what(img_file) != 'jpeg':
-                im = Image.open(open(img_file, 'rb'))
-                buf = cStringIO.StringIO()
-                im.convert('RGB').save(buf, 'JPEG', quality=JPEG_QUALITY)
-                return base64.b64encode(buf.getvalue())
+                 buf = cStringIO.StringIO()
+                 try:
+                   im = Image.open(open(img_file, 'rb'))
+                   im.convert('RGB').save(buf, 'JPEG', quality=JPEG_QUALITY)
+                   return base64.b64encode(buf.getvalue())
+                 except IOError:
+                   return ""
             return get_file_b64(img_file)
         big_file = get_jpg_b64(big_file)
         if big_file:
