@@ -34,7 +34,8 @@ TEMPLATES_FILES = {TYPE_MSG: "TP_MSG",
                    TYPE_SPEAK: "TP_SPEAK",
                    TYPE_EMOJI: "TP_EMOJI",
                    TYPE_CUSTOM_EMOJI: "TP_EMOJI",
-                   TYPE_LINK: "TP_MSG"}
+                   TYPE_LINK: "TP_MSG",
+                   TYPE_VIDEO_FILE: "TP_VIDEO"}
 TEMPLATES = {k: ensure_unicode(open(os.path.join(STATIC_PATH, '{}.html'.format(v))).read())
     for k, v in TEMPLATES_FILES.iteritems()}
 
@@ -153,6 +154,12 @@ class HTMLRender(object):
         elif msg.type == TYPE_WX_VIDEO:
             # TODO: fetch video from resource
             return fallback()
+        elif msg.type == TYPE_VIDEO_FILE:
+            # TODO: fetch video from resource
+            imgpath = msg.imgPath
+            img = self.res.get_video(imgpath)
+            format_dict['img'] = img
+            return template.format(**format_dict)
         return fallback()
 
     def _render_partial_msgs(self, msgs):

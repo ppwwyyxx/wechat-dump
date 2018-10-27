@@ -18,6 +18,11 @@ TYPE_CUSTOM_EMOJI = 1048625
 TYPE_REDENVELOPE = 436207665
 TYPE_LOCATION_SHARING = -1879048186
 TYPE_APP_MSG = 16777265
+#TYPE_? = 35 QQMail assist
+#TYPE_? = 10002 Chatroom member
+#TYPE_? = 64 Voice talk
+#TYPE_? = 318767153 Didi
+#TYPE_? = 419430449 Transfer
 
 _KNOWN_TYPES = [eval(k) for k in dir() if k.startswith('TYPE_')]
 

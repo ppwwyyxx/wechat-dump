@@ -29,6 +29,7 @@ INTERNAL_EMOJI_DIR = os.path.join(LIB_PATH, 'static', 'internal_emoji')
 VOICE_DIRNAME = 'voice2'
 IMG_DIRNAME = 'image2'
 EMOJI_DIRNAME = 'emoji'
+VIDEO_DIRNAME = 'video'
 
 JPEG_QUALITY = 50
 
@@ -72,7 +73,7 @@ class Resource(object):
         def check(subdir):
             assert os.path.isdir(os.path.join(res_dir, subdir)), \
                     "No such directory: {}".format(subdir)
-        [check(k) for k in ['', IMG_DIRNAME, EMOJI_DIRNAME, VOICE_DIRNAME]]
+        [check(k) for k in ['', IMG_DIRNAME, EMOJI_DIRNAME, VOICE_DIRNAME, VIDEO_DIRNAME]]
 
         self.emoji_cache = EmojiCache(
                 os.path.join(os.path.dirname(os.path.abspath(__file__)),
@@ -83,6 +84,7 @@ class Resource(object):
         self.img_dir = os.path.join(res_dir, IMG_DIRNAME)
         self.voice_dir = os.path.join(res_dir, VOICE_DIRNAME)
         self.emoji_dir = os.path.join(res_dir, EMOJI_DIRNAME)
+        self.video_dir = os.path.join(res_dir, VIDEO_DIRNAME)
         self.avt_reader = AvatarReader(res_dir, avt_db)
 
     def get_voice_filename(self, imgpath):
@@ -261,3 +263,18 @@ class Resource(object):
             # first 1k in emoji is encrypted
             logger.warn("Cannot get emoji {} in {}".format(md5, group))
             return None, None
+
+    def get_video(self, imgpath):
+        """
+        :params imgpath: possible file path
+        :returns: two base64 string, thumbnail then video
+        """
+        thumb = os.path.join(self.video_dir, "{}.jpg".format(imgpath))
+        video = os.path.join(self.video_dir, "{}.mp4".format(imgpath))
+        if not os.path.isfile(thumb):
+            logger.error("Thumb file not found for {}".format(imgpath))
+            thumb = None
+        if not os.path.isfile(video):
+            logger.error("Video file not found for {}".format(imgpath))
+            video = None
+        return get_file_b64(thumb), get_file_b64(video)

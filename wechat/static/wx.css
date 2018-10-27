@@ -1630,6 +1630,10 @@ a.btnSecondary:active {
     max-width: 200px;
     max-height: 120px;
 }
+.cloudContent video.zoomIn{
+    max-width: 200px;
+    max-height: 150px;
+}
 .chatItem .cloudMesg .cloudMesgPanel .cloudMesgContent p {
   color: #1F252B;
   width: 100%;
