@@ -22,7 +22,9 @@ TYPE_APP_MSG = 16777265
 _KNOWN_TYPES = [eval(k) for k in dir() if k.startswith('TYPE_')]
 
 import re
+import io
 from pyquery import PyQuery
+import xml.etree.ElementTree as ET
 import logging
 logger = logging.getLogger(__name__)
 
@@ -47,16 +49,16 @@ class WeChatMsg(object):
 
     def msg_str(self):
         if self.type == TYPE_LOCATION:
-            pq = PyQuery(self.content_xml_ready, parser='xml')
-            loc = pq('location').attr
-            label = loc['label']
             try:
+                pq = PyQuery(self.content_xml_ready, parser='xml')
+                loc = pq('location').attr
+                label = loc['label']
                 poiname = loc['poiname']
                 if poiname:
                     label = poiname
+                return "LOCATION:" + label + " ({},{})".format(loc['x'], loc['y'])
             except:
-                pass
-            return "LOCATION:" + label + " ({},{})".format(loc['x'], loc['y'])
+                return "LOCATION: unknown"
         elif self.type == TYPE_LINK:
             pq = PyQuery(self.content_xml_ready)
             url = pq('url').text()
@@ -90,10 +92,15 @@ class WeChatMsg(object):
             # TODO add emoji name
             return self.content
         elif self.type == TYPE_REDENVELOPE:
-            pq = PyQuery(self.content_xml_ready, parser='xml')
-
-            title = pq('sendertitle').text()
-            return u"[RED ENVELOPE]\n{}".format(title)
+            data_to_parse = io.BytesIO(self.content.encode('utf-8'))
+            try:
+                for event, elem in ET.iterparse(data_to_parse, events=('end',)):
+                    if elem.tag == 'sendertitle':
+                        title = elem.text
+                        return u"[RED ENVELOPE]\n{}".format(title)
+            except:
+                pass
+            return u"[RED ENVELOPE]"
         else:
             # TODO replace smiley with text
             return self.content
