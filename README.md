@@ -17,7 +17,7 @@ If you are good at cryptography / reverse engineereing, or you work at Tencent, 
 It is also possible to recover the image without knowing the first 1KB (just have to detect chunks without knowing metadata), but I don't have time to do that either.
 
 If this tools works for you, please take a moment to __add your phone/OS to__ [the wiki](https://github.com/ppwwyyxx/wechat-dump/wiki).
-If it doesn't work, please leave an issue together with your phone/OS/wechat version.
+If it doesn't work, you probably have to investigate it as the behavior may be different on each phone.
 
 ### How to use:
 
@@ -35,8 +35,6 @@ Database parsing and rendering needs:
 + [pysox](https://pypi.python.org/pypi/pysox/0.3.6.alpha) and sox
 + csscompressor (suggested, optional)
 + Silk audio decoder (included; just run `./third-party/compile_silk.sh`)
-
-On Debian/Ubuntu systems, these dependencies can be installed via:
 
 #### Get Necessary Data:
 
@@ -86,25 +84,25 @@ On Debian/Ubuntu systems, these dependencies can be installed via:
         tar xf emoji.cache.tar.bz2
 
 #### Run:
-+ Parse and dump text messages of __every__ chat (requires `decrypted.db`):
++ Parse and dump text messages of __every__ chat (requires decrypted database):
 
     ```
     ./dump-msg.py decrypted.db output_dir
     ```
 
-+ List all chats (requires `decrypted.db`):
++ List all chats (required decrypted database):
 
     ```
     ./list-chats.py decrypted.db
     ```
 
-+ Generate statistical report on text messages (requires `output_dir` from `./dump-msg.py`):
++ Generate statistics report on text messages (requires `output_dir` from `./dump-msg.py`):
 
     ```
     ./count-message.sh output_dir
     ```
 
-+ Dump messages of one contact to html, containing voice messages, emojis, and images (requires `decrypted.db`, `avatar.index`, and `resource`):
++ Dump messages of one contact to html, containing voice messages, emojis, and images (requires decrypted database, `avatar.index`, and `resource`):
 
     ```
     ./dump-html.py "<contact_display_name>"
@@ -122,6 +120,7 @@ Screenshots of generated html:
 See [here](http://ppwwyyxx.com/static/wechat/example.html) for an example html.
 
 ### TODO List
++ Migrate core to Python3
 + Attack the emoji encryption problem
 + Fix rare unhandled message types: > 10000 and < 0
 + Better user experiences... see `grep 'TODO' wechat -R`
