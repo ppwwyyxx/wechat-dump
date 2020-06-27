@@ -204,8 +204,7 @@ class Resource(object):
         """
         path = os.path.join(self.emoji_dir, pack_id or '')
         candidates = glob.glob(os.path.join(path, '{}*'.format(md5)))
-        candidates = [k for k in candidates if not k.endswith('_thumb') \
-                and not re.match('.*_[0-9]+$', k)]
+        candidates = [k for k in candidates if not re.match('.*_[0-9]+$', k)]
 
         def try_use(f):
             if not f: return None
@@ -213,7 +212,7 @@ class Resource(object):
                 return None
             return f[0]
 
-        candidates = [k for k in candidates if (allow_cover or not k.endswith('_cover'))]
+        candidates = [k for k in candidates if (allow_cover or (not k.endswith('_cover') and not k.endswith('_thumb')))]
 
         for cand in candidates:
             if imghdr.what(cand):
@@ -228,10 +227,8 @@ class Resource(object):
         """ :returns: (b64 unicode img, format)"""
         assert md5, md5
         if md5 in self.parser.internal_emojis:
-            # TODO this seems broken
             emoji_img, format = self._get_internal_emoji(self.parser.internal_emojis[md5])
-            logger.warn("Cannot get emoji {}".format(md5))
-            return None, None
+            return emoji_img, format
         else:
             # check cache
             img, format = self.emoji_cache.query(md5)
@@ -256,8 +253,8 @@ class Resource(object):
             if format:
                 return emoji_img, format
 
-            # first 1k in emoji is encrypted
-            logger.warn("Cannot get emoji {} in {}".format(md5, group))
+            # TODO: first 1k in emoji is encrypted
+            logger.warn("Cannot get emoji {} in group {}".format(md5, group))
             return None, None
 
     def get_video(self, videoid):

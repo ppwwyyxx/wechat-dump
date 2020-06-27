@@ -18,7 +18,7 @@ def parse_wechat_audio_file(file_name):
     try:
         return do_parse_wechat_audio_file(file_name)
     except Exception as e:
-        logger.exception("Error when parsing audio file {}".format(file_name))
+        logger.error(f"Error when parsing audio file {file_name}: {str(e)}")
         return "", 0
 
 def do_parse_wechat_audio_file(file_name):
@@ -56,7 +56,7 @@ def do_parse_wechat_audio_file(file_name):
         subproc_succ('sox -r 24000 -e signed -b 16 -c 1 {} {}'.format(raw_file, mp3_file))
         os.unlink(raw_file)
     else:
-        raise NotImplementedError("Unsupported Audio Format! This is a bug!")
+        raise NotImplementedError("Audio file format cannot be recognized.")
     mp3_string = get_file_b64(mp3_file)
     os.unlink(mp3_file)
     return mp3_string, duration
