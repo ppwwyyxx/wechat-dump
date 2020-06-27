@@ -56,6 +56,7 @@ def subproc_succ(cmd):
     """
     output, ret = subproc_call(cmd)
     assert ret == 0
+    return output
 
 
 RES_DIR = "/mnt/sdcard/tencent/MicroMsg"
@@ -66,7 +67,7 @@ def get_uin():
     candidates = []
     try:
         uin = None
-        out, _ = subproc_call(f"adb shell cat {MM_DIR}/shared_prefs/system_config_prefs.xml")
+        out = subproc_succ(f"adb shell cat {MM_DIR}/shared_prefs/system_config_prefs.xml")
         for line in out.decode('utf-8').split("\n"):
             if "default_uin" in line:
                 line = PyQuery(line)
@@ -81,7 +82,7 @@ def get_uin():
 
     try:
         uin = None
-        out, _ = subproc_call(f"adb shell cat {MM_DIR}/shared_prefs/com.tencent.mm_preferences.xml")
+        out = subproc_succ(f"adb shell cat {MM_DIR}/shared_prefs/com.tencent.mm_preferences.xml")
         for line in out.decode('utf-8').split("\n"):
             if "last_login_uin" in line:
                 line = PyQuery(line)
@@ -96,7 +97,7 @@ def get_uin():
 
     try:
         uin = None
-        out, _ = subproc_call(f"adb shell cat {MM_DIR}/shared_prefs/auth_info_key_prefs.xml")
+        out = subproc_succ(f"adb shell cat {MM_DIR}/shared_prefs/auth_info_key_prefs.xml")
         for line in out.decode('utf-8').split("\n"):
             if "auth_uin" in line:
                 line = PyQuery(line)
@@ -131,12 +132,12 @@ def get_imei():
         def get_utf16(self, offset=4):
             return (self.data[offset + 4: offset+4+self.get_int(offset) * 2]).decode('utf-16')
 
-    out, _ = subproc_call("adb shell service call iphonesubinfo 1")
+    out = subproc_succ("adb shell service call iphonesubinfo 1")
     imei = Parcel(out.strip()).get_utf16()
     logger.info(f"found imei={imei} from iphonesubinfo")
     candidates.append(imei)
 
-    out, _ = subproc_call(f"adb shell cat {MM_DIR}/MicroMsg/CompatibleInfo.cfg")
+    out = subproc_succ(f"adb shell cat {MM_DIR}/MicroMsg/CompatibleInfo.cfg")
     try:
         # https://gist.github.com/ChiChou/36556fd412a9e3216abecf06e084e4d9
         import javaobj
@@ -167,6 +168,7 @@ def do_decrypt(input, output, key):
     except Exception as e:
         logger.error(f"Decryption failed: '{e}'")
         raise
+    logger.info(f"Decryption succeeded! Writing database to {output} ...")
     c.execute("SELECT sqlcipher_export('db');" )
     c.execute("DETACH DATABASE db;" )
     c.close()
@@ -201,5 +203,5 @@ if __name__ == "__main__":
                 except:
                     pass
                 else:
-                    logger.info(f"Decryption succeeds! Output at f{output_file}")
+                    logger.info(f"Database dumped to {output_file}")
                     sys.exit()
