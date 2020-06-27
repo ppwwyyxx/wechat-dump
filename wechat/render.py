@@ -1,8 +1,5 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 # -*- coding: UTF-8 -*-
-# File: render.py
-# Date: Wed Nov 29 03:53:55 2017 -0800
-# Author: Yuxin Wu
 
 import os
 import base64
@@ -36,7 +33,7 @@ TEMPLATES_FILES = {TYPE_MSG: "TP_MSG",
                    TYPE_CUSTOM_EMOJI: "TP_EMOJI",
                    TYPE_LINK: "TP_MSG"}
 TEMPLATES = {k: ensure_unicode(open(os.path.join(STATIC_PATH, '{}.html'.format(v))).read())
-    for k, v in TEMPLATES_FILES.iteritems()}
+    for k, v in TEMPLATES_FILES.items()}
 
 class HTMLRender(object):
     def __init__(self, parser, res=None):
@@ -99,6 +96,7 @@ class HTMLRender(object):
             format_dict['nickname'] = '>\n       <pre align=\'left\'>'+msg.talker_nickname+'</pre'
         else:
             format_dict['nickname'] = ' '
+
         def fallback():
             template = TEMPLATES[TYPE_MSG]
             content = msg.msg_str()
@@ -150,6 +148,7 @@ class HTMLRender(object):
                 content = u'URL:<a target="_blank" href="{0}">{0}</a>'.format(url)
                 format_dict['content'] = content
                 return template.format(**format_dict)
+        # TODO handle TYPE_VIDEO_FILE
         elif msg.type == TYPE_WX_VIDEO:
             # TODO: fetch video from resource
             return fallback()

@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 # -*- coding: UTF-8 -*-
 # File: plot-num-msg-by-time.py
 # Date: Wed Mar 25 17:44:39 2015 +0800
@@ -39,7 +39,7 @@ plt.show()
 # I'm in a different time zone in this period:
 #TZ_DELTA = {(datetime(2014, 7, 13), datetime(2014, 10, 1)): -15}
 #def real_hour(x):
-    #for k, v in TZ_DELTA.iteritems():
+    #for k, v in TZ_DELTA.items():
         #if x > k[0] and x < k[1]:
             #print x
             #return (x.hour + v + 24) % 24

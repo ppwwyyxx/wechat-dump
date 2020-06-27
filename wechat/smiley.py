@@ -1,8 +1,5 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 # -*- coding: UTF-8 -*-
-# File: smiley.py
-# Date: Thu Jun 18 00:02:43 2015 +0800
-# Author: Yuxin Wu
 
 import os
 import re
@@ -59,7 +56,7 @@ class SmileyProvider(object):
         # some extra smiley from javascript on wx.qq.com
         extra_smiley = json.load(open(TENCENT_EXTRASMILEY_FILE))
         extra_smiley = {u'[' + k + u']': v for k, v in
-                            extra_smiley.iteritems()}
+                            extra_smiley.items()}
         self.tencent_smiley.update(extra_smiley)
 
         # 1f35c -> "\ue340"
@@ -69,14 +66,14 @@ class SmileyProvider(object):
         # u'\ue415' -> 'e415'       # for android
         unicode_smiley_dict = json.load(open(UNICODE_SMILEY_FILE))
         self.unicode_smiley = {(self.unichar(int(k, 16))): hex(ord(v))[2:] for k, v in
-                                unicode_smiley_dict.iteritems()}
+                                unicode_smiley_dict.items()}
         self.unicode_smiley.update({v: hex(ord(v))[2:] for _, v in
-                                unicode_smiley_dict.iteritems()})
+                                unicode_smiley_dict.items()})
         self.used_smiley_id = set()
 
     def unichar(self, i):
         try:
-            return unichr(i)
+            return chr(i)
         except ValueError:
             return struct.pack('i', i).decode('utf-32')
 
@@ -88,7 +85,7 @@ class SmileyProvider(object):
         if not UNICODE_SMILEY_RE.findall(msg):
         # didn't find the code
             return msg
-        for k, v in self.unicode_smiley.iteritems():
+        for k, v in self.unicode_smiley.items():
             if k in msg:
                 msg = msg.replace(k, self.gen_replace_elem(v))
         return msg
@@ -97,7 +94,7 @@ class SmileyProvider(object):
         if (not '[' in msg or not ']' in msg) \
            and (not '/:' in msg) and (not '/' in msg):
             return msg
-        for k, v in self.tencent_smiley.iteritems():
+        for k, v in self.tencent_smiley.items():
             if k in msg:
                 msg = msg.replace(k, self.gen_replace_elem(v))
         return msg

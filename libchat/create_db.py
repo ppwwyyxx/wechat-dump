@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 # -*- coding: UTF-8 -*-
 # File: create_table.py
 # Date: Wed Mar 25 16:43:22 2015 +0800
@@ -10,7 +10,7 @@ import os
 from libchat import SqliteLibChat
 
 if len(sys.argv) != 2:
-    print "Usage: {} <DB file name>"
+    print("Usage: {} <DB file name>")
     sys.exit()
 
 db_name = sys.argv[1]

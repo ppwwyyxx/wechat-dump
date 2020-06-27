@@ -1,23 +1,14 @@
-#!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
-# File: utils.py
-# Date: Wed Jun 17 23:59:25 2015 +0800
-# Author: Yuxin Wu
 
 import hashlib
 import base64
 
-def ensure_bin_str(s):
-    if type(s) == str:
-        return s
-    if type(s) == unicode:
-        return s.encode('utf-8')
-
 def ensure_unicode(s):
     if type(s) == str:
-        return s.decode('utf-8')
-    if type(s) == unicode:
         return s
+    elif type(s) == bytes:
+        return s.decode('utf-8')
+    raise TypeError(f"type of string is {type(s)}")
 
 
 def md5(s):
@@ -27,7 +18,7 @@ def md5(s):
 
 def get_file_b64(fname):
     data = open(fname, 'rb').read()
-    return base64.b64encode(data)
+    return base64.b64encode(data).decode('ascii')
 
 def safe_filename(fname):
     filename = ensure_unicode(fname)

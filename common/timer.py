@@ -1,8 +1,4 @@
-#!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
-# File: timer.py
-# Date: Wed Jun 17 23:25:54 2015 +0800
-# Author: Yuxin Wu
 
 import time, functools
 from collections import defaultdict
@@ -20,7 +16,7 @@ class TotalTimer(object):
         self.times = defaultdict(float)
 
     def __del__(self):
-        for k, v in self.times.iteritems():
+        for k, v in self.times.items():
             logger.info("{} took {} seconds in total.".format(k, v))
 
 _total_timer = TotalTimer()

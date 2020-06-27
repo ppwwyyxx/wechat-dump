@@ -1,8 +1,4 @@
-#!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
-# File: parser.py
-# Date: Thu Jun 18 00:03:53 2015 +0800
-# Author: Yuxin Wu
 
 import sqlite3
 from collections import defaultdict
@@ -51,7 +47,7 @@ SELECT username,conRemark,nickname FROM rcontact
             else:
                 self.contacts[username] = ensure_unicode(nickname)
 
-        for k, v in self.contacts.iteritems():
+        for k, v in self.contacts.items():
             self.contacts_rev[v].append(k)
         logger.info("Found {} names in `contact` table.".format(len(self.contacts)))
 
@@ -70,7 +66,7 @@ SELECT {} FROM message
             if not WeChatMsg.filter_type(msg.type):
                 self.msgs_by_chat[msg.chat].append(msg)
 
-        for k, v in self.msgs_by_chat.iteritems():
+        for k, v in self.msgs_by_chat.items():
             self.msgs_by_chat[k] = sorted(v, key=lambda x: x.createTime)
             msgs_tot_cnt += len(v)
         logger.info("Found {} message records.".format(msgs_tot_cnt))
@@ -166,7 +162,7 @@ SELECT {} FROM message
 
     @property
     def all_chat_nicknames(self):
-        return [self.contacts[k] for k in self.all_chat_ids]
+        return [self.contacts[k] for k in self.all_chat_ids if len(self.contacts[k])]
 
     def get_id_by_nickname(self, nickname):
         l = self.contacts_rev[nickname]

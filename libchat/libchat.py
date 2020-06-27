@@ -1,8 +1,5 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 # -*- coding: UTF-8 -*-
-# File: libchat.py
-# Date: Sun Apr 12 21:08:51 2015 +0900
-# Author: Yuxin Wu
 import sqlite3
 import os
 from datetime import datetime
@@ -99,7 +96,7 @@ class SqliteLibChat(object):
         else:
             self.c.execute("SELECT * FROM message WHERE {}".format(
                 ' AND '.join(["{} = {}".format(k, v)
-                              for k, v in predicate.iteritems()])))
+                              for k, v in predicate.items()])))
         for row in self.c.fetchall():
             yield ChatMsg(*SqliteLibChat.postfilter(row))
 
@@ -113,5 +110,5 @@ if __name__ == '__main__':
 
     for k in db.iterate_all_msg():
         from IPython import embed; embed()
-        print k
+        print(k)
 

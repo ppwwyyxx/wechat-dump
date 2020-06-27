@@ -1,8 +1,4 @@
-#!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
-# File: msg.py
-# Date: Thu Jun 18 00:01:00 2015 +0800
-# Author: Yuxin Wu
 TYPE_MSG = 1
 TYPE_IMG = 3
 TYPE_SPEAK = 34
@@ -16,6 +12,7 @@ TYPE_WX_VIDEO = 62  # video took by wechat
 TYPE_SYSTEM = 10000
 TYPE_CUSTOM_EMOJI = 1048625
 TYPE_REDENVELOPE = 436207665
+TYPE_MONEY_TRANSFER = 419430449  # 微信转账
 TYPE_LOCATION_SHARING = -1879048186
 TYPE_APP_MSG = 16777265
 
@@ -40,7 +37,7 @@ class WeChatMsg(object):
         return False
 
     def __init__(self, values):
-        for k, v in values.iteritems():
+        for k, v in values.items():
             setattr(self, k, v)
         if self.type not in _KNOWN_TYPES:
             logger.warn("Unhandled message type: {}".format(self.type))
@@ -101,6 +98,16 @@ class WeChatMsg(object):
             except:
                 pass
             return u"[RED ENVELOPE]"
+        elif self.type == TYPE_MONEY_TRANSFER:
+            data_to_parse = io.BytesIO(self.content.encode('utf-8'))
+            try:
+                for event, elem in ET.iterparse(data_to_parse, events=('end',)):
+                    if elem.tag == 'des':
+                        title = elem.text
+                        return u"[Money Transfer]\n{}".format(title)
+            except:
+                pass
+            return u"[Money Transfer]"
         else:
             # TODO replace smiley with text
             return self.content
@@ -113,14 +120,14 @@ class WeChatMsg(object):
         return msg
 
     def __repr__(self):
-        ret = u"{}|{}:{}:{}".format(
+        ret = "{}|{}:{}:{}".format(
             self.type,
             self.talker_nickname if not self.isSend else 'me',
             self.createTime,
-            ensure_unicode(self.msg_str())).encode('utf-8')
+            ensure_unicode(self.msg_str()))
         if self.imgPath:
-            ret = u"{}|img:{}".format(ensure_unicode(ret.strip()), self.imgPath)
-            return ret.encode('utf-8')
+            ret = "{}|img:{}".format(ensure_unicode(ret.strip()), self.imgPath)
+            return ret
         else:
             return ret
 
