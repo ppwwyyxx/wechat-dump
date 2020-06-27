@@ -27,7 +27,7 @@ If it doesn't work, please leave an issue together with your phone/OS/wechat ver
 + python-PIL
 + [PyQuery](https://pypi.python.org/pypi/pyquery/1.2.1)
 + [pysox](https://pypi.python.org/pypi/pysox/0.3.6.alpha) and sox
-+ [pysqlcipher](https://pypi.python.org/pypi/pysqlcipher)
++ [sqlcipher](https://github.com/sqlcipher/sqlcipher) >= 4.1 and [pysqlcipher](https://pypi.python.org/pypi/pysqlcipher)
 + numpy
 + csscompressor (suggested, optional)
 + adb and rooted android phone connected to a Linux/Mac OSX/Win10+Bash.

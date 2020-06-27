@@ -55,7 +55,7 @@ elif [[ $1 == "db" || $1 == "res" ]]; then
 		echo "Pulling resources... "
 		for d in avatar image2 voice2 emoji video sfs; do
 			adb shell "cd $RES_DIR/$chooseUser &&
-								 busybox tar czf - $d 2>/dev/null | busybox base64" |
+								 tar czf - $d 2>/dev/null | base64" |
 					base64 -di | tar xzf -
 
 			# Old Slow Way:

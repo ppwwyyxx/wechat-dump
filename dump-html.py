@@ -49,6 +49,8 @@ if __name__ == '__main__':
         with open(output_file, 'w') as f:
             print >> f, htmls[0].encode('utf-8')
     else:
+        assert output_file.endswith(".html")
+        basename = output_file[:-5]
         for idx, html in enumerate(htmls):
-            with open(output_file + '.{}'.format(idx), 'w') as f:
+            with open(basename + '.{}'.format(idx) + '.html', 'w') as f:
                 print >> f, html.encode('utf-8')

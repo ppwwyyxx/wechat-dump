@@ -47,9 +47,8 @@ if __name__ == '__main__':
     conn = sqlite.connect(args.db)
     c = conn.cursor()
     c.execute("PRAGMA key = '" + key + "';")
-    c.execute("PRAGMA cipher_use_hmac = OFF;")
-    c.execute("PRAGMA cipher_page_size = 1024;")
-    c.execute("PRAGMA kdf_iter = 4000;")
+    # https://github.com/sqlcipher/sqlcipher/commit/e4b66d6cc8a2b7547a32ff2c3ac52f148eba3516
+    c.execute("PRAGMA cipher_compatibility = 1;")
     c.execute("ATTACH DATABASE '" + args.output + "' AS db KEY '';")
     c.execute("SELECT sqlcipher_export('db');" )
     c.execute("DETACH DATABASE db;" )
