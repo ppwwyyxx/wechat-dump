@@ -20,7 +20,7 @@ except ImportError:
     css_compress = lambda x: x
 
 from .msg import *
-from common.textutil import ensure_unicode
+from common.textutil import ensure_unicode, get_file_b64
 from common.progress import ProgressReporter
 from common.timer import timing
 from .smiley import SmileyProvider
@@ -31,9 +31,13 @@ TEMPLATES_FILES = {TYPE_MSG: "TP_MSG",
                    TYPE_SPEAK: "TP_SPEAK",
                    TYPE_EMOJI: "TP_EMOJI",
                    TYPE_CUSTOM_EMOJI: "TP_EMOJI",
-                   TYPE_LINK: "TP_MSG"}
-TEMPLATES = {k: ensure_unicode(open(os.path.join(STATIC_PATH, '{}.html'.format(v))).read())
-    for k, v in TEMPLATES_FILES.items()}
+                   TYPE_LINK: "TP_MSG",
+                   TYPE_VIDEO_FILE: "TP_VIDEO_FILE"
+                  }
+TEMPLATES = {
+    k: open(os.path.join(STATIC_PATH, '{}.html'.format(v))).read()
+    for k, v in TEMPLATES_FILES.items()
+}
 
 class HTMLRender(object):
     def __init__(self, parser, res=None):
@@ -148,7 +152,18 @@ class HTMLRender(object):
                 content = u'URL:<a target="_blank" href="{0}">{0}</a>'.format(url)
                 format_dict['content'] = content
                 return template.format(**format_dict)
-        # TODO handle TYPE_VIDEO_FILE
+        elif msg.type == TYPE_VIDEO_FILE:
+            video = self.res.get_video(msg.imgPath)
+            if video.endswith(".mp4"):
+                video_str = get_file_b64(video)
+                format_dict["video_str"] = video_str
+                return template.format(**format_dict)
+            elif video.endswith(".jpg"):
+                # only has thumbnail
+                image_str = get_file_b64(video)
+                format_dict["img"] = (image_str, 'jpeg')
+                return TEMPLATES[TYPE_IMG].format(**format_dict)
+            return f"VIDEO FILE {msg.imgPath}"
         elif msg.type == TYPE_WX_VIDEO:
             # TODO: fetch video from resource
             return fallback()
