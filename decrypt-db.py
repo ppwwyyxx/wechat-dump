@@ -2,15 +2,17 @@
 # -*- coding: utf-8 -*-
 
 import subprocess
+import os
 import sys
-import re, struct
+import re
+import struct
 import argparse
 import logging
 from pyquery import PyQuery
 from pysqlcipher3 import dbapi2 as sqlite
 from hashlib import md5
 
-import wechat
+import wechat  # noqa: setup logger color
 
 
 logger = logging.getLogger("wechat")
@@ -106,7 +108,7 @@ def get_uin():
     else:
         candidates.append(uin)
         logger.info(f"found uin={uin} in auth_info_key_prefs.xml")
-    candidates = list(set(x for x in candidates if x != 0))
+    candidates = list({x for x in candidates if x != 0})
     logger.info(f"Possible uin: {candidates}")
     return candidates
 
@@ -118,7 +120,7 @@ def get_imei():
         # https://gist.github.com/ktnr74/60ac7bcc2cd17b43f2cb
         def __init__(self, text):
             if text.startswith(b'Result: Parcel(') and text.endswith(b'\')'):
-                self.data = b''.join([ struct.pack('<L', int(x, 16)) for x in re.findall(b'([0-9a-f]{8}) ', text)])
+                self.data = b''.join([struct.pack('<L', int(x, 16)) for x in re.findall(b'([0-9a-f]{8}) ', text)])
                 self.resultcode = self.get_int(0)
             else:
                 raise Exception('Unexpected input!')

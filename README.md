@@ -25,6 +25,7 @@ If it doesn't work, please leave an issue together with your phone/OS/wechat ver
 
 Decryption of database needs:
 + adb and rooted android phone connected to a Linux/Mac OSX/Win10+Bash.
+  If the phone does not come with adb support, you can download an app such as https://play.google.com/store/apps/details?id=eu.chainfire.adbd
 + Python3 with [PyQuery](https://pypi.python.org/pypi/pyquery/),
   [javaobj-py3](https://pypi.org/project/javaobj-py3),
   [sqlcipher](https://github.com/sqlcipher/sqlcipher) >= 4.1, [pysqlcipher3](https://pypi.python.org/pypi/pysqlcipher3).
@@ -46,7 +47,6 @@ On Debian/Ubuntu systems, these dependencies can be installed via:
     + Get `/data/data/com.tencent.mm/MicroMsg/${userid}/{EnMicroMsg.db,sfs/avatar.index}` from the device.
 2. Decrypt database file:
   + Automatic: `./decrypt-db.py decrypt --input EnMicroMsg.db`
-    + Requires rooted adb. If the OS distribution does not come with adb support, you can download an app such as https://play.google.com/store/apps/details?id=eu.chainfire.adbd
   + Manual:
     + Get WeChat uin (an integer), possible ways are:
       + `./decrypt-db.py uin`, which looks for uin in `/data/data/com.tencent.mm/shared_prefs/`
@@ -55,10 +55,10 @@ On Debian/Ubuntu systems, these dependencies can be installed via:
       + `./decrypt-db.py imei` implements some ways to find device id.
       + Call `*#06#` on your phone
       + Find IMEI in system settings
-    + Decrypt database with combination of uin and imei:
+    + Decrypt database with combination of uin and device id:
 
       ```
-      ./decrypt-db.py --input EnMicroMsg.db --imei <imei> --uin <uin>
+      ./decrypt-db.py decrypt --input EnMicroMsg.db --imei <device id> --uin <uin>
       ```
 
       NOTE: you may need to try different ways to get device id and fine one that can decrypt the
