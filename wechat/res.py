@@ -25,6 +25,7 @@ INTERNAL_EMOJI_DIR = os.path.join(LIB_PATH, 'static', 'internal_emoji')
 VOICE_DIRNAME = 'voice2'
 IMG_DIRNAME = 'image2'
 EMOJI_DIRNAME = 'emoji'
+VIDEO_DIRNAME = 'video'
 
 JPEG_QUALITY = 50
 
@@ -84,6 +85,7 @@ class Resource(object):
         self.img_dir = os.path.join(res_dir, IMG_DIRNAME)
         self.voice_dir = os.path.join(res_dir, VOICE_DIRNAME)
         self.emoji_dir = os.path.join(res_dir, EMOJI_DIRNAME)
+        self.video_dir = os.path.join(res_dir, VIDEO_DIRNAME)
         self.avt_reader = AvatarReader(res_dir, avt_db)
 
     def get_voice_filename(self, imgpath):
@@ -171,7 +173,6 @@ class Resource(object):
             return (big[0], "")
         return (big[0], ths[0])
 
-
     def get_img(self, fnames):
         """
         :params fnames: possible file paths
@@ -258,3 +259,12 @@ class Resource(object):
             # first 1k in emoji is encrypted
             logger.warn("Cannot get emoji {} in {}".format(md5, group))
             return None, None
+
+    def get_video(self, videoid):
+        video_file = os.path.join(self.video_dir, videoid + ".mp4")
+        video_thumbnail_file = os.path.join(self.video_dir, videoid + ".jpg")
+        if os.path.exists(video_file):
+            return video_file
+        elif os.path.exists(video_thumbnail_file):
+            return video_thumbnail_file
+        return ""
