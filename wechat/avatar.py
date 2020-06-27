@@ -1,11 +1,7 @@
-#!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
-# File: avatar.py
-# Date: Wed Nov 29 03:27:16 2017 -0800
-# Author: Yuxin Wu
 
 from PIL import Image
-import cStringIO
+import io
 import glob
 import os
 import numpy as np
@@ -13,7 +9,7 @@ import logging
 import sqlite3
 logger = logging.getLogger(__name__)
 
-from common.textutil import ensure_bin_str, md5
+from common.textutil import ensure_unicode, md5
 
 
 class AvatarReader(object):
@@ -40,7 +36,7 @@ class AvatarReader(object):
         if not self._use_avt:
             return None
 
-        username = ensure_bin_str(username)
+        username = ensure_unicode(username).encode('utf-8')
         filename = md5(username)
         dir1, dir2 = filename[:2], filename[2:4]
         filename = os.path.join(dir1, dir2,
@@ -58,13 +54,12 @@ class AvatarReader(object):
                     else:
                         return None
             except TypeError:
-                logger.warn("Avatar for {} not found in avatar database.".format(username))
+                logger.warning("Avatar for {} not found in avatar database.".format(username))
                 return None
         except Exception as e:
             raise
-            print e
-            logger.warn("Failed to retrieve avatar!")
-            return None
+            # logger.exception("Failed to retrieve avatar!")
+            # return None
 
 
     def read_img(self, pos, size):
@@ -77,7 +72,7 @@ class AvatarReader(object):
             with open(fname, 'rb') as f:
                 f.seek(start_pos)
                 data = f.read(size)
-                im = Image.open(cStringIO.StringIO(data))
+                im = Image.open(io.BytesIO(data))
                 return im
         except IOError as e:
             logger.warn("Cannot read avatar from {}: {}".format(fname, str(e)))

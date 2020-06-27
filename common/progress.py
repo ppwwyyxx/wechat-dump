@@ -1,8 +1,4 @@
-#!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
-# File: progress.py
-# Date: Wed Jun 17 23:59:52 2015 +0800
-# Author: Yuxin Wu
 
 import time
 import sys

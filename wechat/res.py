@@ -1,21 +1,17 @@
-#!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
-# File: res.py
-# Date: Wed Nov 29 03:43:50 2017 -0800
-# Author: Yuxin Wu
 
 import glob
 import os
 import re
 from PIL import Image
-import cStringIO
+import io
 import base64
 import logging
 logger = logging.getLogger(__name__)
 import imghdr
 from multiprocessing import Pool
 import atexit
-import cPickle as pickle
+import pickle
 import requests
 
 from .avatar import AvatarReader
@@ -36,26 +32,29 @@ class EmojiCache(object):
     def __init__(self, fname):
         self.fname = fname
         if os.path.isfile(fname):
-            self.dic = pickle.load(open(fname))
+            with open(fname, 'rb') as f:
+                self.dic = pickle.load(f)
         else:
             self.dic = {}
 
         self._curr_size = len(self.dic)
 
     def query(self, md5):
-        return self.dic.get(md5, (None, None))
+        data, format = self.dic.get(md5, (None, None))
+        if data is not None and not isinstance(data, str):
+            data = data.decode('ascii')
+        return data, format
 
     def fetch(self, md5, url):
         try:
             logger.info("Requesting emoji {} from {} ...".format(md5, url))
             r = requests.get(url).content
-            im = Image.open(cStringIO.StringIO(r))
+            im = Image.open(io.BytesIO(r))
             format = im.format.lower()
-            ret = (base64.b64encode(r), format)
+            ret = (base64.b64encode(r).decode('ascii'), format)
             self.dic[md5] = ret
 
-            if len(self.dic) == self._curr_size + 10:
-                self._curr_size = len(self.dic)
+            if len(self.dic) >= self._curr_size + 10:
                 self.flush()
             return ret
         except Exception as e:
@@ -63,8 +62,10 @@ class EmojiCache(object):
             return None, None
 
     def flush(self):
-        with open(self.fname, 'wb') as f:
-            pickle.dump(self.dic, f)
+        if len(self.dic) > self._curr_size:
+            self._curr_size = len(self.dic)
+            with open(self.fname, 'wb') as f:
+                pickle.dump(self.dic, f)
 
 class Resource(object):
     """ multimedia resources in chat"""
@@ -86,7 +87,7 @@ class Resource(object):
         self.avt_reader = AvatarReader(res_dir, avt_db)
 
     def get_voice_filename(self, imgpath):
-        fname = md5(imgpath)
+        fname = md5(imgpath.encode('ascii'))
         dir1, dir2 = fname[:2], fname[2:4]
         ret = os.path.join(self.voice_dir, dir1, dir2,
                            'msg_{}.amr'.format(imgpath))
@@ -107,21 +108,19 @@ class Resource(object):
         """ for speed.
         msgs: a collection of WeChatMsg, to cache for later fetch"""
         voice_paths = [msg.imgPath for msg in msgs if msg.type == TYPE_SPEAK]
+        # NOTE: remove all the caching code to debug serial decoding
         self.voice_cache_idx = {k: idx for idx, k in enumerate(voice_paths)}
         pool = Pool(3)
         atexit.register(lambda x: x.terminate(), pool)
         self.voice_cache = [pool.apply_async(parse_wechat_audio_file,
                                              (self.get_voice_filename(k),)) for k in voice_paths]
-# single-threaded version, for debug
-        #self.voice_cache = map(parse_wechat_audio_file,
-                             #(self.get_voice_filename(k) for k in voice_paths))
 
     def get_avatar(self, username):
-        """ return base64 string"""
+        """ return base64 unicode string"""
         im = self.avt_reader.get_avatar(username)
         if im is None:
             return ""
-        buf = cStringIO.StringIO()
+        buf = io.BytesIO()
         try:
             im.save(buf, 'JPEG', quality=JPEG_QUALITY)
         except IOError:
@@ -131,7 +130,7 @@ class Resource(object):
             except IOError:
                 return ""
         jpeg_str = buf.getvalue()
-        return base64.b64encode(jpeg_str)
+        return base64.b64encode(jpeg_str).decode('ascii')
 
     def _get_img_file(self, fnames):
         """ fnames: a list of filename to search for
@@ -167,7 +166,7 @@ class Resource(object):
                 logger.warn("Found big image but not thumbnail: {}".format(fname))
                 return (name, "")
         big = cands[-1]
-        ths = filter(name_is_thumbnail, [k[0] for k in cands])
+        ths = list(filter(name_is_thumbnail, [k[0] for k in cands]))
         if not ths:
             return (big[0], "")
         return (big[0], ths[0])
@@ -187,10 +186,11 @@ class Resource(object):
             if not img_file.endswith('jpg') and \
                imghdr.what(img_file) != 'jpeg':
                 im = Image.open(open(img_file, 'rb'))
-                buf = cStringIO.StringIO()
+                buf = io.BytesIO()
                 im.convert('RGB').save(buf, 'JPEG', quality=JPEG_QUALITY)
-                return base64.b64encode(buf.getvalue())
+                return base64.b64encode(buf.getvalue()).decode('ascii')
             return get_file_b64(img_file)
+
         big_file = get_jpg_b64(big_file)
         if big_file:
             return big_file
@@ -224,7 +224,7 @@ class Resource(object):
         return get_file_b64(f), imghdr.what(f)
 
     def get_emoji_by_md5(self, md5):
-        """ :returns: (b64 img, format)"""
+        """ :returns: (b64 unicode img, format)"""
         assert md5, md5
         if md5 in self.parser.internal_emojis:
             # TODO this seems broken

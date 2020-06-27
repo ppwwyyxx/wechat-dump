@@ -1,8 +1,4 @@
-#!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
-# File: msgslice.py
-# Date: Thu Jan 08 00:15:49 2015 +0800
-# Author: Yuxin Wu
 
 class MessageSlicerByTime(object):
     """ Separate messages into slices by time,

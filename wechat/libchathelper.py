@@ -1,8 +1,4 @@
-#!/usr/bin/env python2
 # -*- coding: UTF-8 -*-
-# File: libchathelper.py
-# Date: Wed Nov 29 03:44:54 2017 -0800
-# Author: Yuxin Wu
 
 import base64
 from pyquery import PyQuery
@@ -65,8 +61,8 @@ class LibChatHelper(object):
     def _get_sound(self, msg):
         if msg.type == TYPE_SPEAK:
             audio_str, duration = self.res.get_voice_mp3(msg.imgPath)
-            return '{}:{}'.format(duration, base64.b64decode(audio_str))
-        return ''
+            return base64.b64decode(audio_str)
+        return b''
 
     def _get_extra(self, msg):
         ret = {}
@@ -83,7 +79,7 @@ class LibChatHelper(object):
         if img:
             # TODO don't use b64, directly return image content
             img = base64.b64decode(img)
-# TODO do we need to save format?
+        # TODO do we need to save format or voice duration?
         sound = self._get_sound(msg)
         extra = self._get_extra(msg)
 

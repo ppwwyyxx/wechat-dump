@@ -22,19 +22,14 @@ If it doesn't work, you probably have to investigate it as the behavior may be d
 ### How to use:
 
 #### Dependencies:
-
-Decryption of database needs:
 + adb and rooted android phone connected to a Linux/Mac OSX/Win10+Bash.
   If the phone does not come with adb support, you can download an app such as https://play.google.com/store/apps/details?id=eu.chainfire.adbd
-+ Python3 with [PyQuery](https://pypi.python.org/pypi/pyquery/),
-  [javaobj-py3](https://pypi.org/project/javaobj-py3),
-  [sqlcipher](https://github.com/sqlcipher/sqlcipher) >= 4.1, [pysqlcipher3](https://pypi.python.org/pypi/pysqlcipher3).
-
-Database parsing and rendering needs:
-+ Python2 with numpy, requests, Pillow, [PyQuery](https://pypi.python.org/pypi/pyquery/)
-+ [pysox](https://pypi.python.org/pypi/pysox/0.3.6.alpha) and sox
++ Python >= 3.6
++ [PyQuery](https://pypi.python.org/pypi/pyquery/), [javaobj-py3](https://pypi.org/project/javaobj-py3), Pillow, requests
++ [sqlcipher](https://github.com/sqlcipher/sqlcipher) >= 4.1, [pysqlcipher3](https://pypi.python.org/pypi/pysqlcipher3)
++ sox (command line tool)
 + csscompressor (suggested, optional)
-+ Silk audio decoder (included; just run `./third-party/compile_silk.sh`)
++ Silk audio decoder (included; build with `./third-party/compile_silk.sh`)
 
 #### Get Necessary Data:
 
@@ -120,7 +115,6 @@ Screenshots of generated html:
 See [here](http://ppwwyyxx.com/static/wechat/example.html) for an example html.
 
 ### TODO List
-+ Migrate core to Python3
 + Attack the emoji encryption problem
 + Fix rare unhandled message types: > 10000 and < 0
 + Better user experiences... see `grep 'TODO' wechat -R`
