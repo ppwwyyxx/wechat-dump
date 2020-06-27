@@ -23,63 +23,59 @@ If it doesn't work, please leave an issue together with your phone/OS/wechat ver
 
 #### Dependencies:
 
-+ requests
-+ python-PIL
-+ [PyQuery](https://pypi.python.org/pypi/pyquery/1.2.1)
-+ [pysox](https://pypi.python.org/pypi/pysox/0.3.6.alpha) and sox
-+ [sqlcipher](https://github.com/sqlcipher/sqlcipher) >= 4.1 and [pysqlcipher](https://pypi.python.org/pypi/pysqlcipher)
-+ numpy
-+ csscompressor (suggested, optional)
+Decryption of database needs:
 + adb and rooted android phone connected to a Linux/Mac OSX/Win10+Bash.
++ Python3 with [PyQuery](https://pypi.python.org/pypi/pyquery/),
+  [javaobj-py3](https://pypi.org/project/javaobj-py3),
+  [sqlcipher](https://github.com/sqlcipher/sqlcipher) >= 4.1, [pysqlcipher3](https://pypi.python.org/pypi/pysqlcipher3).
+
+Database parsing and rendering needs:
++ Python2 with numpy, requests, Pillow, [PyQuery](https://pypi.python.org/pypi/pyquery/)
++ [pysox](https://pypi.python.org/pypi/pysox/0.3.6.alpha) and sox
++ csscompressor (suggested, optional)
 + Silk audio decoder (included; just run `./third-party/compile_silk.sh`)
-+ gnu-sed
 
 On Debian/Ubuntu systems, these dependencies can be installed via:
 
-```sh
-sudo apt-get install sox android-tools-adb python-requests python-pil python-pyquery python-numpy libsox-dev libsqlite3-dev libsqlcipher-dev
-pip install --user pysqlcipher csscompressor
-pip install --user --pre pysox
-```
-
 #### Get Necessary Data:
 
-+ Get the decrypted WeChat database and the avatar index:
-	+ Automatic: `./android-interact.sh db-decrypt`
-		+ Requires rooted adb. If the OS distribution does not come with adb support, you can download an app such as https://play.google.com/store/apps/details?id=eu.chainfire.adbd
-	+ Manual:
-		+ Figure out your `${userid}` by inspecting the contents of `/data/data/com.tencent.mm/MicroMsg` on the __root__ filesystem of the device. It should be a 32-character-long name consisting of hexadecimal digits.
-		+ Get `/data/data/com.tencent.mm/MicroMsg/${userid}/{EnMicroMsg.db,sfs/avatar.index}` from the device, possible ways are:
-			+ `./android-interact.sh db`
-			+ Use your rooted file system manager app
-		+ Get WeChat uin (an integer), possible ways are:
-			+ `./android-interact.sh uin`, which pulls the value from `/data/data/com.tencent.mm/shared_prefs/system_config_prefs.xml`
-			+ Login to [web wechat](https://wx.qq.com), get wxuin=1234567 from `document.cookie`
-		+ Get your phone IMEI/MEID number (a positive integer), possible ways are:
-			+ `./android-interact.sh imei`
-			+ Call `*#06#` on your phone
-			+ Find IMEI in system settings
-		+ Decrypt database, will produce `decrypted.db`:
+1. Pull database file and avatar index:
+  + Automatic: `./android-interact.sh db`. It may use an incorrect userid.
+  + Manual:
+    + Figure out your `${userid}` by inspecting the contents of `/data/data/com.tencent.mm/MicroMsg` on the __root__ filesystem of the device. It should be a 32-character-long name consisting of hexadecimal digits.
+    + Get `/data/data/com.tencent.mm/MicroMsg/${userid}/{EnMicroMsg.db,sfs/avatar.index}` from the device.
+2. Decrypt database file:
+  + Automatic: `./decrypt-db.py decrypt --input EnMicroMsg.db`
+    + Requires rooted adb. If the OS distribution does not come with adb support, you can download an app such as https://play.google.com/store/apps/details?id=eu.chainfire.adbd
+  + Manual:
+    + Get WeChat uin (an integer), possible ways are:
+      + `./decrypt-db.py uin`, which looks for uin in `/data/data/com.tencent.mm/shared_prefs/`
+      + Login to [web wechat](https://wx.qq.com), get wxuin=1234567 from `document.cookie`
+    + Get your device id (a positive integer), possible ways are:
+      + `./decrypt-db.py imei` implements some ways to find device id.
+      + Call `*#06#` on your phone
+      + Find IMEI in system settings
+    + Decrypt database with combination of uin and imei:
 
-            ```
-            ./decrypt-db.py <path to EnMicroMsg.db> <imei> <uin>
-            ```
+      ```
+      ./decrypt-db.py --input EnMicroMsg.db --imei <imei> --uin <uin>
+      ```
 
-    NOTE: you may need to try different ways to get IMEI/MEID,
-		because things behave differently on different phones.
-		Some phones may have multiple IMEIs, you may need to try them all.
-		See [#33](https://github.com/ppwwyyxx/wechat-dump/issues/33).
+      NOTE: you may need to try different ways to get device id and fine one that can decrypt the
+      database. Some phones may have multiple IMEIs, you may need to try them all.
+      See [#33](https://github.com/ppwwyyxx/wechat-dump/issues/33).
+      The command will dump decrypted database at `EnMicroMsg.db.decrypted`.
 
-		If decryption doesn't work, you can also try the [password cracker](https://github.com/chg-hou/EnMicroMsg.db-Password-Cracker)
-		to brute-force the password.
+  If decryption doesn't work, you can also try the [password cracker](https://github.com/chg-hou/EnMicroMsg.db-Password-Cracker)
+  to brute-force the password.
 
 + Copy the WeChat user resource directory `/mnt/sdcard/tencent/MicroMsg/${userid}/{avatar,emoji,image2,sfs,video,voice2}` from the phone to the `resource` directory:
 	+ `./android-interact.sh res`
 	+ You might need to change `RES_DIR` in the script if the default is incorrect on your phone.
-	+ This script needs busybox and base64 on your phone.
+	+ This script needs tar and base64 command on your phone.
 		If they are not available, there is a slow fallback method in the script you can use.
 	+ This can take a few minutes. One way to do it faster:
-        + If there's enough free space on your phone, you can log in and archive all required files via `busybox tar` with or without compression,
+        + If there's enough free space on your phone, you can log in and archive all required files via `tar` with or without compression,
 				and use `adb pull` to copy the archive. Note that `busybox` is needed as the Android system's `tar` may choke on long paths.
 	+ What you'll need in the end is a `resource` directory with the following subdir: `avatar,emoji,image2,sfs,video,voice2`.
 
