@@ -6,7 +6,7 @@ TYPE_NAMECARD = 42
 TYPE_VIDEO_FILE = 43
 TYPE_EMOJI = 47
 TYPE_LOCATION = 48
-TYPE_LINK = 49  # link share OR file from web
+TYPE_LINK = 49  # link share OR file from web, see https://github.com/ppwwyyxx/wechat-dump/issues/52
 TYPE_VOIP = 50
 TYPE_WX_VIDEO = 62  # video took by wechat
 TYPE_SYSTEM = 10000
@@ -60,11 +60,13 @@ class WeChatMsg(object):
             pq = PyQuery(self.content_xml_ready)
             url = pq('url').text()
             if not url:
+                # TODO: see https://github.com/ppwwyyxx/wechat-dump/issues/52 for
+                # more logic to implement
                 title = pq('title').text()
-                assert title, \
-                        u"No title or url found in TYPE_LINK: {}".format(self.content)
-                return u"FILE:{}".format(title)
-            return u"URL:{}".format(url)
+                if title:  # may not be correct
+                    return "FILE:{}".format(title)
+                return "NOT IMPLEMENTED: " + self.content_xml_ready
+            return "URL:{}".format(url)
         elif self.type == TYPE_NAMECARD:
             pq = PyQuery(self.content_xml_ready, parser='xml')
             msg = pq('msg').attr
@@ -73,7 +75,7 @@ class WeChatMsg(object):
                 name = msg['alias']
             if not name:
                 name = ""
-            return u"NAMECARD: {}".format(self.content_xml_ready)
+            return "NAMECARD: {}".format(self.content_xml_ready)
         elif self.type == TYPE_APP_MSG:
             pq = PyQuery(self.content_xml_ready, parser='xml')
             return pq('title').text()
@@ -94,20 +96,20 @@ class WeChatMsg(object):
                 for event, elem in ET.iterparse(data_to_parse, events=('end',)):
                     if elem.tag == 'sendertitle':
                         title = elem.text
-                        return u"[RED ENVELOPE]\n{}".format(title)
+                        return "[RED ENVELOPE]\n{}".format(title)
             except:
                 pass
-            return u"[RED ENVELOPE]"
+            return "[RED ENVELOPE]"
         elif self.type == TYPE_MONEY_TRANSFER:
             data_to_parse = io.BytesIO(self.content.encode('utf-8'))
             try:
                 for event, elem in ET.iterparse(data_to_parse, events=('end',)):
                     if elem.tag == 'des':
                         title = elem.text
-                        return u"[Money Transfer]\n{}".format(title)
+                        return "[Money Transfer]\n{}".format(title)
             except:
                 pass
-            return u"[Money Transfer]"
+            return "[Money Transfer]"
         else:
             # TODO replace smiley with text
             return self.content
