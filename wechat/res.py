@@ -4,6 +4,7 @@ import glob
 import os
 import re
 from PIL import Image
+import tempfile
 import io
 import base64
 import logging
@@ -16,6 +17,7 @@ import requests
 
 from .avatar import AvatarReader
 from .common.textutil import md5, get_file_b64
+from .common.procutil import subproc_succ
 from .common.timer import timing
 from .msg import TYPE_SPEAK
 from .audio import parse_wechat_audio_file
@@ -46,21 +48,41 @@ class EmojiCache(object):
             data = data.decode('ascii')
         return data, format
 
-    def fetch(self, md5, url):
-        try:
-            logger.info("Requesting emoji {} from {} ...".format(md5, url))
-            r = requests.get(url).content
-            im = Image.open(io.BytesIO(r))
-            format = im.format.lower()
-            ret = (base64.b64encode(r).decode('ascii'), format)
-            self.dic[md5] = ret
+    def fetch(self, md5, urls):
+        cdnurl, encrypturl, aeskey = urls
+        if cdnurl:
+            try:
+                logger.info("Requesting emoji {} from {} ...".format(md5, cdnurl))
+                r = requests.get(cdnurl).content
+                im = Image.open(io.BytesIO(r))
+                ret = (base64.b64encode(r).decode('ascii'), im.format.lower())
+                self.add(md5, ret)
+                return ret
+            except Exception:
+                logger.exception("Error processing cdnurl {}".format(cdnurl))
 
-            if len(self.dic) >= self._curr_size + 10:
-                self.flush()
-            return ret
-        except Exception as e:
-            logger.exception("Error processing emoji from {}".format(url))
-            return None, None
+        if encrypturl:
+            try:
+                logger.info("Requesting encrypted emoji {} from {} ...".format(md5, encrypturl))
+                buf = requests.get(encrypturl).content
+                with tempfile.TemporaryDirectory(prefix="wechat_dump_download") as d:
+                    fname = os.path.join(d, md5)
+                    with open(fname, 'wb') as f:
+                        f.write(buf)
+                    cmd = f"openssl enc -d -aes-128-cbc -in {fname} -K {aeskey} -iv {aeskey}"
+                    decrypted_buf = subproc_succ(cmd)
+                im = Image.open(io.BytesIO(decrypted_buf))
+                ret = (base64.b64encode(decrypted_buf).decode('ascii'), im.format.lower())
+                self.add(md5, ret)
+                return ret
+            except Exception:
+                logger.exception("Error processing encrypturl {}".format(encrypturl))
+        return None, None
+
+    def add(self, md5, values):
+        self.dic[md5] = values
+        if len(self.dic) >= self._curr_size + 10:
+            self.flush()
 
     def flush(self):
         if len(self.dic) > self._curr_size:
@@ -206,17 +228,10 @@ class Resource(object):
         path = os.path.join(self.emoji_dir, pack_id or '')
         candidates = glob.glob(os.path.join(path, '{}*'.format(md5)))
         candidates = [k for k in candidates if not re.match('.*_[0-9]+$', k)]
-
-        def try_use(f):
-            if not f: return None
-            if not imghdr.what(f[0]):   # cannot recognize file type
-                return None
-            return f[0]
-
         candidates = [k for k in candidates if (allow_cover or (not k.endswith('_cover') and not k.endswith('_thumb')))]
 
         for cand in candidates:
-            if imghdr.what(cand):
+            if imghdr.what(cand):  # does not recognize
                 return get_file_b64(cand), imghdr.what(cand)
         return None, None
 
@@ -243,19 +258,19 @@ class Resource(object):
                 return emoji_img, format
 
             # check url
-            url = self.parser.emoji_url.get(md5, None)
-            if url:
-                emoji_img, format = self.emoji_cache.fetch(md5, url)
+            urls = self.parser.emoji_url.get(md5, None)
+            if urls:
+                emoji_img, format = self.emoji_cache.fetch(md5, urls)
                 if format:
                     return emoji_img, format
 
-            # check resource/emoji dir again, for cover
+            # check resource/emoji dir again, fallback to allow cover/thumbnail
             emoji_img, format = self._get_res_emoji(md5, group, allow_cover=True)
             if format:
                 return emoji_img, format
 
             # TODO: first 1k in emoji is encrypted
-            logger.warn("Cannot get emoji {} in group {}".format(md5, group))
+            logger.warning("Cannot get emoji {} in group {}".format(md5, group))
             return None, None
 
     def get_video(self, videoid):
@@ -265,4 +280,5 @@ class Resource(object):
             return video_file
         elif os.path.exists(video_thumbnail_file):
             return video_thumbnail_file
+        logger.warning(f"Cannot get video {videoid}")
         return ""

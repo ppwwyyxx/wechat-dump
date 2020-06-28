@@ -163,7 +163,9 @@ class HTMLRender(object):
                 image_str = get_file_b64(video)
                 format_dict["img"] = (image_str, 'jpeg')
                 return TEMPLATES[TYPE_IMG].format(**format_dict)
-            return f"VIDEO FILE {msg.imgPath}"
+            # fallback
+            format_dict['content'] = f"VIDEO FILE {msg.imgPath}"
+            return TEMPLATES_FILES[TYPE_MSG].format(**format_dict)
         elif msg.type == TYPE_WX_VIDEO:
             # TODO: fetch video from resource
             return fallback()

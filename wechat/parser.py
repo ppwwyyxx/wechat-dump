@@ -100,26 +100,26 @@ SELECT {} FROM message
             md5, group = row
             self.emoji_groups[md5] = group
 
-        NEEDED_EMOJI_CATALOG = [49, 50, 17]
+        HAS_EMOJI_CATALOG = [49, 50, 17]  # these are included in static/
         try:
             emojiinfo_q = self.cc.execute(
-    """ SELECT md5, catalog, name, cdnUrl FROM EmojiInfo""")
+    """ SELECT md5, catalog, name, cdnUrl, encrypturl, aeskey FROM EmojiInfo""")
         except: # old database does not have cdnurl
             emojiinfo_q = self.cc.execute(
     """ SELECT md5, catalog, name FROM EmojiInfo""")
             for row in emojiinfo_q:
                 md5, catalog, name = row
-                if catalog not in NEEDED_EMOJI_CATALOG:
-                    continue
-                self.internal_emojis[md5] = name
+                if name and catalog in HAS_EMOJI_CATALOG:
+                    self.internal_emojis[md5] = name
         else:
             for row in emojiinfo_q:
-                md5, catalog, name, cdnUrl = row
-                if cdnUrl:
-                    self.emoji_url[md5] = cdnUrl
-                if catalog not in NEEDED_EMOJI_CATALOG:
-                    continue
-                self.internal_emojis[md5] = name
+                md5, catalog, name, cdnUrl, encrypturl, aeskey = row
+                if cdnUrl or encrypturl:
+                    self.emoji_url[md5] = (cdnUrl, encrypturl, aeskey)
+                if not cdnUrl and encrypturl:
+                    logger.warning(f"Emoji {md5} has encrypturl only.")
+                if name and catalog in HAS_EMOJI_CATALOG:
+                    self.internal_emojis[md5] = name
 
 
     def _parse(self):

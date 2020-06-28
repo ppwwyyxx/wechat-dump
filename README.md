@@ -18,7 +18,7 @@ If it doesn't work, you probably have to investigate it as the behavior may be d
 + Python >= 3.6
 + [PyQuery](https://pypi.python.org/pypi/pyquery/), [javaobj-py3](https://pypi.org/project/javaobj-py3), Pillow, requests
 + [sqlcipher](https://github.com/sqlcipher/sqlcipher) >= 4.1, [pysqlcipher3](https://pypi.python.org/pypi/pysqlcipher3)
-+ sox (command line tool)
++ sox, openssl (command line tools)
 + csscompressor (suggested, optional)
 + Silk audio decoder (included; build with `./third-party/compile_silk.sh`)
 
