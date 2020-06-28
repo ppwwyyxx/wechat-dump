@@ -72,8 +72,8 @@ class Resource(object):
     """ multimedia resources in chat"""
     def __init__(self, parser, res_dir, avt_db):
         def check(subdir):
-            assert os.path.isdir(os.path.join(res_dir, subdir)), \
-                    "No such directory: {}".format(subdir)
+            dir_to_check = os.path.join(res_dir, subdir)
+            assert os.path.isdir(dir_to_check), f"No such directory: {dir_to_check}"
         [check(k) for k in ['', IMG_DIRNAME, EMOJI_DIRNAME, VOICE_DIRNAME]]
 
         self.emoji_cache = EmojiCache(
