@@ -8,8 +8,8 @@ logger = logging.getLogger(__name__)
 
 from libchat.libchat import SqliteLibChat, ChatMsg
 from .msg import *
-from common.timer import timing
-from common.progress import ProgressReporter
+from .common.timer import timing
+from .common.progress import ProgressReporter
 
 class LibChatHelper(object):
     """ Build LibChat messages from WeChat Msg"""

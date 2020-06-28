@@ -5,8 +5,8 @@ import os
 import logging
 logger = logging.getLogger(__name__)
 
-from common.textutil import get_file_b64
-from common.procutil import subproc_succ
+from .common.textutil import get_file_b64
+from .common.procutil import subproc_succ
 
 SILK_DECODER = os.path.join(os.path.dirname(__file__),
                             '../third-party/silk/decoder')

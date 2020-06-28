@@ -25,7 +25,7 @@ import xml.etree.ElementTree as ET
 import logging
 logger = logging.getLogger(__name__)
 
-from common.textutil import ensure_unicode
+from .common.textutil import ensure_unicode
 
 
 class WeChatMsg(object):

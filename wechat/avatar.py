@@ -10,7 +10,7 @@ import logging
 import sqlite3
 logger = logging.getLogger(__name__)
 
-from common.textutil import ensure_unicode, md5
+from .common.textutil import ensure_unicode, md5
 
 
 class AvatarReader(object):

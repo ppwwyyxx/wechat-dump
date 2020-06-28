@@ -11,8 +11,7 @@ from pyquery import PyQuery
 from pysqlcipher3 import dbapi2 as sqlite
 from hashlib import md5
 
-import wechat  # noqa: setup logger color
-from common.procutil import subproc_succ, subproc_call
+from wechat.common.procutil import subproc_succ, subproc_call
 
 
 logger = logging.getLogger("wechat")
