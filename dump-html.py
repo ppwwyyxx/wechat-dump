@@ -52,6 +52,6 @@ if __name__ == '__main__':
         assert output_file.endswith(".html")
         basename = output_file[:-5]
         for idx, html in enumerate(htmls):
-            with open(basename + '.{}'.format(idx) + '.html', 'w') as f:
+            with open(basename + f'{idx:02d}.html', 'w') as f:
                 f.write(html)
     res.emoji_cache.flush()
