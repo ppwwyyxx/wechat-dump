@@ -32,7 +32,7 @@ class MessageSlicerBySize(object):
     """ Separate messages into slices by max slice size,
         to avoid too large html.
     """
-    def __init__(self, size=1000):
+    def __init__(self, size=2000):
         """ a slice will have <= 1.5 * cnt messages"""
         self.size = size
         assert self.size > 1

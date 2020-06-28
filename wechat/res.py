@@ -121,6 +121,7 @@ class Resource(object):
         """ return base64 unicode string"""
         im = self.avt_reader.get_avatar(username)
         if im is None:
+            logger.warning(f"Avatar for {username} is missing.")
             return ""
         buf = io.BytesIO()
         try:
