@@ -136,7 +136,7 @@ SELECT {} FROM message
         if values['content']:
             values['content'] = ensure_unicode(values['content'])
         else:
-            values['content'] = u''
+            values['content'] = ''
         values['createTime'] = datetime.fromtimestamp(values['createTime']/ 1000)
         values['chat'] = values['talker']
         try:
@@ -147,7 +147,7 @@ SELECT {} FROM message
                 if values['isSend'] == 1:
                     values['talker'] = self.username
                 elif values['type'] == TYPE_SYSTEM:
-                    values['talker'] = u'SYSTEM'
+                    values['talker'] = 'SYSTEM'
                 else:
                     talker = content[:content.find(':')]
                     values['talker'] = talker
@@ -175,9 +175,22 @@ SELECT {} FROM message
         return [self.contacts[k] for k in self.all_chat_ids if len(self.contacts[k])]
 
     def get_id_by_nickname(self, nickname):
+        """
+        Get chat id by nickname.
+        """
         l = self.contacts_rev[nickname]
         if len(l) == 0:
             raise KeyError("No contacts have nickname {}".format(nickname))
         if len(l) > 1:
             logger.warn("More than one contacts have nickname {}! Using the first contact".format(nickname))
         return l[0]
+
+    def get_chat_id(self, nick_name_or_id):
+        """
+        Get the unique chat id by either chat id itself, or the nickname of the chat.
+        """
+        if nick_name_or_id in self.contacts:
+            return nick_name_or_id
+        else:
+            return self.get_id_by_nickname(nick_name_or_id)
+

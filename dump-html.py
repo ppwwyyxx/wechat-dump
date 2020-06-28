@@ -31,15 +31,16 @@ if __name__ == '__main__':
     parser = WeChatDBParser(args.db)
 
     try:
-        chatid = parser.get_id_by_nickname(name)
+        chatid = parser.get_chat_id(args.name)
     except KeyError:
         sys.stderr.write(u"Valid Contacts: {}\n".format(
             u'\n'.join(parser.all_chat_nicknames)))
         sys.stderr.write(u"Couldn't find the chat {}.".format(name));
         sys.exit(1)
+
     res = Resource(parser, args.res, args.avt)
     msgs = parser.msgs_by_chat[chatid]
-    logger.info(f"Number of Messages: {len(msgs)}")
+    logger.info(f"Number of Messages for chatid {chatid}: {len(msgs)}")
     assert len(msgs) > 0
 
     render = HTMLRender(parser, res)

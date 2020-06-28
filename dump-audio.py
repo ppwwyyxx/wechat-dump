@@ -24,7 +24,7 @@ if __name__ == '__main__':
     res = Resource(parser, args.res, '')
 
     try:
-        chatid = parser.get_id_by_nickname(args.name)
+        chatid = parser.get_chat_id(args.name)
     except KeyError:
         sys.stderr.write(u"Valid Contacts: {}\n".format('\n'.join(parser.all_chat_nicknames)))
         sys.stderr.write(u"Couldn't find the chat {}.".format(args.name));
