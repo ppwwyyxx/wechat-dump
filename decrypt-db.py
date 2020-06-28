@@ -103,8 +103,8 @@ def get_imei():
     except:
         logger.warning("imei not found in CompatibleInfo.cfg")
     else:
+        candidates.append(imei)
         logger.info(f"found imei={imei} in CompatibleInfo.cfg")
-    candidates.append(imei)
     logger.info(f"Possible imei: {candidates}")
     return [x.encode('ascii') for x in set(candidates)]
 

@@ -3,6 +3,7 @@
 output/
 resource
 *.db
+*.db.decrypted
 *2015*
 *2017*
 2020*

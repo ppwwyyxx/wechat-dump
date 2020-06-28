@@ -53,17 +53,15 @@ If it doesn't work, you probably have to investigate it as the behavior may be d
   If decryption doesn't work, you can also try the [password cracker](https://github.com/chg-hou/EnMicroMsg.db-Password-Cracker)
   to brute-force the password.
 
-+ Copy the WeChat user resource directory `/mnt/sdcard/tencent/MicroMsg/${userid}/{avatar,emoji,image2,sfs,video,voice2}` from the phone to the `resource` directory:
+3. Copy the WeChat user resource directory `/mnt/sdcard/tencent/MicroMsg/${userid}/{avatar,emoji,image2,sfs,video,voice2}` from the phone to the `resource` directory:
 	+ `./android-interact.sh res`
 	+ You might need to change `RES_DIR` in the script if the default is incorrect on your phone.
-	+ This script needs tar and base64 command on your phone.
-		If they are not available, there is a slow fallback method in the script you can use.
-	+ This can take a few minutes. One way to do it faster:
-        + If there's enough free space on your phone, you can log in and archive all required files via `tar` with or without compression,
-				and use `adb pull` to copy the archive. Note that `busybox` is needed as the Android system's `tar` may choke on long paths.
-	+ What you'll need in the end is a `resource` directory with the following subdir: `avatar,emoji,image2,sfs,video,voice2`.
+	+ This can take a while. One way that might be slightly faster:
+    + If there's enough free space on your phone, you can log in and archive all required files via `tar` with or without compression,
+		  and use `adb pull` to copy the archive. Note that `busybox tar` is recommended as the Android system's `tar` may choke on long paths.
+	+ What is needed in the end is a `resource` directory with the following subdir: `avatar,emoji,image2,sfs,video,voice2`.
 
-+ (Optional) Download the emoji cache from [here](https://github.com/ppwwyyxx/wechat-dump/releases/download/0.1/emoji.cache.tar.bz2)
+4. (Optional) Download the emoji cache from [here](https://github.com/ppwwyyxx/wechat-dump/releases/download/0.1/emoji.cache.tar.bz2)
 	and decompress it under `wechat-dump`. This will avoid downloading too many emojis during rendering.
 
         wget -c https://github.com/ppwwyyxx/wechat-dump/releases/download/0.1/emoji.cache.tar.bz2

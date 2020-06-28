@@ -1,6 +1,5 @@
 #!/bin/bash
 # File: android-interact.sh
-# Date: Wed Nov 29 02:19:00 2017 -0800
 
 PROG_NAME=`python -c "import os, sys; print(os.path.realpath(sys.argv[1]))" "$0"`
 PROG_DIR=`dirname "$PROG_NAME"`
@@ -29,25 +28,36 @@ if [[ $1 == "db" || $1 == "res" ]]; then
 	echo "Found $numUser user(s). User chosen: $chooseUser"
 
 	if [[ $1 == "res" ]]; then
-		mkdir -p resource; cd resource
-		echo "Pulling resources... "
-		for d in avatar image2 voice2 emoji video sfs; do
-			adb shell "cd $RES_DIR/$chooseUser &&
-								 tar czf - $d 2>/dev/null | base64" |
-					base64 -di | tar xzf -
+		mkdir -p resource
+    (
+      cd resource || exit
+      echo "Pulling resources... "
+      for d in avatar image2 voice2 emoji video sfs; do
+        echo "Trying to download $RES_DIR/$chooseUser/$d with busybox ..."
+        adb shell "cd $RES_DIR/$chooseUser &&
+                   busybox tar czf - $d 2>/dev/null | busybox base64" |
+            base64 -di | tar xzf -
+        [[ -d $d ]] && continue
 
-			# Old Slow Way:
-			# mkdir -p $d; cd $d
-			# adb pull "$RES_DIR/$chooseUser/$d"
-			# cd ..
-			[[ -d $d ]] || {
-				>&2 echo "Failed to download resource directory: $RES_DIR/$chooseUser/$d"
-				exit 1
-			}
-		done
-		cd ..
-		echo "Resource pulled at ./resource"
-		echo "Total size: $(du -sh resource | cut -f1)"
+        echo "Trying to download $RES_DIR/$chooseUser/$d with tar & base64 ..."
+        adb shell "cd $RES_DIR/$chooseUser &&
+                   tar czf - $d 2>/dev/null | base64" | base64 -di | tar xzf -
+        [[ -d $d ]] && continue
+
+        echo "Trying to download $RES_DIR/$chooseUser/$d with adb pull (slow) ..."
+        mkdir -p $d
+        (
+          cd $d || exit
+          adb pull "$RES_DIR/$chooseUser/$d"
+        )
+
+        [[ -d $d ]] || {
+          echo "Failed to download $RES_DIR/$chooseUser/$d"
+        }
+      done
+      echo "Resource pulled at ./resource"
+      echo "Total size: $(du -sh | cut -f1)"
+    )
 	else
 		echo "Pulling database and avatar index file..."
 		adb pull $MM_DIR/MicroMsg/$chooseUser/EnMicroMsg.db
