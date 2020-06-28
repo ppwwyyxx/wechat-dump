@@ -53,15 +53,11 @@ if [[ $1 == "db" || $1 == "res" ]]; then
 		adb pull $MM_DIR/MicroMsg/$chooseUser/EnMicroMsg.db
 		[[ -f EnMicroMsg.db ]] && \
 			echo "Database successfully downloaded to EnMicroMsg.db" || {
-			>&2 echo "Failed to pull database by adb"
+			>&2 echo "Failed to pull database by adb!"
 			exit 1
 		}
 		adb pull $MM_DIR/MicroMsg/$chooseUser/sfs/avatar.index
-		[[ -f avatar.index ]] && \
-			echo "Avatar index successfully downloaded to avatar.index" || {
-				>&2 echo "Failed to pull avatar index by adb, are you using latest version of wechat?"
-				exit 1
-			}
+		[[ -f avatar.index ]] && echo "Avatar index successfully downloaded to avatar.index"
 	fi
 else
 	echo "Usage: $0 <res|db>"

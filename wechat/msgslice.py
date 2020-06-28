@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 
-class MessageSlicerByTime(object):
+class MessageSlicerByTime:
     """ Separate messages into slices by time,
         for time display in html.
         A new day always begins a new slice.
@@ -28,11 +28,11 @@ class MessageSlicerByTime(object):
         assert len(msgs) == sum([len(k) for k in ret])
         return ret
 
-class MessageSlicerBySize(object):
+class MessageSlicerBySize:
     """ Separate messages into slices by max slice size,
         to avoid too large html.
     """
-    def __init__(self, size=2000):
+    def __init__(self, size=1500):
         """ a slice will have <= 1.5 * cnt messages"""
         self.size = size
         assert self.size > 1
