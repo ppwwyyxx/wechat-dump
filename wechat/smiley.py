@@ -7,7 +7,7 @@ import re
 import json
 import struct
 
-from common.textutil import get_file_b64
+from .common.textutil import get_file_b64
 
 STATIC_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static')
 TENCENT_SMILEY_FILE = os.path.join(STATIC_PATH, 'tencent-smiley.json')

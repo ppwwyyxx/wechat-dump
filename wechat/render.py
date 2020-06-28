@@ -20,9 +20,9 @@ except ImportError:
     css_compress = lambda x: x
 
 from .msg import *
-from common.textutil import ensure_unicode, get_file_b64
-from common.progress import ProgressReporter
-from common.timer import timing
+from .common.textutil import ensure_unicode, get_file_b64
+from .common.progress import ProgressReporter
+from .common.timer import timing
 from .smiley import SmileyProvider
 from .msgslice import MessageSlicerByTime, MessageSlicerBySize
 

@@ -15,8 +15,8 @@ import pickle
 import requests
 
 from .avatar import AvatarReader
-from common.textutil import md5, get_file_b64
-from common.timer import timing
+from .common.textutil import md5, get_file_b64
+from .common.timer import timing
 from .msg import TYPE_SPEAK
 from .audio import parse_wechat_audio_file
 

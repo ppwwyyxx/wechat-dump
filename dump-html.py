@@ -5,9 +5,9 @@ import sys
 import argparse
 import logging
 
-from common.textutil import ensure_unicode
 from wechat.parser import WeChatDBParser
 from wechat.res import Resource
+from wechat.common.textutil import ensure_unicode
 from wechat.render import HTMLRender
 
 logger = logging.getLogger("wechat")

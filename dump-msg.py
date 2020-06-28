@@ -3,7 +3,7 @@
 
 import logging
 from wechat.parser import WeChatDBParser
-from common.textutil import safe_filename
+from wechat.common.textutil import safe_filename
 import sys, os
 
 logger = logging.getLogger("wechat")

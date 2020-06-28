@@ -5,7 +5,7 @@
 # Author: Yuxin Wu
 
 from wechat.parser import WeChatDBParser
-from common.textutil import ensure_unicode
+from wechat.common.textutil import ensure_unicode
 
 from datetime import timedelta, datetime
 import numpy as np

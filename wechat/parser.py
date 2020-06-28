@@ -8,7 +8,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 from .msg import WeChatMsg, TYPE_SYSTEM
-from common.textutil import ensure_unicode
+from .common.textutil import ensure_unicode
 
 """ tables in concern:
 emojiinfo
