@@ -2,6 +2,7 @@
 # -*- coding: UTF-8 -*-
 
 import os
+import functools
 import re
 import json
 import struct
@@ -9,10 +10,7 @@ import struct
 from common.textutil import get_file_b64
 
 STATIC_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static')
-
-UNICODE_SMILEY_FILE = os.path.join(STATIC_PATH, 'unicode-smiley.json')
 TENCENT_SMILEY_FILE = os.path.join(STATIC_PATH, 'tencent-smiley.json')
-TENCENT_EXTRASMILEY_FILE = os.path.join(STATIC_PATH, 'tencent-smiley-extra.json')
 
 try:
     UNICODE_SMILEY_RE = re.compile(
@@ -37,9 +35,15 @@ HEAD = """.smiley {
 }
 """
 
-TEMPLATE = """.smiley{name} {{
+TEMPLATE = """.{name} {{
     background-image: url("data:image/png;base64,{b64}");
+    background-size: 24px 24px;
 }}"""
+
+def _css_class_name(s):
+    s = s.replace("/", "_")
+    s = s.replace(".", "_")
+    return "smiley_" + s
 
 class SmileyProvider(object):
     def __init__(self, html_replace=True):
@@ -50,74 +54,40 @@ class SmileyProvider(object):
         if not html_replace:
             raise NotImplementedError()
 
-        # [微笑] -> 0
+        # [微笑] -> smiley/0.png
         self.tencent_smiley = json.load(open(TENCENT_SMILEY_FILE))
+        self.used_smileys = set()
 
-        # some extra smiley from javascript on wx.qq.com
-        extra_smiley = json.load(open(TENCENT_EXTRASMILEY_FILE))
-        extra_smiley = {u'[' + k + u']': v for k, v in
-                            extra_smiley.items()}
-        self.tencent_smiley.update(extra_smiley)
+    def reset(self):
+        self.used_smileys.clear()
 
-        # 1f35c -> "\ue340"
-        #self.unicode_smiley_code = gUnicodeCodeMap
-
-        # u'\U0001f35c' -> "e340"   # for iphone
-        # u'\ue415' -> 'e415'       # for android
-        unicode_smiley_dict = json.load(open(UNICODE_SMILEY_FILE))
-        self.unicode_smiley = {(self.unichar(int(k, 16))): hex(ord(v))[2:] for k, v in
-                                unicode_smiley_dict.items()}
-        self.unicode_smiley.update({v: hex(ord(v))[2:] for _, v in
-                                unicode_smiley_dict.items()})
-        self.used_smiley_id = set()
-
-    def unichar(self, i):
-        try:
-            return chr(i)
-        except ValueError:
-            return struct.pack('i', i).decode('utf-32')
-
-    def gen_replace_elem(self, smiley_id):
-        self.used_smiley_id.add(str(smiley_id))
-        return '<span class="smiley smiley{}"></span>'.format(smiley_id)
-
-    def _replace_unicode(self, msg):
-        if not UNICODE_SMILEY_RE.findall(msg):
-        # didn't find the code
-            return msg
-        for k, v in self.unicode_smiley.items():
-            if k in msg:
-                msg = msg.replace(k, self.gen_replace_elem(v))
-        return msg
-
-    def _replace_tencent(self, msg):
-        if (not '[' in msg or not ']' in msg) \
-           and (not '/:' in msg) and (not '/' in msg):
-            return msg
-        for k, v in self.tencent_smiley.items():
-            if k in msg:
-                msg = msg.replace(k, self.gen_replace_elem(v))
-        return msg
+    def gen_replace_elem(self, smiley_path):
+        self.used_smileys.add(str(smiley_path))
+        return '<span class="smiley {}"></span>'.format(_css_class_name(smiley_path))
 
     def replace_smileycode(self, msg):
         """ replace the smiley code in msg
             return a html
         """
-        msg = self._replace_unicode(msg)
-        msg = self._replace_tencent(msg)
+        # pre-filter:
+        if ('[' not in msg) and ('/' not in msg) and not UNICODE_SMILEY_RE.findall(msg):
+            return msg
+        for k, v in self.tencent_smiley.items():
+            if k in msg:
+                msg = msg.replace(k, self.gen_replace_elem(v))
+        return msg
         return msg
 
     def gen_used_smiley_css(self):
         ret = HEAD
-        for sid in self.used_smiley_id:
-            fname = os.path.join(STATIC_PATH, 'smileys', '{}.png'.format(sid))
+        for path in self.used_smileys:
+            fname = os.path.join(STATIC_PATH, path)
             b64 = get_file_b64(fname)
-            ret = ret + TEMPLATE.format(name=sid, b64=b64)
+            ret = ret + TEMPLATE.format(name=_css_class_name(path), b64=b64)
         return ret
 
 if __name__ == '__main__':
     smiley = SmileyProvider()
     msg = u"[挥手]哈哈呵呵ｈｉｈｉ\U0001f684\u2728\u0001 /::<\ue415"
     msg = smiley.replace_smileycode(msg)
-    #print msg
     smiley.gen_used_smiley_css()

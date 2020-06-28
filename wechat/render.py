@@ -171,7 +171,7 @@ class HTMLRender(object):
 
     def _render_partial_msgs(self, msgs):
         """ return single html"""
-        self.smiley.used_smiley_id.clear()
+        self.smiley.reset()
         slicer = MessageSlicerByTime()
         slices = slicer.slice(msgs)
 
