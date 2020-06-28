@@ -30,16 +30,20 @@ def do_parse_wechat_audio_file(file_name):
     with open(file_name, 'rb') as f:
         header = f.read(10)
     if b'AMR' in header:
-        raise NotImplementedError("AMR decoding not implemented because it seems deprecated since WeChat6.0+")
-        # The below is python2 only. It should be equivalent to using sox from command line?
-        import pysox
-        infile = pysox.CSoxStream(file_name)
-        outfile = pysox.CSoxStream(mp3_file, 'w', infile.get_signal())
-        chain = pysox.CEffectsChain(infile, outfile)
-        chain.flow_effects()
-        outfile.close()
-        signal = infile.get_signal().get_signalinfo()
-        duration = signal['length'] * 1.0 / signal['rate']
+        cmd = f"sox -e signed -c 1 {file_name} {mp3_file}"
+        subproc_succ(cmd)
+        cmd = f"soxi -D {mp3_file}"
+        duration = float(subproc_succ(cmd))
+
+        # The below is python2 only. It should be equivalent to using sox from command line
+        # import pysox
+        # infile = pysox.CSoxStream(file_name)
+        # outfile = pysox.CSoxStream(mp3_file, 'w', infile.get_signal())
+        # chain = pysox.CEffectsChain(infile, outfile)
+        # chain.flow_effects()
+        # outfile.close()
+        # signal = infile.get_signal().get_signalinfo()
+        # duration = signal['length'] * 1.0 / signal['rate']
     elif b'SILK' in header:
         raw_file = os.path.join('/tmp',
                                 os.path.basename(file_name)[:-4] + '.raw')
