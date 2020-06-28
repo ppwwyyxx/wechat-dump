@@ -1,8 +1,5 @@
 #!/usr/bin/env python3
 # -*- coding: UTF-8 -*-
-# File: plot-num-msg-by-time.py
-# Date: Wed Mar 25 17:44:39 2015 +0800
-# Author: Yuxin Wu
 
 from wechat.parser import WeChatDBParser
 from wechat.common.textutil import ensure_unicode
