@@ -7,15 +7,6 @@ This tool can parse and export WeChat messages on a rooted android phone.
 
 Right now it can dump messages in text-only mode, or generate a single-file html containing voice messages, images, emoji, etc.
 
-__NEWS__: WeChat 6.0+ uses silk to encode audio. The code is updated.
-
-__NEWS__: WeChat 6.3 uses a new avatar storage. The code is updated.
-
-__HELP NEEDED__: Starting from May 2016, the first 1KB of all emojis in `resource/emoji` are encrypted. Right now I'm using emoji URL which covers most of them.
-
-If you are good at cryptography / reverse engineereing, or you work at Tencent, feel free to contact me or help take a look.
-It is also possible to recover the image without knowing the first 1KB (just have to detect chunks without knowing metadata), but I don't have time to do that either.
-
 If this tools works for you, please take a moment to __add your phone/OS to__ [the wiki](https://github.com/ppwwyyxx/wechat-dump/wiki).
 If it doesn't work, you probably have to investigate it as the behavior may be different on each phone.
 
@@ -115,7 +106,10 @@ Screenshots of generated html:
 See [here](http://ppwwyyxx.com/static/wechat/example.html) for an example html.
 
 ### TODO List
-+ Attack the emoji encryption problem
++ Crack emoji encryption to handle some missing emojis.
+  * __HELP WANTED__: Starting from May 2016, the first 1KB of all emojis in `resource/emoji` are encrypted. Right now I'm using emoji URL which covers most of them.
+    Any thoughts on how they are encrypted are appreciated.
+    It is also possible to recover the image without knowing the first 1KB (just have to detect chunks without knowing metadata).
 + Fix rare unhandled message types: > 10000 and < 0
 + Better user experiences... see `grep 'TODO' wechat -R`
 
