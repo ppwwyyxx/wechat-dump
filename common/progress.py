@@ -32,12 +32,12 @@ class ProgressReporter(object):
         self._prev_report_time = now
         dt = now - self._start_time
         if self._total and self._cnt > 0:
-            eta_msg = '{}/{} ETA: {:.2f}'.format(self._cnt, self._total,
+            eta_msg = '{}/{} ETA: {:.1f}'.format(self._cnt, self._total,
                     (self._total-self._cnt)*dt/self._cnt)
         else:
             eta_msg = '{} done'.format(self._cnt)
-        self._fout.write(u'{}: avg {:.3f}/sec'
-                         u', passed {:.3f}sec, {}  {} \r'.format(
+        self._fout.write(u'{}: avg {:.1f}/sec'
+                         u', passed {:.1f}sec, {}  {} \r'.format(
             self._name, self._cnt / dt, dt, eta_msg, extra_msg))
         self._fout.flush()
 
