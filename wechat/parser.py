@@ -116,8 +116,6 @@ SELECT {} FROM message
                 md5, catalog, name, cdnUrl, encrypturl, aeskey = row
                 if cdnUrl or encrypturl:
                     self.emoji_url[md5] = (cdnUrl, encrypturl, aeskey)
-                if not cdnUrl and encrypturl:
-                    logger.warning(f"Emoji {md5} has encrypturl only.")
                 if name and catalog in HAS_EMOJI_CATALOG:
                     self.internal_emojis[md5] = name
 

@@ -16,7 +16,7 @@ import pickle
 import requests
 
 from .avatar import AvatarReader
-from .common.textutil import md5, get_file_b64
+from .common.textutil import md5 as get_md5_hex, get_file_b64
 from .common.procutil import subproc_succ
 from .common.timer import timing
 from .msg import TYPE_SPEAK
@@ -50,14 +50,19 @@ class EmojiCache(object):
 
     def fetch(self, md5, urls):
         cdnurl, encrypturl, aeskey = urls
+        ret = None
         if cdnurl:
             try:
                 logger.info("Requesting emoji {} from {} ...".format(md5, cdnurl))
                 r = requests.get(cdnurl).content
+                emoji_md5 = get_md5_hex(r)
                 im = Image.open(io.BytesIO(r))
                 ret = (base64.b64encode(r).decode('ascii'), im.format.lower())
-                self.add(md5, ret)
-                return ret
+                if emoji_md5 == md5:
+                    self.add(md5, ret)
+                    return ret
+                else:
+                    raise ValueError("Emoji MD5 from CDNURL does not match")
             except Exception:
                 logger.exception("Error processing cdnurl {}".format(cdnurl))
 
@@ -77,6 +82,9 @@ class EmojiCache(object):
                 return ret
             except Exception:
                 logger.exception("Error processing encrypturl {}".format(encrypturl))
+        if ret is not None:
+            # ret may become something with wrong md5. Try it anyway, but don't cache.
+            return ret
         return None, None
 
     def add(self, md5, values):
@@ -111,7 +119,7 @@ class Resource(object):
         self.avt_reader = AvatarReader(res_dir, avt_db)
 
     def get_voice_filename(self, imgpath):
-        fname = md5(imgpath.encode('ascii'))
+        fname = get_md5_hex(imgpath.encode('ascii'))
         dir1, dir2 = fname[:2], fname[2:4]
         ret = os.path.join(self.voice_dir, dir1, dir2,
                            'msg_{}.amr'.format(imgpath))
