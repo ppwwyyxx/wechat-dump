@@ -124,6 +124,7 @@ def do_decrypt(input, output, key):
         c.execute("ATTACH DATABASE '" + output + "' AS db KEY '';")
     except Exception as e:
         logger.error(f"Decryption failed: '{e}'")
+        os.unlink(output)
         raise
     logger.info(f"Decryption succeeded! Writing database to {output} ...")
     c.execute("SELECT sqlcipher_export('db');" )
