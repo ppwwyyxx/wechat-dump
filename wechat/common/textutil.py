@@ -20,6 +20,10 @@ def get_file_b64(fname):
     data = open(fname, 'rb').read()
     return base64.b64encode(data).decode('ascii')
 
+def get_file_md5(fname):
+    data = open(fname, 'rb').read()
+    return md5(data)
+
 def safe_filename(fname):
     filename = ensure_unicode(fname)
     return "".join(

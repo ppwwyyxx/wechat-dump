@@ -16,7 +16,7 @@ import pickle
 import requests
 
 from .avatar import AvatarReader
-from .common.textutil import md5 as get_md5_hex, get_file_b64
+from .common.textutil import md5 as get_md5_hex, get_file_b64, get_file_md5
 from .common.procutil import subproc_succ
 from .common.timer import timing
 from .msg import TYPE_SPEAK
@@ -228,18 +228,24 @@ class Resource(object):
             return big_file
         return get_jpg_b64(small_file)
 
-    def _get_res_emoji(self, md5, pack_id, allow_cover=False):
+    def _get_res_emoji(self, md5, pack_id, fallback=False):
         """
         pack_id: can be None
-        allow_cover: Cover is non-animated. Can be used as a fallback.
+        fallback:
+            1. allow cover/thumb that are non-animated.
+            2. allow file to have mismatch md5 (often non-animated cover as well)
         """
         path = os.path.join(self.emoji_dir, pack_id or '')
         candidates = glob.glob(os.path.join(path, '{}*'.format(md5)))
         candidates = [k for k in candidates if not re.match('.*_[0-9]+$', k)]
-        candidates = [k for k in candidates if (allow_cover or (not k.endswith('_cover') and not k.endswith('_thumb')))]
+        candidates = [k for k in candidates if (fallback or (not k.endswith('_cover') and not k.endswith('_thumb')))]
 
         for cand in candidates:
             if imghdr.what(cand):  # does not recognize
+                if not fallback:
+                    emoji_md5 = get_file_md5(cand)
+                    if emoji_md5 != md5:
+                        continue
                 return get_file_b64(cand), imghdr.what(cand)
         return None, None
 
@@ -272,9 +278,10 @@ class Resource(object):
                 if format:
                     return emoji_img, format
 
-            # check resource/emoji dir again, fallback to allow cover/thumbnail
-            emoji_img, format = self._get_res_emoji(md5, group, allow_cover=True)
+            # check resource/emoji dir again, with fallback
+            emoji_img, format = self._get_res_emoji(md5, group, fallback=True)
             if format:
+                logger.info(f"Using fallback for emoji {md5}")
                 return emoji_img, format
 
             # TODO: first 1k in emoji is encrypted
