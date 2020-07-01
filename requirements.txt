@@ -1,0 +1,8 @@
+pyquery
+javaobj-py3>=0.4.1
+pycryptodome
+pillow>=7.0
+requests
+pysqlcipher3>=1.0.3
+csscompressor
+
