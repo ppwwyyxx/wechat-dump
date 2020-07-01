@@ -2,13 +2,14 @@
 
 ## 导出安卓微信聊天数据
 
-WeChat(微信), as the most popular mobile IM app in China, doesn't give users any method to export well-formatted history message.
+WeChat(微信), as the most popular mobile IM app in China, doesn't give users any way to export well-formatted history messages.
 This tool can parse and export WeChat messages on a rooted android phone.
 
-Right now it can dump messages in text-only mode, or generate a single-file html containing voice messages, images, emoji, etc.
+Right now the tool can dump chat messages to self-contained html files including voice messages, images, emojis, videos, etc.
+It can also dump messages to texts.
 
 If this tools works for you, please take a moment to __add your phone/OS to__ [the wiki](https://github.com/ppwwyyxx/wechat-dump/wiki).
-If it doesn't work, you probably have to investigate it as the behavior may be different on each phone.
+If it doesn't work, you probably have to do some investigation before posting an issue, as the behavior may be different on each phone.
 
 ### How to use:
 
@@ -16,11 +17,10 @@ If it doesn't work, you probably have to investigate it as the behavior may be d
 + adb and rooted android phone connected to a Linux/Mac OSX/Win10+Bash.
   If the phone does not come with adb support, you can download an app such as https://play.google.com/store/apps/details?id=eu.chainfire.adbd
 + Python >= 3.6
-+ [PyQuery](https://pypi.python.org/pypi/pyquery/), [javaobj-py3](https://pypi.org/project/javaobj-py3), [PyCryptodome](https://github.com/Legrandin/pycryptodome) Pillow, requests
-+ [sqlcipher](https://github.com/sqlcipher/sqlcipher) >= 4.1, [pysqlcipher3](https://pypi.python.org/pypi/pysqlcipher3)
++ [sqlcipher](https://github.com/sqlcipher/sqlcipher) >= 4.1
 + sox (command line tools)
-+ csscompressor (suggested, optional)
-+ Silk audio decoder (included; build with `./third-party/compile_silk.sh`)
++ Silk audio decoder (included; build it with `./third-party/compile_silk.sh`)
++ Other python dependencies: `pip install -r requirements.txt`.
 
 #### Get Necessary Data:
 
@@ -104,10 +104,6 @@ Screenshots of generated html:
 See [here](http://ppwwyyxx.com/static/wechat/example.html) for an example html.
 
 ### TODO List
-+ Crack emoji encryption to handle some missing emojis.
-  * __HELP WANTED__: Starting from May 2016, the first 1KB of all emojis in `resource/emoji` are encrypted. Right now I'm using emoji URL which covers most of them.
-    Any thoughts on how they are encrypted are appreciated.
-    It is also possible to recover the image without knowing the first 1KB (just have to detect chunks without knowing metadata).
 + Fix rare unhandled message types: > 10000 and < 0
 + Better user experiences... see `grep 'TODO' wechat -R`
 

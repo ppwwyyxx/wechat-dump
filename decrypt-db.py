@@ -7,6 +7,7 @@ import re
 import struct
 import argparse
 import logging
+import javaobj
 from pyquery import PyQuery
 from pysqlcipher3 import dbapi2 as sqlite
 from hashlib import md5
@@ -66,6 +67,16 @@ def get_uin():
     else:
         candidates.append(uin)
         logger.info(f"found uin={uin} in auth_info_key_prefs.xml")
+
+    try:
+        out = subproc_succ(f"adb shell cat {MM_DIR}/MicroMsg/systemInfo.cfg")
+        uin = javaobj.loads(out).get(1, 0)
+    except:
+        logger.warning("default uin not found in systemInfo.cfg")
+    else:
+        candidates.append(uin)
+        logger.info(f"found uin={uin} in systemInfo.cfg")
+
     candidates = list({x for x in candidates if x != 0})
     logger.info(f"Possible uin: {candidates}")
     return candidates
@@ -97,7 +108,6 @@ def get_imei():
     out = subproc_succ(f"adb shell cat {MM_DIR}/MicroMsg/CompatibleInfo.cfg")
     try:
         # https://gist.github.com/ChiChou/36556fd412a9e3216abecf06e084e4d9
-        import javaobj
         jobj = javaobj.loads(out)
         imei = jobj[258]
     except:
