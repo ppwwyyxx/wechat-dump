@@ -16,9 +16,9 @@ If it doesn't work, you probably have to investigate it as the behavior may be d
 + adb and rooted android phone connected to a Linux/Mac OSX/Win10+Bash.
   If the phone does not come with adb support, you can download an app such as https://play.google.com/store/apps/details?id=eu.chainfire.adbd
 + Python >= 3.6
-+ [PyQuery](https://pypi.python.org/pypi/pyquery/), [javaobj-py3](https://pypi.org/project/javaobj-py3), Pillow, requests
++ [PyQuery](https://pypi.python.org/pypi/pyquery/), [javaobj-py3](https://pypi.org/project/javaobj-py3), [PyCryptodome](https://github.com/Legrandin/pycryptodome) Pillow, requests
 + [sqlcipher](https://github.com/sqlcipher/sqlcipher) >= 4.1, [pysqlcipher3](https://pypi.python.org/pypi/pysqlcipher3)
-+ sox, openssl (command line tools)
++ sox (command line tools)
 + csscompressor (suggested, optional)
 + Silk audio decoder (included; build with `./third-party/compile_silk.sh`)
 

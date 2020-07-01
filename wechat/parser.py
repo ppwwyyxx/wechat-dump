@@ -31,8 +31,9 @@ class WeChatDBParser(object):
         self.contacts_rev = defaultdict(list)
         self.msgs_by_chat = defaultdict(list)
         self.emoji_groups = {}
-        self.emoji_url = {}
+        self.emoji_info = {}
         self.internal_emojis = {}
+        self.emoji_encryption_key = None
         self._parse()
 
     def _parse_contact(self):
@@ -94,30 +95,22 @@ SELECT {} FROM message
 
     def _parse_emoji(self):
         # wechat provided emojis
-        emojiinfo_q = self.cc.execute(
+        query = self.cc.execute(
 """ SELECT md5, groupid FROM EmojiInfoDesc """)
-        for row in emojiinfo_q:
+        for row in query:
             md5, group = row
             self.emoji_groups[md5] = group
 
-        HAS_EMOJI_CATALOG = [49, 50, 17]  # these are included in static/
         try:
-            emojiinfo_q = self.cc.execute(
+            query = self.cc.execute(
     """ SELECT md5, catalog, name, cdnUrl, encrypturl, aeskey FROM EmojiInfo""")
         except: # old database does not have cdnurl
-            emojiinfo_q = self.cc.execute(
-    """ SELECT md5, catalog, name FROM EmojiInfo""")
-            for row in emojiinfo_q:
-                md5, catalog, name = row
-                if name and catalog in HAS_EMOJI_CATALOG:
-                    self.internal_emojis[md5] = name
+            pass
         else:
-            for row in emojiinfo_q:
+            for row in query:
                 md5, catalog, name, cdnUrl, encrypturl, aeskey = row
                 if cdnUrl or encrypturl:
-                    self.emoji_url[md5] = (cdnUrl, encrypturl, aeskey)
-                if name and catalog in HAS_EMOJI_CATALOG:
-                    self.internal_emojis[md5] = name
+                    self.emoji_info[md5] = (catalog, cdnUrl, encrypturl, aeskey)
 
 
     def _parse(self):
@@ -126,6 +119,15 @@ SELECT {} FROM message
         self._parse_msg()
         self._parse_imginfo()
         self._parse_emoji()
+
+    def get_emoji_encryption_key(self):
+        # obtain local encryption key in a special entry in the database
+        query = self.cc.execute("SELECT md5 FROM EmojiInfo where catalog == 153")
+        results = list(query)
+        if len(results):
+            assert len(results) == 1, "Found > 1 encryption keys in EmojiInfo. This is a bug!"
+            return results[0][0]
+        return None
 
     # process the values in a row
     def _parse_msg_row(self, row):

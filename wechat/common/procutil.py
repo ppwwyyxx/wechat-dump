@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 
 import subprocess
+import logging
+logger = logging.getLogger(__name__)
 
 def subproc_call(cmd, timeout=None):
     """

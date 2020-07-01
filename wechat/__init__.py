@@ -26,5 +26,5 @@ set_level_color(logging.ERROR, '\033[1;31m')
 
 if __name__ == '__main__':
     logger.info("info")
-    logger.warn("warn")
+    logger.warning("warn")
 

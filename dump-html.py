@@ -55,4 +55,4 @@ if __name__ == '__main__':
         for idx, html in enumerate(htmls):
             with open(basename + f'{idx:02d}.html', 'w') as f:
                 f.write(html)
-    res.emoji_cache.flush()
+    res.emoji_reader.flush_cache()

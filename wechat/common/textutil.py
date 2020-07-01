@@ -17,12 +17,12 @@ def md5(s):
     return m.hexdigest()
 
 def get_file_b64(fname):
-    data = open(fname, 'rb').read()
-    return base64.b64encode(data).decode('ascii')
+    with open(fname, 'rb') as f:
+        return base64.b64encode(f.read()).decode('ascii')
 
 def get_file_md5(fname):
-    data = open(fname, 'rb').read()
-    return md5(data)
+    with open(fname, 'rb') as f:
+        return md5(f.read())
 
 def safe_filename(fname):
     filename = ensure_unicode(fname)
