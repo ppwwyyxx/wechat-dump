@@ -46,7 +46,7 @@ if __name__ == '__main__':
     render = HTMLRender(parser, res)
     htmls = render.render_msgs(msgs)
 
-    os.makedirs(os.path.dirname(output_file), exist_ok=True)
+    os.makedirs(os.path.dirname(os.path.abspath(output_file)), exist_ok=True)
     if len(htmls) == 1:
         with open(output_file, 'w') as f:
             f.write(htmls[0])
