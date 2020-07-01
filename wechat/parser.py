@@ -32,7 +32,6 @@ class WeChatDBParser(object):
         self.msgs_by_chat = defaultdict(list)
         self.emoji_groups = {}
         self.emoji_info = {}
-        self.internal_emojis = {}
         self.emoji_encryption_key = None
         self._parse()
 

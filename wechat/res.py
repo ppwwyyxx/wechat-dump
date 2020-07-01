@@ -50,7 +50,7 @@ class Resource(object):
         ret = os.path.join(self.voice_dir, dir1, dir2,
                            'msg_{}.amr'.format(imgpath))
         if not os.path.isfile(ret):
-            logger.error("Voice file not found for {}".format(imgpath))
+            logger.error(f"Cannot find voice file {imgpath}, {fname}")
             return ""
         return ret
 
@@ -77,7 +77,7 @@ class Resource(object):
         """ return base64 unicode string"""
         im = self.avt_reader.get_avatar(username)
         if im is None:
-            logger.warning(f"Avatar for {username} is missing.")
+            logger.warning(f"Cannot find avatar for {username}.")
             return ""
         buf = io.BytesIO()
         try:
@@ -165,5 +165,5 @@ class Resource(object):
             return video_file
         elif os.path.exists(video_thumbnail_file):
             return video_thumbnail_file
-        logger.warning(f"Cannot get video {videoid}")
+        logger.warning(f"Cannot find video {videoid}")
         return ""
