@@ -15,7 +15,7 @@ from .common.textutil import md5 as get_md5_hex, get_file_b64, get_file_md5
 
 
 LIB_PATH = os.path.dirname(os.path.abspath(__file__))
-DEFAULT_EMOJI_CACHE = os.path.join(LIB_PATH, '..', 'emoji.cache.pkl')
+DEFAULT_EMOJI_CACHE = os.path.join(LIB_PATH, '..', 'emoji.cache')
 logger = logging.getLogger(__name__)
 
 
@@ -39,7 +39,7 @@ class EmojiReader:
             resource_dir: path to resource/
             parser: Database parser
             cache_file: a cache file to store emoji downloaded from URLs.
-                default to a emoji.cache.pkl file under wechat-dump.
+                default to a emoji.cache file under wechat-dump.
         """
         self.emoji_dir = Path(resource_dir) / 'emoji'
         assert self.emoji_dir.is_dir(), self.emoji_dir
@@ -89,7 +89,7 @@ class EmojiReader:
             return img, format
         else:
             emoji_in_table = emoji_info is not None
-            msg = "not in database" if not emoji_in_table else f"group={subdir}"
+            msg = "not in database" if not emoji_in_table else f"group='{subdir}'"
             logger.warning(f"Cannot find emoji {md5}: {msg}")
             return None, None
 
@@ -132,11 +132,14 @@ class EmojiReader:
             content = self._decode_emoji(fname)
             try:
                 data_md5 = get_md5_hex(content)
-                assert data_md5 == md5
+                if data_md5 != md5:
+                    if content.startswith(b"wxgf"):
+                        raise ValueError("Unsupported mysterious image format: wxgf")
+                    raise ValueError("Decoded data mismatch md5!")
                 im = Image.open(io.BytesIO(content))
                 return (base64.b64encode(content).decode('ascii'), im.format.lower())
-            except:
-                logger.exception(f"Error decoding emoji {fname}.")
+            except Exception as e:
+                logger.error(f"Error decoding emoji {fname} : {str(e)}")
 
         def get_data_fallback(fname):
             if not imghdr.what(fname):
