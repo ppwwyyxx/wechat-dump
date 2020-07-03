@@ -1,15 +1,12 @@
 ## Dump WeChat Messages from Android
 
-## 导出安卓微信聊天数据
+## 导出安卓微信消息记录
 
-WeChat(微信), as the most popular mobile IM app in China, doesn't give users any way to export well-formatted history messages.
-This tool can parse and export WeChat messages on a rooted android phone.
+WeChat, as the most popular mobile IM app in China, doesn't provide any options to export structured message history.
+This tool can decrypt and parse WeChat messages on a rooted android phone,
+and dump messages into self-contained html files including voice messages, images, emojis, videos, etc.
 
-Right now the tool can dump chat messages to self-contained html files including voice messages, images, emojis, videos, etc.
-It can also dump messages to texts.
-
-If this tools works for you, please take a moment to __add your phone/OS to__ [the wiki](https://github.com/ppwwyyxx/wechat-dump/wiki).
-If it doesn't work, you probably have to do some investigation before posting an issue, as the behavior may be different on each phone.
+If the tool works for you, please take a moment to __add your phone/OS to__ [the wiki](https://github.com/ppwwyyxx/wechat-dump/wiki).
 
 ### How to use:
 
