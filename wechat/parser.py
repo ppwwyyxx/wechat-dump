@@ -121,6 +121,7 @@ SELECT {} FROM message
 
     def get_emoji_encryption_key(self):
         # obtain local encryption key in a special entry in the database
+        # this also equals to md5(imei)
         query = self.cc.execute("SELECT md5 FROM EmojiInfo where catalog == 153")
         results = list(query)
         if len(results):
