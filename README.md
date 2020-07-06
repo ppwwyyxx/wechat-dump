@@ -42,7 +42,7 @@ If the tool works for you, please take a moment to __add your phone/OS to__ [the
       ./decrypt-db.py decrypt --input EnMicroMsg.db --imei <device id> --uin <uin>
       ```
 
-      NOTE: you may need to try different ways to get device id and fine one that can decrypt the
+      NOTE: you may need to try different ways to get device id and find one that can decrypt the
       database. Some phones may have multiple IMEIs, you may need to try them all.
       See [#33](https://github.com/ppwwyyxx/wechat-dump/issues/33).
       The command will dump decrypted database at `EnMicroMsg.db.decrypted`.
