@@ -116,10 +116,18 @@ def get_imei():
         candidates.append(imei)
         logger.info(f"found imei={imei} in CompatibleInfo.cfg")
     logger.info(f"Possible imei: {candidates}")
-    return [x.encode('ascii') for x in set(candidates)]
+    return list(set(candidates))
 
 
 def get_key(imei, uin):
+    """
+    Args:
+        imei, uin: str
+    """
+    if isinstance(uin, str):
+        uin = uin.encode('ascii')
+    if isinstance(imei, str):
+        imei = imei.encode('ascii')
     a = md5(imei + uin)
     return a.hexdigest()[:7]
 
@@ -162,7 +170,6 @@ if __name__ == "__main__":
         output_file = args.input + ".decrypted"
         assert not os.path.isfile(output_file), f"Output {output_file} exists!"
         for uin in uins:
-            uin = str(uin).encode('ascii')
             for imei in imeis:
                 key = get_key(imei, uin)
                 logger.info(f"Trying key {key} ...")
