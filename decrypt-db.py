@@ -105,8 +105,8 @@ def get_imei():
     logger.info(f"found imei={imei} from iphonesubinfo")
     candidates.append(imei)
 
-    out = subproc_succ(f"adb shell cat {MM_DIR}/MicroMsg/CompatibleInfo.cfg")
     try:
+        out = subproc_succ(f"adb shell cat {MM_DIR}/MicroMsg/CompatibleInfo.cfg")
         # https://gist.github.com/ChiChou/36556fd412a9e3216abecf06e084e4d9
         jobj = javaobj.loads(out)
         imei = jobj[258]
@@ -115,6 +115,7 @@ def get_imei():
     else:
         candidates.append(imei)
         logger.info(f"found imei={imei} in CompatibleInfo.cfg")
+    candidates.append("1234567890ABCDEF")  # https://github.com/ppwwyyxx/wechat-dump/issues/70
     logger.info(f"Possible imei: {candidates}")
     return list(set(candidates))
 
