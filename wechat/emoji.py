@@ -129,8 +129,8 @@ class EmojiReader:
                 if data_md5 == md5:
                     return get_file_b64(fname), imghdr.what(fname)
 
-            content = self._decrypt_emoji(fname)
             try:
+                content = self._decrypt_emoji(fname)
                 data_md5 = get_md5_hex(content)
                 if data_md5 != md5:
                     if content.startswith(b"wxgf"):
