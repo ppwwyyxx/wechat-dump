@@ -77,7 +77,7 @@ def get_uin():
         candidates.append(uin)
         logger.info(f"found uin={uin} in systemInfo.cfg")
 
-    candidates = list({x for x in candidates if x != 0})
+    candidates = list({str(x) for x in candidates if x != 0})
     logger.info(f"Possible uin: {candidates}")
     return candidates
 
