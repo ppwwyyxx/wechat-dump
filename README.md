@@ -21,7 +21,7 @@ If the tool works for you, please take a moment to __add your phone/OS to__ [the
 
 #### Get Necessary Data:
 
-1. Pull database file and avatar index:
+1. Pull database file and (for older wechat versions) avatar index:
   + Automatic: `./android-interact.sh db`. It may use an incorrect userid.
   + Manual:
     + Figure out your `${userid}` by inspecting the contents of `/data/data/com.tencent.mm/MicroMsg` on the __root__ filesystem of the device. It should be a 32-character-long name consisting of hexadecimal digits.
@@ -52,11 +52,10 @@ If the tool works for you, please take a moment to __add your phone/OS to__ [the
 
 3. Copy the WeChat user resource directory `/mnt/sdcard/tencent/MicroMsg/${userid}/{avatar,emoji,image2,sfs,video,voice2}` from the phone to the `resource` directory:
 	+ `./android-interact.sh res`
-	+ You might need to change `RES_DIR` in the script if the default is incorrect on your phone.
-	+ This can take a while. One way that might be slightly faster:
-    + If there's enough free space on your phone, you can log in and archive all required files via `tar` with or without compression,
-		  and use `adb pull` to copy the archive. Note that `busybox tar` is recommended as the Android system's `tar` may choke on long paths.
-	+ What is needed in the end is a `resource` directory with the following subdir: `avatar,emoji,image2,sfs,video,voice2`.
+	+ Change `RES_DIR` in the script if the location of these directories is different on your phone.
+	+ This can take a while. Can be faster to first archive it with `tar` with or without compression, and then copy the archive,
+		`busybox tar` is recommended as the Android system's `tar` may choke on long paths.
+	+ In the end, we need a `resource` directory with the following subdir: `avatar,emoji,image2,sfs,video,voice2`.
 
 4. (Optional) Download the emoji cache from [here](https://github.com/ppwwyyxx/wechat-dump/releases/download/0.1/emoji.cache.tar.bz2)
 	and decompress it under `wechat-dump`. This will avoid downloading too many emojis during rendering.
@@ -83,7 +82,7 @@ If the tool works for you, please take a moment to __add your phone/OS to__ [the
     ./count-message.sh output_dir
     ```
 
-+ Dump messages of one contact to html, containing voice messages, emojis, and images (requires decrypted database, `avatar.index`, and `resource`):
++ Dump messages of one contact to html, containing voice messages, emojis, and images (requires decrypted database and `resource`):
 
     ```
     ./dump-html.py "<contact_display_name>"
