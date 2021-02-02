@@ -17,7 +17,7 @@ def get_args():
     parser.add_argument('name', help='name of contact')
     parser.add_argument('--output', help='output html file', default='output.html')
     parser.add_argument('--db', default='decrypted.db', help='path to decrypted database')
-    parser.add_argument('--avt', default='avatar.index', help='path to avatar.index file')
+    parser.add_argument('--avt', default='avatar.index', help='path to avatar.index file that only exists in old version of wechat')
     parser.add_argument('--res', default='resource', help='reseource directory')
     args = parser.parse_args()
     return args

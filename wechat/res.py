@@ -30,6 +30,11 @@ JPEG_QUALITY = 50
 class Resource(object):
     """ multimedia resources in chat"""
     def __init__(self, parser, res_dir, avt_db):
+        """
+        Args:
+            res_dir: path to the resource directory
+            avt_db: "avatar.index" file that only exists in old versions of wechat
+        """
         def check(subdir):
             dir_to_check = os.path.join(res_dir, subdir)
             assert os.path.isdir(dir_to_check), f"No such directory: {dir_to_check}"
