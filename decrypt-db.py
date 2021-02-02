@@ -70,7 +70,7 @@ def get_uin():
 
     try:
         out = subproc_succ(f"adb shell cat {MM_DIR}/MicroMsg/systemInfo.cfg")
-        uin = javaobj.loads(out).get(1, 0)
+        uin = int(javaobj.loads(out).get(1, 0))
     except:
         logger.warning("default uin not found in systemInfo.cfg")
     else:
