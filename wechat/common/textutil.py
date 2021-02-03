@@ -1,4 +1,4 @@
-# -*- coding: UTF-8 -*-
+# -*- coding: utf-8 -*-
 
 import hashlib
 import base64
@@ -26,5 +26,9 @@ def get_file_md5(fname):
 
 def safe_filename(fname):
     filename = ensure_unicode(fname)
-    return "".join(
-        [c for c in filename if c.isalpha() or c.isdigit() or c==' ']).rstrip()
+    import os
+    if os.uname().sysname == 'Linux' :
+        return filename
+    else :
+        return "".join(
+            [c for c in filename if c.isalpha() or c.isdigit() or c==' ']).rstrip()
