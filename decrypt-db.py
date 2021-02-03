@@ -160,7 +160,8 @@ if __name__ == "__main__":
     parser.add_argument('--input', help='encrypted EnMicroMsg.db')
     args = parser.parse_args()
 
-    subproc_succ("adb root")
+    if (not args.uin) or (not args.imei) or (not (args.task == 'decrypt') ) :
+        subproc_succ("adb root")
 
     if args.task == 'uin':
         uin = get_uin()
