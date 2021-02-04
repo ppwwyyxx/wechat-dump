@@ -25,7 +25,7 @@ If the tool works for you, please take a moment to __add your phone/OS to__ [the
   + Automatic: `./android-interact.sh db`. It may use an incorrect userid.
   + Manual:
     + Figure out your `${userid}` by inspecting the contents of `/data/data/com.tencent.mm/MicroMsg` on the __root__ filesystem of the device. It should be a 32-character-long name consisting of hexadecimal digits.
-    + Get `/data/data/com.tencent.mm/MicroMsg/${userid}/{EnMicroMsg.db,sfs/avatar.index}` from the device.
+    + Get `/data/data/com.tencent.mm/MicroMsg/${userid}/EnMicroMsg.db` from the device.
 2. Decrypt database file:
   + Automatic: `./decrypt-db.py decrypt --input EnMicroMsg.db`
   + Manual:
