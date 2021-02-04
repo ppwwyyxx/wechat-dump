@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-# -*- coding: UTF-8 -*-
+"-*- coding: utf-8 -*-"
 import os
 import sys
 import argparse
 import logging
-
+ 
 from wechat.parser import WeChatDBParser
 from wechat.res import Resource
 from wechat.common.textutil import ensure_unicode
@@ -18,7 +18,7 @@ def get_args():
     parser.add_argument('--output', help='output html file', default='output.html')
     parser.add_argument('--db', default='decrypted.db', help='path to decrypted database')
     parser.add_argument('--avt', default='avatar.index', help='path to avatar.index file that only exists in old version of wechat')
-    parser.add_argument('--res', default='resource', help='reseource directory')
+    parser.add_argument('--res', default='resource', help='resource directory')
     args = parser.parse_args()
     return args
 
@@ -35,7 +35,7 @@ if __name__ == '__main__':
     except KeyError:
         sys.stderr.write(u"Valid Contacts: {}\n".format(
             u'\n'.join(parser.all_chat_nicknames)))
-        sys.stderr.write(u"Couldn't find the chat {}.".format(name));
+        sys.stderr.write(u"Couldn't find the chat \"{}\"\n".format(name));
         sys.exit(1)
 
     res = Resource(parser, args.res, args.avt)
