@@ -151,6 +151,15 @@ def do_decrypt(input, output, key):
     c.execute("DETACH DATABASE db;" )
     c.close()
 
+def try_decrypt( input, output_file, key ):
+    try:
+        do_decrypt(args.input, output_file, key)
+    except:
+        logger.info(f"Key {key} failed...")
+        pass
+    else:
+        logger.info(f"Database dumped to {output_file}")
+        sys.exit()
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -158,9 +167,10 @@ if __name__ == "__main__":
     parser.add_argument('--imei', help='overwrite imei')
     parser.add_argument('--uin', help='overwrite uin')
     parser.add_argument('--input', help='encrypted EnMicroMsg.db')
+    parser.add_argument('--key', help='use if you have the key already')
     args = parser.parse_args()
 
-    if (not args.uin) or (not args.imei) or (not (args.task == 'decrypt') ) :
+    if (not args.key) and ((not args.uin) or (not args.imei) or (not (args.task == 'decrypt') )) :
         subproc_succ("adb root")
 
     if args.task == 'uin':
@@ -168,18 +178,19 @@ if __name__ == "__main__":
     elif args.task == 'imei':
         imei = get_imei()
     elif args.task == 'decrypt':
-        uins = [args.uin] if args.uin else get_uin()
-        imeis = [args.imei] if args.imei else get_imei()
         output_file = args.input + ".decrypted"
         assert not os.path.isfile(output_file), f"Output {output_file} exists!"
-        for uin in uins:
-            for imei in imeis:
-                key = get_key(imei, uin)
-                logger.info(f"Trying key {key} ...")
-                try:
-                    do_decrypt(args.input, output_file, key)
-                except:
-                    pass
-                else:
-                    logger.info(f"Database dumped to {output_file}")
-                    sys.exit()
+
+        if args.key :
+            logger.info(f"Key given ...")
+            logger.info(f"Trying key {args.key} ...")
+            try_decrypt(args.input, output_file, args.key)
+        else:
+            uins = [args.uin] if args.uin else get_uin()
+            imeis = [args.imei] if args.imei else get_imei()
+            for uin in uins:
+                for imei in imeis:
+                    key = get_key(imei, uin)
+                    logger.info(f"Trying key {key} ...")
+                    try_decrypt(args.input, output_file, key )
+
