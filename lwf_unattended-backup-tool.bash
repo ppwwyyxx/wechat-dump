@@ -83,7 +83,7 @@ popd
 for usern in "${USER_NAMES[@]}"
 do
     USERNAME="${usern:2:-5}"
-    "$SOURCE_DIR/dump-html.py" "$USERNAME" --db EnMicroMsg.db.decrypted --output "output_dir_html/$USERNAME".html
+    "$SOURCE_DIR/dump-html.py" "$USERNAME" --db EnMicroMsg.db.decrypted --output "output_dir_html/$USERNAME".html || true
 done
 
 ls output_dir_html

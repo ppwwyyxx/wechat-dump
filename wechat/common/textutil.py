@@ -28,7 +28,8 @@ def safe_filename(fname):
     filename = ensure_unicode(fname)
     import os
     if os.uname().sysname == 'Linux' :
-        return filename
+        return "".join(
+            [c for c in filename if (not ( c == '/' ) )]).rstrip()
     else :
         return "".join(
             [c for c in filename if c.isalpha() or c.isdigit() or c==' ']).rstrip()
