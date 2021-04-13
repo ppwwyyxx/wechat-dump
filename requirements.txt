@@ -5,4 +5,4 @@ pillow>=7.0
 requests
 pysqlcipher3>=1.0.3
 csscompressor
-
+numpy
