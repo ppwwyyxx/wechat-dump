@@ -3,7 +3,8 @@ html,
 body {
   word-break: normal;
   word-wrap: break-word;
-}
+} 
+
 /* for single line hack */
 .chatListColumn .nickName,
 .chatListColumn .desc {
@@ -144,7 +145,9 @@ body {
   text-align: center;
 }
 body {
-  position: relative;
+  position: relative;  
+  padding: 20px 0;
+  box-sizing: border-box;
 }
 a,
 input {
@@ -813,7 +816,7 @@ a.btnSecondary:active {
 .chatPanel {
   position: relative;
   margin: 0 auto;
-  padding: 40px 0 30px 0;
+ // padding: 40px 0 30px 0;
   width: 600px;
   border-radius: 4px;
   text-align: center;
@@ -1278,7 +1281,7 @@ a.btnSecondary:active {
 }
 /*ä¼šè¯å†…å®¹çª—ä½“*/
 .chatPanel .chatScorll {
-  height: 100%;
+  height: calc(100vh - 42px - 40px); // 42px topbar 40px bodyPadding
   width: 100%;
   min-height: 200px;
   overflow: hidden;
