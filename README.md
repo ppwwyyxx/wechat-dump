@@ -2,13 +2,15 @@
 
 ## 导出安卓微信消息记录
 
-WeChat, as the most popular mobile IM app in China, doesn't provide any options to export structured message history.
-This tool can decrypt and parse WeChat messages on a rooted android phone,
-and dump messages into self-contained html files including voice messages, images, emojis, videos, etc.
+WeChat, as the most popular mobile IM app in China, doesn't provide any methods to export structured message history.
+
+We reverse-engineered the storage protocol of WeChat messages, and
+provide this tool to decrypt and parse WeChat messages on a rooted android phone.
+It can also render the messages into self-contained html files including voice messages, images, emojis, videos, etc.
 
 If the tool works for you, please take a moment to __add your phone/OS to__ [the wiki](https://github.com/ppwwyyxx/wechat-dump/wiki).
 
-### How to use:
+## How to use:
 
 #### Dependencies:
 + adb and rooted android phone connected to a Linux/Mac OSX/Win10+Bash.
@@ -47,8 +49,8 @@ If the tool works for you, please take a moment to __add your phone/OS to__ [the
       See [#33](https://github.com/ppwwyyxx/wechat-dump/issues/33).
       The command will dump decrypted database at `EnMicroMsg.db.decrypted`.
 
-  If decryption doesn't work, you can also try the [password cracker](https://github.com/chg-hou/EnMicroMsg.db-Password-Cracker)
-  to brute-force the password.
+  If the above decryption doesn't work, you can also try the [password cracker](https://github.com/chg-hou/EnMicroMsg.db-Password-Cracker)
+  to brute-force the key. The encryption key is not very strong.
 
 3. Copy the WeChat user resource directory `/mnt/sdcard/tencent/MicroMsg/${userid}/{avatar,emoji,image2,sfs,video,voice2}` from the phone to the `resource` directory:
 	+ `./android-interact.sh res`
