@@ -181,7 +181,8 @@ if __name__ == "__main__":
                 logger.info(f"Trying key {key} ...")
                 try:
                     do_decrypt(args.input, output_file, key)
-                except:
+                except Exception as error:
+                    logger.warning(f"An unexpected error occurred.{error}")
                     pass
                 else:
                     logger.info(f"Database dumped to {output_file}")
