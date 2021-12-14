@@ -8,7 +8,7 @@ We reverse-engineered the storage protocol of WeChat messages, and
 provide this tool to decrypt and parse WeChat messages on a rooted android phone.
 It can also render the messages into self-contained html files including voice messages, images, emojis, videos, etc.
 
-If the tool works for you, please take a moment to __add your phone/OS to__ [the wiki](https://github.com/ppwwyyxx/wechat-dump/wiki).
+If the tool works for you, please take a moment to add your phone/OS to [the wiki](https://github.com/ppwwyyxx/wechat-dump/wiki).
 
 ## How to use:
 
