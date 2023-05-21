@@ -138,7 +138,7 @@ def do_decrypt(input, output, key):
     conn = sqlite.connect(input)
     c = conn.cursor()
     version_str = list(conn.execute("PRAGMA cipher_version"))[0][0]
-    version = tuple([int(x) for x in version_str.split(".")])
+    version = tuple([int(x) for x in version_str.split(".")[:2]])
     assert version >= (4, 1), "Sqlcipher>=4.1 is required"
 
     c.execute("PRAGMA key = '" + key + "';")
