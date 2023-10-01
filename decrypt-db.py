@@ -144,6 +144,15 @@ def do_decrypt(input, output, key):
     c.execute("PRAGMA key = '" + key + "';")
     # https://github.com/sqlcipher/sqlcipher/commit/e4b66d6cc8a2b7547a32ff2c3ac52f148eba3516
     c.execute("PRAGMA cipher_compatibility = 1;")
+    # these 2 params are now necessary, found by https://blog.greycode.top/posts/android-wechat-bak/
+    c.execute("PRAGMA cipher_use_hmac = off;")
+    c.execute("PRAGMA kdf_iter = 4000;")
+    # These other params are not necessary but recommended by https://blog.greycode.top/posts/android-wechat-bak/
+    # They may become necessary in the future.
+    c.execute("PRAGMA cipher_page_size = 1024;")
+    c.execute("PRAGMA cipher_hmac_algorithm = HMAC_SHA1;")
+    c.execute("PRAGMA cipher_kdf_algorithm = PBKDF2_HMAC_SHA1;")
+
     try:
         c.execute("ATTACH DATABASE '" + output + "' AS db KEY '';")
     except Exception as e:
