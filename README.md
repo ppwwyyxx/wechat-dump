@@ -14,7 +14,7 @@ If the tool works for you, please take a moment to add your phone/OS to [the wik
 
 #### Dependencies:
 + adb and rooted android phone connected to a Linux/Mac OSX/Win10+Bash.
-  If the phone does not come with adb support, you can download an app such as https://play.google.com/store/apps/details?id=eu.chainfire.adbd
+  If the phone does not come with adb support, you can try download an app.
 + Python >= 3.6
 + [sqlcipher](https://github.com/sqlcipher/sqlcipher) >= 4.1
 + sox (command line tools)
