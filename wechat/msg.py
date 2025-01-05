@@ -14,6 +14,7 @@ TYPE_CUSTOM_EMOJI = 1048625
 TYPE_REDENVELOPE = 436207665
 TYPE_MONEY_TRANSFER = 419430449  # 微信转账
 TYPE_LOCATION_SHARING = -1879048186
+TYPE_REPLY = 822083633  # 回复的消息.
 TYPE_APP_MSG = 16777265
 
 _KNOWN_TYPES = [eval(k) for k in dir() if k.startswith('TYPE_')]
@@ -110,6 +111,11 @@ class WeChatMsg(object):
             except:
                 pass
             return "[Money Transfer]"
+        elif self.type == TYPE_REPLY:
+            pq = PyQuery(self.content_xml_ready)
+            msg = pq('title').text()
+            # TODO parse reply.
+            return msg
         else:
             # TODO replace smiley with text
             return self.content

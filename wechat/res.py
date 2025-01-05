@@ -147,11 +147,18 @@ class Resource(object):
             if not img_file:
                 return None
             if not img_file.endswith('jpg') and \
-               imghdr.what(img_file) != 'jpeg':
-                im = Image.open(open(img_file, 'rb'))
+                   imghdr.what(img_file) != 'jpeg':
+                try:
+                    im = Image.open(open(img_file, 'rb'))
+                except:
+                    return None
                 buf = io.BytesIO()
                 im.convert('RGB').save(buf, 'JPEG', quality=JPEG_QUALITY)
                 return base64.b64encode(buf.getvalue()).decode('ascii')
+            with open(img_file, 'rb') as f:
+                if f.read(4) == b'wxgf':
+                    logger.warning(f"Don't know how to decode wxgf image {img_file}")
+                    return None
             return get_file_b64(img_file)
 
         big_file = get_jpg_b64(big_file)

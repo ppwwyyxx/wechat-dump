@@ -74,7 +74,10 @@ SELECT {} FROM message
     def _parse_userinfo(self):
         userinfo_q = self.cc.execute(""" SELECT id, value FROM userinfo """)
         userinfo = dict(userinfo_q)
-        self.username = userinfo[2]
+        self.username = userinfo.get(2, None)
+        if self.username is None:
+            logger.error("Cannot find username in userinfo table!")
+            self.username = input("Please enter your username:")
         logger.info("Your username is: {}".format(self.username))
 
     def _parse_imginfo(self):

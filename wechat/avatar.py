@@ -54,6 +54,11 @@ class AvatarReader(object):
         candidates = glob.glob(os.path.join(self.avt_dir, dir1, dir2, f"*{avtid}*"))
         candidates = sorted(set(candidates), key=_filename_priority, reverse=True)
         for cand in candidates:
+            if os.path.isdir(cand):
+                candidates.extend(os.path.join(cand, x) for x in os.listdir(cand))
+        for cand in candidates:
+            if os.path.isdir(cand):
+                continue
             try:
                 if cand.endswith(".bm"):
                     return self.read_bm_file(cand)

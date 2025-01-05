@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import os
+import shlex
 import sys
 import re
 import struct
@@ -21,11 +22,15 @@ RES_DIR = "/mnt/sdcard/tencent/MicroMsg"
 MM_DIR = "/data/data/com.tencent.mm"
 
 
+def adb_command(command):
+    return subproc_succ("adb shell su -c " + shlex.quote(command))
+
+
 def get_uin():
     candidates = []
     try:
         uin = None
-        out = subproc_succ(f"adb shell cat {MM_DIR}/shared_prefs/system_config_prefs.xml")
+        out = adb_command(f"cat {MM_DIR}/shared_prefs/system_config_prefs.xml")
         for line in out.decode('utf-8').split("\n"):
             if "default_uin" in line:
                 line = PyQuery(line)
@@ -40,7 +45,7 @@ def get_uin():
 
     try:
         uin = None
-        out = subproc_succ(f"adb shell cat {MM_DIR}/shared_prefs/com.tencent.mm_preferences.xml")
+        out = adb_command(f"cat {MM_DIR}/shared_prefs/com.tencent.mm_preferences.xml")
         for line in out.decode('utf-8').split("\n"):
             if "last_login_uin" in line:
                 line = PyQuery(line)
@@ -55,7 +60,7 @@ def get_uin():
 
     try:
         uin = None
-        out = subproc_succ(f"adb shell cat {MM_DIR}/shared_prefs/auth_info_key_prefs.xml")
+        out = adb_command(f"cat {MM_DIR}/shared_prefs/auth_info_key_prefs.xml")
         for line in out.decode('utf-8').split("\n"):
             if "auth_uin" in line:
                 line = PyQuery(line)
@@ -69,7 +74,7 @@ def get_uin():
         logger.info(f"found uin={uin} in auth_info_key_prefs.xml")
 
     try:
-        out = subproc_succ(f"adb shell cat {MM_DIR}/MicroMsg/systemInfo.cfg")
+        out = adb_command(f"cat {MM_DIR}/MicroMsg/systemInfo.cfg")
         uin = int(javaobj.loads(out).get(1, 0))
     except:
         logger.warning("default uin not found in systemInfo.cfg")
@@ -101,13 +106,13 @@ def get_imei():
         def get_utf16(self, offset=4):
             return (self.data[offset + 4: offset+4+self.get_int(offset) * 2]).decode('utf-16')
 
-    out = subproc_succ("adb shell service call iphonesubinfo 1")
+    out = adb_command(f"service call iphonesubinfo 1")
     imei = Parcel(out.strip()).get_utf16()
     logger.info(f"found imei={imei} from iphonesubinfo")
     candidates.append(imei)
 
     try:
-        out = subproc_succ(f"adb shell cat {MM_DIR}/MicroMsg/CompatibleInfo.cfg")
+        out = adb_command(f"cat {MM_DIR}/MicroMsg/CompatibleInfo.cfg")
         # https://gist.github.com/ChiChou/36556fd412a9e3216abecf06e084e4d9
         jobj = javaobj.loads(out)
         imei = jobj[258]

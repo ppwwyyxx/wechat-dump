@@ -47,7 +47,7 @@ ifeq (yes,$(USE_NEON))
 endif
 
 
-CFLAGS	+= -Wall -enable-threads -O3
+CFLAGS	+= -Wall -O3
 
 CFLAGS  += $(call cppflags-from-defines,$(CDEFINES))
 CFLAGS  += $(call cppflags-from-defines,$(ADDED_DEFINES))
