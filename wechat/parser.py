@@ -26,7 +26,11 @@ class WeChatDBParser(object):
         """ db_fname: a decrypted EnMicroMsg.db"""
         self.db_fname = db_fname
         self.db_conn = sqlite3.connect(self.db_fname)
+        self.db_conn_bytes = sqlite3.connect(self.db_fname)
+        # https://stackoverflow.com/questions/22751363/sqlite3-operationalerror-could-not-decode-to-utf-8-column
+        self.db_conn_bytes.text_factory = lambda b: b
         self.cc = self.db_conn.cursor()
+
         self.contacts = {}      # username -> nickname
         self.contacts_rev = defaultdict(list)
         self.msgs_by_chat = defaultdict(list)
@@ -53,7 +57,7 @@ SELECT username,conRemark,nickname FROM rcontact
 
     def _parse_msg(self):
         msgs_tot_cnt = 0
-        db_msgs = self.cc.execute(
+        db_msgs = self.db_conn_bytes.cursor().execute(
 """
 SELECT {} FROM message
 """.format(','.join(WeChatDBParser.FIELDS)))
@@ -136,11 +140,20 @@ SELECT {} FROM message
     def _parse_msg_row(self, row):
         """ parse a record of message into my format"""
         values = dict(zip(WeChatDBParser.FIELDS, row))
+        try:
+            values['content'].decode()
+        except:
+            logger.warning(f"Invalid byte sequence in message content (type={values['type']})")
+            values['content'] = 'FAILED TO DECODE'
         if values['content']:
             values['content'] = ensure_unicode(values['content'])
         else:
             values['content'] = ''
         values['createTime'] = datetime.fromtimestamp(values['createTime']/ 1000)
+
+        values['talker'] = values['talker'].decode()
+        if values['imgPath']:
+            values['imgPath'] = values['imgPath'].decode()
         values['chat'] = values['talker']
         try:
             if values['chat'].endswith('@chatroom'):

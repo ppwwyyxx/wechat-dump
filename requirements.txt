@@ -6,3 +6,4 @@ requests
 pysqlcipher3>=1.0.3
 csscompressor
 numpy
+ipython
