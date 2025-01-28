@@ -17,8 +17,9 @@ def get_args():
     parser.add_argument('name', help='name of contact')
     parser.add_argument('--output', help='output html file', default='output.html')
     parser.add_argument('--db', default='decoded.db', help='path to decoded database')
-    parser.add_argument('--avt', default='avatar.index', help='path to avatar.index file that only exists in old version of wechat')
     parser.add_argument('--res', default='resource', help='reseource directory')
+    parser.add_argument('--wxgf-server', help='address of the wxgf image decoder server')
+    parser.add_argument('--avt', default='avatar.index', help='path to avatar.index file that only exists in old version of wechat. Ignore for new version of wechat.')
     args = parser.parse_args()
     return args
 
@@ -38,7 +39,9 @@ if __name__ == '__main__':
         sys.stderr.write(u"Couldn't find the chat {}.".format(name));
         sys.exit(1)
 
-    res = Resource(parser, args.res, args.avt)
+    res = Resource(parser, args.res,
+                   wxgf_server=args.wxgf_server,
+                   avt_db=args.avt)
     msgs = parser.msgs_by_chat[chatid]
     logger.info(f"Number of Messages for chatid {chatid}: {len(msgs)}")
     assert len(msgs) > 0
