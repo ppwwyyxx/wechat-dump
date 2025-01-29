@@ -113,7 +113,10 @@ class WeChatMsg(object):
             return "[Money Transfer]"
         elif self.type == TYPE_REPLY:
             pq = PyQuery(self.content_xml_ready)
-            msg = pq('title').text()
+            titles = pq('title')
+            if len(titles) == 0:
+                return self.content_xml_ready
+            msg = titles[0].text
             # TODO parse reply.
             return msg
         else:
