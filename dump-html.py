@@ -15,9 +15,10 @@ logger = logging.getLogger("wechat")
 def get_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('name', help='name of contact')
-    parser.add_argument('--output', help='output html file', default='output.html')
-    parser.add_argument('--db', default='decoded.db', help='path to decoded database')
-    parser.add_argument('--res', default='resource', help='reseource directory')
+    parser.add_argument('--output', help='output html file, e.g. output.html', default='output.html')
+    parser.add_argument('--db', default='EnMicroMsg.db.decoded',
+                        help='path to the decoded database, e.g. EnMicroMsg.db.decoded')
+    parser.add_argument('--res', default='resource', help='the resource directory')
     parser.add_argument('--wxgf-server', help='address of the wxgf image decoder server')
     parser.add_argument('--avt', default='avatar.index', help='path to avatar.index file that only exists in old version of wechat. Ignore for new version of wechat.')
     args = parser.parse_args()
