@@ -15,12 +15,16 @@ TYPE_REDENVELOPE = 436207665
 TYPE_MONEY_TRANSFER = 419430449  # 微信转账
 TYPE_LOCATION_SHARING = -1879048186
 TYPE_REPLY = 822083633  # 回复的消息.
+TYPE_FILE = 1090519089
+TYPE_QQMUSIC = 1040187441
 TYPE_APP_MSG = 16777265
 
-_KNOWN_TYPES = [eval(k) for k in dir() if k.startswith('TYPE_')]
+_KNOWN_TYPES = tuple([eval(k) for k in dir() if k.startswith('TYPE_')])
 
 import re
+import json
 import io
+import html
 from pyquery import PyQuery
 import xml.etree.ElementTree as ET
 import logging
@@ -40,10 +44,7 @@ class WeChatMsg(object):
     def __init__(self, values):
         for k, v in values.items():
             setattr(self, k, v)
-        if self.type not in _KNOWN_TYPES:
-            logger.warn("Unhandled message type: {}".format(self.type))
-            # only to supress repeated warning:
-            _KNOWN_TYPES.append(self.type)
+        self.known_type = self.type in _KNOWN_TYPES
 
     def msg_str(self):
         if self.type == TYPE_LOCATION:
@@ -119,6 +120,20 @@ class WeChatMsg(object):
             msg = titles[0].text
             # TODO parse reply.
             return msg
+        elif self.type == TYPE_FILE:
+            pq = PyQuery(self.content_xml_ready)
+            titles = pq('title')
+            if len(titles) == 0:
+                return self.content_xml_ready
+            return "FILE:" + titles[0].text
+        elif self.type == TYPE_QQMUSIC:
+            pq = PyQuery(self.content_xml_ready)
+            title = pq('title')[0].text
+            singer = pq('des')[0].text
+            url = html.unescape(pq('url')[0].text)
+            return json.dumps(dict(
+                title=title, singer=singer, url=url
+            ))
         else:
             # TODO replace smiley with text
             return self.content

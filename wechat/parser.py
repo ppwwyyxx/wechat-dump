@@ -1,7 +1,7 @@
 # -*- coding: UTF-8 -*-
 
 import sqlite3
-from collections import defaultdict
+from collections import defaultdict, Counter
 import itertools
 from datetime import datetime
 import logging
@@ -61,6 +61,7 @@ SELECT username,conRemark,nickname FROM rcontact
 """
 SELECT {} FROM message
 """.format(','.join(WeChatDBParser.FIELDS)))
+        unknown_type_cnt = Counter()
         for row in db_msgs:
             values = self._parse_msg_row(row)
             if not values:
@@ -69,6 +70,9 @@ SELECT {} FROM message
             # TODO keep system message?
             if not WeChatMsg.filter_type(msg.type):
                 self.msgs_by_chat[msg.chat].append(msg)
+            if not msg.known_type:
+                unknown_type_cnt[msg.type] += 1
+        logger.warning("[Parser] Unhandled messages (type->cnt): {}".format(unknown_type_cnt))
 
         for k, v in self.msgs_by_chat.items():
             self.msgs_by_chat[k] = sorted(v, key=lambda x: x.createTime)
@@ -80,8 +84,13 @@ SELECT {} FROM message
         userinfo = dict(userinfo_q)
         self.username = userinfo.get(2, None)
         if self.username is None:
+            nickname = userinfo.get(4, None)
+            if nickname is not None:
+                self.username = self.contacts_rev.get(nickname, [None])[0]
+        if self.username is None:
             logger.error("Cannot find username in userinfo table!")
             self.username = input("Please enter your username:")
+        assert isinstance(self.username, str), self.username
         logger.info("Your username is: {}".format(self.username))
 
     def _parse_imginfo(self):
@@ -120,8 +129,8 @@ SELECT {} FROM message
 
 
     def _parse(self):
-        self._parse_userinfo()
         self._parse_contact()
+        self._parse_userinfo()  # depend on self.contacts
         self._parse_msg()
         self._parse_imginfo()
         self._parse_emoji()
@@ -140,16 +149,16 @@ SELECT {} FROM message
     def _parse_msg_row(self, row):
         """ parse a record of message into my format"""
         values = dict(zip(WeChatDBParser.FIELDS, row))
+        values['createTime'] = datetime.fromtimestamp(values['createTime']/ 1000)
         try:
             values['content'].decode()
         except:
-            logger.warning(f"Invalid byte sequence in message content (type={values['type']})")
+            logger.warning(f"Invalid byte sequence in message content (type={values['type']}, createTime={values['createTime']})")
             values['content'] = 'FAILED TO DECODE'
         if values['content']:
             values['content'] = ensure_unicode(values['content'])
         else:
             values['content'] = ''
-        values['createTime'] = datetime.fromtimestamp(values['createTime']/ 1000)
 
         values['talker'] = values['talker'].decode()
         if values['imgPath']:
