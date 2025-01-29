@@ -5141,7 +5141,9 @@ a.btnBlue:active .btnBluePanel {
 }
 .cloudText img {
   vertical-align: text-bottom;
-  margin-bottom: -5px;
+  max-width: 200px;
+  /* *margin-bottom: -5px; */
+  /* qqmusic cover img */
 }
 .cloudImg {
   line-height: 0;

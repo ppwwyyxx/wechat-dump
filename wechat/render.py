@@ -2,7 +2,7 @@
 # -*- coding: UTF-8 -*-
 
 import os
-import base64
+from collections import Counter
 import glob
 from pyquery import PyQuery
 import logging
@@ -32,7 +32,8 @@ TEMPLATES_FILES = {TYPE_MSG: "TP_MSG",
                    TYPE_EMOJI: "TP_EMOJI",
                    TYPE_CUSTOM_EMOJI: "TP_EMOJI",
                    TYPE_LINK: "TP_MSG",
-                   TYPE_VIDEO_FILE: "TP_VIDEO_FILE"
+                   TYPE_VIDEO_FILE: "TP_VIDEO_FILE",
+                   TYPE_QQMUSIC: "TP_QQMUSIC",
                   }
 TEMPLATES = {
     k: open(os.path.join(STATIC_PATH, '{}.html'.format(v))).read()
@@ -65,6 +66,8 @@ class HTMLRender(object):
             js = ensure_unicode(open(js).read())
             self.js_string.append(js)
 
+        self.unknown_type_cnt = Counter()
+
     @property
     def all_css(self):
         # call after processing all messages,
@@ -90,12 +93,14 @@ class HTMLRender(object):
         return self.final_js
 
     #@timing(total=True)
-    def render_msg(self, msg):
+    def render_msg(self, msg: WeChatMsg):
         """ render a message, return the html block"""
         # TODO for chatroom, add nickname on avatar
         sender = u'you ' + msg.talker if not msg.isSend else 'me'
         format_dict = {'sender_label': sender,
                        'time': msg.createTime }
+        if not msg.known_type:
+            self.unknown_type_cnt[msg.type] += 1
         if(not msg.isSend and msg.is_chatroom()):
             format_dict['nickname'] = '>\n       <pre align=\'left\'>'+msg.talker_nickname+'</pre'
         else:
@@ -104,8 +109,11 @@ class HTMLRender(object):
         def fallback():
             template = TEMPLATES[TYPE_MSG]
             content = msg.msg_str()
-            format_dict['content'] = self.smiley.replace_smileycode(content)
-            return template.format(**format_dict)
+            content = self.smiley.replace_smileycode(content)
+            if not msg.known_type:
+                # Show raw (usually xml) content if unknown.
+                content = html.escape(content)
+            return template.format(content=content, **format_dict)
 
         template = TEMPLATES.get(msg.type)
         if msg.type == TYPE_SPEAK:
@@ -128,6 +136,15 @@ class HTMLRender(object):
             # TODO do not show fancybox when no bigimg found
             format_dict['img'] = (img, 'jpeg')
             return template.format(**format_dict)
+        elif msg.type == TYPE_QQMUSIC:
+            jobj = json.loads(msg.msg_str())
+            content = f"{jobj['title']} - {jobj['singer']}"
+
+            # imgPath was original THUMBNAIL_DIRPATH://th_xxxxxxxxx
+            imgpath = msg.imgPath.split('_')[-1]
+            img = self.res.get_img([imgpath])
+            format_dict['img'] = (img, 'jpeg')
+            return template.format(url=jobj['url'], content=content, **format_dict)
         elif msg.type == TYPE_EMOJI or msg.type == TYPE_CUSTOM_EMOJI:
             if 'emoticonmd5' in msg.content:
                 pq = PyQuery(msg.content)
@@ -145,11 +162,11 @@ class HTMLRender(object):
                 import IPython as IP; IP.embed()
             return template.format(**format_dict)
         elif msg.type == TYPE_LINK:
-            content = msg.msg_str()
-            # TODO show a short link with long href, if link too long
-            if content.startswith(u'URL:'):
-                url = content[4:]
-                content = u'URL:<a target="_blank" href="{0}">{0}</a>'.format(url)
+            pq = PyQuery(msg.content_xml_ready)
+            url = pq('url').text()
+            if url:
+                title = pq('title')[0].text
+                content = '<a target="_blank" href="{0}">{1}</a>'.format(url, title)
                 format_dict['content'] = content
                 return template.format(**format_dict)
         elif msg.type == TYPE_VIDEO_FILE:
@@ -224,6 +241,7 @@ class HTMLRender(object):
         slice_by_size = MessageSlicerBySize().slice(msgs)
         ret = [self._render_partial_msgs(s) for s in slice_by_size]
         self.prgs.finish()
+        logger.warning("[HTMLRenderer] Unhandled messages (type->cnt): {}".format(self.unknown_type_cnt))
         return ret
 
 if __name__ == '__main__':
