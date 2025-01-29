@@ -2,10 +2,9 @@
 # -*- coding: UTF-8 -*-
 
 import os
-import functools
+import re
 import re
 import json
-import struct
 
 from .common.textutil import get_file_b64
 
@@ -40,10 +39,20 @@ TEMPLATE = """.{name} {{
     background-size: 24px 24px;
 }}"""
 
-def _css_class_name(s):
-    s = s.replace("/", "_")
-    s = s.replace(".", "_")
-    return "smiley_" + s
+
+
+def _css_class_name(name: str) -> str:
+    """
+    Sanitizes a string to be a valid CSS class name by replacing invalid characters with underscores.
+    """
+    # CSS class names must start with a letter or underscore, followed by letters, digits, hyphens, or underscores
+    name = re.sub(r'[^a-zA-Z0-9_-]', '_', name)
+
+    # Ensure the first character is a valid start character (letter or underscore)
+    if not name[0].isalpha() and name[0] != '_':
+        name = '_' + name
+    return "smiley_" + name
+
 
 class SmileyProvider(object):
     def __init__(self, html_replace=True):
@@ -76,7 +85,6 @@ class SmileyProvider(object):
             if k in msg:
                 msg = msg.replace(k, self.gen_replace_elem(v))
         return msg
-        return msg
 
     def gen_used_smiley_css(self):
         ret = HEAD
@@ -88,6 +96,8 @@ class SmileyProvider(object):
 
 if __name__ == '__main__':
     smiley = SmileyProvider()
-    msg = u"[挥手]哈哈呵呵ｈｉｈｉ\U0001f684\u2728\u0001 /::<\ue415"
+    msg = u"[天啊]哈哈呵呵ｈｉｈｉ\U0001f684\u2728\u0001 /::<\ue415"
     msg = smiley.replace_smileycode(msg)
-    smiley.gen_used_smiley_css()
+    print(msg)
+    print()
+    print(smiley.gen_used_smiley_css())

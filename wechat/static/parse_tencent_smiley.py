@@ -2,6 +2,7 @@
 # -*- coding: UTF-8 -*-
 
 import xml.etree.ElementTree as ET
+import struct
 import os
 import json
 
@@ -84,4 +85,4 @@ if __name__ == "__main__":
     add(parse_unicode_smiley(), "unicode-smiley.json")
 
     with open('tencent-smiley.json', 'w') as f:
-        json.dump(smileys, f)
+        json.dump(smileys, f, indent=2)

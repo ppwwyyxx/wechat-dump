@@ -16,7 +16,8 @@ class WxgfAndroidDecoder:
             self.ws = create_connection(server)
 
     def __del__(self):
-        self.ws.close()
+        if self.has_server():
+            self.ws.close()
 
     def has_server(self) -> bool:
         return hasattr(self, 'ws')
