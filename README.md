@@ -8,7 +8,7 @@ We reverse-engineered the storage protocol of WeChat messages, and
 provide this tool to decrypt and parse WeChat messages on a rooted android phone.
 It can also render the messages into self-contained html files including voice messages, images, emojis, videos, etc.
 
-The tool is last verified to work with latest version of wechat on 2025/01/01.
+The tool is last verified to work with latest version of WeChat on 2025/01/01.
 If the tool works for you, please take a moment to add your phone/OS to [the wiki](https://github.com/ppwwyyxx/wechat-dump/wiki).
 
 ## How to use:
@@ -23,7 +23,7 @@ If the tool works for you, please take a moment to add your phone/OS to [the wik
 
 #### Get Necessary Data:
 
-1. Pull database file and (for older wechat versions) avatar index:
+1. Pull database file and (for older WeChat versions) avatar index:
   + Automatic: `./android-interact.sh db`. It may use an incorrect userid.
   + Manual:
     + Figure out your `${userid}` by inspecting the contents of `/data/data/com.tencent.mm/MicroMsg` on the __root__ filesystem of the device.
@@ -34,7 +34,7 @@ If the tool works for you, please take a moment to add your phone/OS to [the wik
   + Manual:
     + Get WeChat uin (an integer), possible ways are:
       + `./decrypt-db.py uin`, which looks for uin in `/data/data/com.tencent.mm/shared_prefs/`
-      + Login to [web wechat](https://wx.qq.com), get wxuin=1234567 from `document.cookie`
+      + Login to [web WeChat](https://wx.qq.com), get wxuin=1234567 from `document.cookie`
     + Get your device id (a positive integer), possible ways are:
       + `./decrypt-db.py imei` implements some ways to find device id.
       + Call `*#06#` on your phone
@@ -56,10 +56,13 @@ If the tool works for you, please take a moment to add your phone/OS to [the wik
 3. Copy the WeChat user resource directory `/data/data/com.tencent.mm/MicroMsg/${userid}/{avatar,emoji,image2,sfs,video,voice2}` from the phone to the `resource` directory:
 	+ `./android-interact.sh res`
 	+ Change `RES_DIR` in the script if the location of these directories is different on your phone.
-      For older version of wechat, the directory may be `/mnt/sdcard/tencent/MicroMsg/`
+      For older version of WeChat, the directory may be `/mnt/sdcard/tencent/MicroMsg/`
 	+ This can take a while. It can be faster to first archive it with `tar` with or without compression, and then copy the archive,
   	  `busybox tar` is recommended as the Android system's `tar` may choke on long paths.
 	+ In the end, we need a `resource` directory with the following subdir: `avatar,emoji,image2,sfs,video,voice2`.
+
+4. (Optional) Install and start a WXGF decoder server on an android device. Without this, certain WXGF images will not be rendered or will be rendered in low resolution.
+   See [WXGFDecoder](WXGFDecoder) for instructions.
 
 4. (Optional) Download the emoji cache from [here](https://github.com/ppwwyyxx/wechat-dump/releases/download/0.1/emoji.cache.tar.bz2)
 	and decompress it under `wechat-dump`. This will avoid downloading too many emojis during rendering.
@@ -92,9 +95,8 @@ If the tool works for you, please take a moment to add your phone/OS to [the wik
     ./dump-html.py "<contact_display_name>"
     ```
 
-    The output file is `output.html`.
-
-    Check `./dump-html.py -h` to use different paths.
+    * The output file is `output.html`. Check `./dump-html.py -h` to use different input/output paths.
+    * Add `--wxgf-server ws://xx.xx.xx.xx:xxxx` to use a WXGF decoder server.
 
 ### Examples:
 Screenshots of generated html:
@@ -104,7 +106,7 @@ Screenshots of generated html:
 See [here](http://ppwwyyxx.com/static/wechat/example.html) for an example html.
 
 ### TODO List (help needed!)
-* __IMPORTANT__ Some emojis and chat images are stored in a proprietary "wxgf" format. We don't yet know how to decode this format.
+* Decoding WXGF images using an android app is too complex. Looking for an easier way (e.g. qemu).
 * Fix rare unhandled message types: > 10000 and < 0
 * Better user experiences... see `grep 'TODO' wechat -R`
 
