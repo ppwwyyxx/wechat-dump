@@ -52,7 +52,7 @@ class Resource(object):
         self.video_dir = os.path.join(res_dir, VIDEO_DIRNAME)
         self.avt_reader = AvatarReader(res_dir, avt_db)
         self.wxgf_decoder = WxgfAndroidDecoder(wxgf_server)
-        self.emoji_reader = EmojiReader(res_dir, self.parser)
+        self.emoji_reader = EmojiReader(res_dir, self.parser, wxgf_decoder=self.wxgf_decoder)
 
     def _get_voice_filename(self, imgpath):
         fname = get_md5_hex(imgpath.encode('ascii'))
@@ -195,12 +195,11 @@ class Resource(object):
         """ Returns: (b64 encoded img string, format) """
         return self.emoji_reader.get_emoji(md5)
 
-    def get_video(self, videoid):
+    def get_video(self, videoid) -> str | None:
         video_file = os.path.join(self.video_dir, videoid + ".mp4")
         video_thumbnail_file = os.path.join(self.video_dir, videoid + ".jpg")
         if os.path.exists(video_file):
             return video_file
         elif os.path.exists(video_thumbnail_file):
             return video_thumbnail_file
-        logger.warning(f"Cannot find video {videoid}")
-        return ""
+        return None

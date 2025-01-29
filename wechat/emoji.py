@@ -1,7 +1,6 @@
 import os
 from pathlib import Path
 import logging
-import tempfile
 import io
 import requests
 import base64
@@ -10,6 +9,7 @@ from PIL import Image
 import pickle
 from Crypto.Cipher import AES
 
+from .wxgf import WxgfAndroidDecoder, is_wxgf_buffer
 from .parser import WeChatDBParser
 from .common.textutil import md5 as get_md5_hex, get_file_b64, get_file_md5
 
@@ -23,21 +23,20 @@ def _get_aes_key(md5):
     # ascii representation of the first half of md5 is used as aes key
     assert len(md5) == 32
     return md5[:16].encode('ascii')
-    # ret = ""
-    # for ch in md5[:16]:
-        # ret += format(ord(ch), 'x')
-    # return ret
 
 
 class EmojiReader:
     def __init__(self,
         resource_dir: str,
         parser: WeChatDBParser,
+        *,
+        wxgf_decoder: WxgfAndroidDecoder,
         cache_file: str=None):
         """
         Args:
             resource_dir: path to resource/
             parser: Database parser
+            wxgf_decoder: Wxgf image decoder
             cache_file: a cache file to store emoji downloaded from URLs.
                 default to a emoji.cache file under wechat-dump.
         """
@@ -48,6 +47,7 @@ class EmojiReader:
         # mapping from md5 to the (cdnurl, encrypturl, aeskey)
         # columns in EmojiInfo table.
         self.cache_file = cache_file or DEFAULT_EMOJI_CACHE
+        self.wxgf_decoder = wxgf_decoder
 
         # cache stores md5 -> (base64str, format)
         if os.path.isfile(self.cache_file):
@@ -133,9 +133,14 @@ class EmojiReader:
                 content = self._decode_emoji(fname)
                 data_md5 = get_md5_hex(content)
                 if data_md5 != md5:
-                    if content.startswith(b"wxgf"):
-                        raise ValueError("Unsupported mysterious image format: wxgf")
-                    raise ValueError("Decoded data mismatch md5!")
+                    if is_wxgf_buffer(content):
+                        content = self.wxgf_decoder.decode_with_cache(fname, content)
+                        if content is None:
+                            if not self.wxgf_decoder.has_server():
+                                logger.warning("wxgf decoder server is not provided. Cannot decode wxgf emojis.")
+                            raise ValueError("Failed to decode wxgf file.")
+                    else:
+                        raise ValueError("Decoded data mismatch md5!")
                 im = Image.open(io.BytesIO(content))
                 return (base64.b64encode(content).decode('ascii'), im.format.lower())
             except Exception as e:
@@ -183,6 +188,9 @@ class EmojiReader:
             try:
                 logger.info("Requesting encrypted emoji {} from {} ...".format(md5, encrypturl))
                 buf = requests.get(encrypturl).content
+                if buf == b'':
+                    logger.error(f"Failed to download emoji {md5}")
+                    return None, None
                 aeskey = bytes.fromhex(aeskey)
                 cipher = AES.new(aeskey, AES.MODE_CBC, iv=aeskey)
                 decoded_buf = cipher.decrypt(buf)

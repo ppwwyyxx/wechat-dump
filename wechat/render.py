@@ -3,6 +3,7 @@
 
 import os
 from collections import Counter
+from functools import lru_cache
 import glob
 from pyquery import PyQuery
 import logging
@@ -35,10 +36,19 @@ TEMPLATES_FILES = {TYPE_MSG: "TP_MSG",
                    TYPE_VIDEO_FILE: "TP_VIDEO_FILE",
                    TYPE_QQMUSIC: "TP_QQMUSIC",
                   }
-TEMPLATES = {
-    k: open(os.path.join(STATIC_PATH, '{}.html'.format(v))).read()
-    for k, v in TEMPLATES_FILES.items()
-}
+
+
+@lru_cache()
+def get_template(name: str | int) -> str | None:
+    """Return the html template given a file name or msg type."""
+    if isinstance(name, int):
+        name = TEMPLATES_FILES.get(name, None)
+        if name is None:
+            return None
+    html_path = os.path.join(STATIC_PATH, f"{name}.html")
+    with open(html_path) as f:
+        return f.read()
+
 
 class HTMLRender(object):
     def __init__(self, parser, res=None):
@@ -107,7 +117,7 @@ class HTMLRender(object):
             format_dict['nickname'] = ' '
 
         def fallback():
-            template = TEMPLATES[TYPE_MSG]
+            template = get_template(TYPE_MSG)
             content = msg.msg_str()
             content = self.smiley.replace_smileycode(content)
             if not msg.known_type:
@@ -115,7 +125,7 @@ class HTMLRender(object):
                 content = html.escape(content)
             return template.format(content=content, **format_dict)
 
-        template = TEMPLATES.get(msg.type)
+        template = get_template(msg.type)
         if msg.type == TYPE_SPEAK:
             audio_str, duration = self.res.get_voice_mp3(msg.imgPath)
             format_dict['voice_duration'] = duration
@@ -140,10 +150,13 @@ class HTMLRender(object):
             jobj = json.loads(msg.msg_str())
             content = f"{jobj['title']} - {jobj['singer']}"
 
-            # imgPath was original THUMBNAIL_DIRPATH://th_xxxxxxxxx
-            imgpath = msg.imgPath.split('_')[-1]
-            img = self.res.get_img([imgpath])
-            format_dict['img'] = (img, 'jpeg')
+            if msg.imgPath is not None:
+                # imgPath was original THUMBNAIL_DIRPATH://th_xxxxxxxxx
+                imgpath = msg.imgPath.split('_')[-1]
+                img = self.res.get_img([imgpath])
+                format_dict['img'] = (img, 'jpeg')
+            else:
+                template = get_template("TP_QQMUSIC_NOIMG")
             return template.format(url=jobj['url'], content=content, **format_dict)
         elif msg.type == TYPE_EMOJI or msg.type == TYPE_CUSTOM_EMOJI:
             if 'emoticonmd5' in msg.content:
@@ -171,7 +184,12 @@ class HTMLRender(object):
                 return template.format(**format_dict)
         elif msg.type == TYPE_VIDEO_FILE:
             video = self.res.get_video(msg.imgPath)
-            if video.endswith(".mp4"):
+            if video is None:
+                logger.warning(f"Cannot find video {msg.imgPath} ({msg.createTime})")
+                # fallback
+                format_dict['content'] = f"VIDEO FILE {msg.imgPath}"
+                return get_template(TYPE_MSG).format(**format_dict)
+            elif video.endswith(".mp4"):
                 video_str = get_file_b64(video)
                 format_dict["video_str"] = video_str
                 return template.format(**format_dict)
@@ -179,10 +197,7 @@ class HTMLRender(object):
                 # only has thumbnail
                 image_str = get_file_b64(video)
                 format_dict["img"] = (image_str, 'jpeg')
-                return TEMPLATES[TYPE_IMG].format(**format_dict)
-            # fallback
-            format_dict['content'] = f"VIDEO FILE {msg.imgPath}"
-            return TEMPLATES_FILES[TYPE_MSG].format(**format_dict)
+                return get_template(TYPE_IMG).format(**format_dict)
         elif msg.type == TYPE_WX_VIDEO:
             # TODO: fetch video from resource
             return fallback()
