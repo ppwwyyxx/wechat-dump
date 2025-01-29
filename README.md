@@ -106,6 +106,8 @@ Screenshots of generated html:
 See [here](http://ppwwyyxx.com/static/wechat/example.html) for an example html.
 
 ### TODO List (help needed!)
+* After chat history migration, some emojis in the `EmojiInfo` table don't have corresponding URLs but only a md5 -
+  they are not downloaded by WeChat until the message needs to be displayed. We don't know how to manually download these emojis.
 * Decoding WXGF images using an android app is too complex. Looking for an easier way (e.g. qemu).
 * Fix rare unhandled message types: > 10000 and < 0
 * Better user experiences... see `grep 'TODO' wechat -R`

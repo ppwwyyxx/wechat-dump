@@ -59,3 +59,6 @@ class WxgfAndroidDecoder:
 def is_wxgf_file(fname):
     with open(fname, 'rb') as f:
         return f.read(4) == WXGF_HEADER
+
+def is_wxgf_buffer(buf: bytes):
+    return buf[:4] == WXGF_HEADER
