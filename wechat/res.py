@@ -2,6 +2,7 @@
 
 import os
 from PIL import Image
+import requests
 import time
 import io
 import base64
@@ -83,12 +84,24 @@ class Resource(object):
         self.voice_cache = [pool.apply_async(parse_wechat_audio_file,
                                              (self._get_voice_filename(k),)) for k in voice_paths]
 
-    def get_avatar(self, username):
+    def get_avatar(self, username) -> str:
         """ return base64 unicode string"""
         im = self.avt_reader.get_avatar(username)
         if im is None:
-            logger.warning(f"Cannot find avatar for {username}.")
-            return ""
+            # Try downloading the avatar directly.
+            avatar_url = self.parser.avatar_urls.get(username)
+            if avatar_url is None:
+                return ""
+            logger.info(f"Requesting avatar of {username} from {avatar_url} ...")
+            try:
+                r = requests.get(avatar_url).content
+                im = Image.open(io.BytesIO(r))
+            except Exception:
+                logger.exception(f"Failed to fetch avatar of {username}.")
+                return ""
+            else:
+                self.avt_reader.save_avatar_to_avtdir(username, im)
+
         buf = io.BytesIO()
         try:
             im.save(buf, 'JPEG', quality=JPEG_QUALITY)
