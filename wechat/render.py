@@ -21,7 +21,7 @@ except ImportError:
     css_compress = lambda x: x
 
 from .msg import *
-from .common.textutil import ensure_unicode, get_file_b64
+from .common.textutil import get_file_b64
 from .common.progress import ProgressReporter
 from .common.timer import timing
 from .smiley import SmileyProvider
@@ -52,8 +52,10 @@ def get_template(name: str | int) -> str | None:
 
 class HTMLRender(object):
     def __init__(self, parser, res=None):
-        self.html = ensure_unicode(open(HTML_FILE).read())
-        self.time_html = open(TIME_HTML_FILE).read()
+        with open(HTML_FILE) as f:
+            self.html = f.read()
+        with open(TIME_HTML_FILE) as f:
+            self.time_html = f.read()
         self.parser = parser
         self.res = res
         assert self.res is not None, \
@@ -64,8 +66,8 @@ class HTMLRender(object):
         self.css_string = []    # css to add
         for css in css_files:
             logger.info("Loading {}".format(os.path.basename(css)))
-            css = ensure_unicode((open(css).read()))
-            self.css_string.append(css)
+            with open(css) as f:
+                self.css_string.append(f.read())
 
         js_files = glob.glob(os.path.join(LIB_PATH, 'static/*.js'))
         # to load jquery before other js
@@ -73,8 +75,8 @@ class HTMLRender(object):
         self.js_string = []
         for js in js_files:
             logger.info("Loading {}".format(os.path.basename(js)))
-            js = ensure_unicode(open(js).read())
-            self.js_string.append(js)
+            with open(js) as f:
+                self.js_string.append(f.read())
 
         self.unknown_type_cnt = Counter()
 
@@ -229,7 +231,8 @@ class HTMLRender(object):
                            )
 
     def prepare_avatar_css(self, talkers):
-        avatar_tpl= ensure_unicode(open(FRIEND_AVATAR_CSS_FILE).read())
+        with open(FRIEND_AVATAR_CSS_FILE) as f:
+            avatar_tpl = f.read()
         my_avatar = self.res.get_avatar(self.parser.username)
         css = avatar_tpl.format(name='me', avatar=my_avatar)
 

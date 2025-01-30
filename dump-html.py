@@ -6,7 +6,6 @@ import logging
 
 from wechat.parser import WeChatDBParser
 from wechat.res import Resource
-from wechat.common.textutil import ensure_unicode
 from wechat.render import HTMLRender
 
 logger = logging.getLogger("wechat")
@@ -26,7 +25,6 @@ def get_args():
 if __name__ == '__main__':
     args = get_args()
 
-    name = ensure_unicode(args.name)
     output_file = args.output
 
     parser = WeChatDBParser(args.db)
@@ -36,7 +34,7 @@ if __name__ == '__main__':
     except KeyError:
         sys.stderr.write(u"Valid Contacts: {}\n".format(
             u'\n'.join(parser.all_chat_nicknames)))
-        sys.stderr.write(u"Couldn't find the chat {}.".format(name));
+        sys.stderr.write(u"Couldn't find the chat {}.".format(args.name));
         sys.exit(1)
 
     res = Resource(parser, args.res,

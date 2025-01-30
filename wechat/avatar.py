@@ -10,7 +10,7 @@ import logging
 import sqlite3
 logger = logging.getLogger(__name__)
 
-from .common.textutil import ensure_unicode, md5
+from .common.textutil import md5
 
 
 def _filename_priority(s):
@@ -72,7 +72,6 @@ class AvatarReader(object):
         """ username: `username` field in db.rcontact"""
         if not self._use_avt:
             return None
-        username = ensure_unicode(username)
         avtid = md5(username.encode('utf-8'))
 
         if self.avt_db is not None:
