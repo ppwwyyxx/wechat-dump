@@ -16,6 +16,7 @@ addr_upload2
 chatroom
 message
 rcontact
+img_flag
 """
 
 class WeChatDBParser(object):
@@ -36,6 +37,7 @@ class WeChatDBParser(object):
         self.emoji_groups = {}
         self.emoji_info = {}
         self.emoji_encryption_key = None
+        self.avatar_urls = {}
         self._parse()
 
     def _parse_contact(self):
@@ -126,6 +128,14 @@ SELECT {} FROM message
                 if cdnUrl or encrypturl:
                     self.emoji_info[md5] = (catalog, cdnUrl, encrypturl, aeskey)
 
+    def _parse_img_flag(self):
+        """Parse the img_flag table which stores avatar for each id."""
+        query = self.cc.execute(
+""" SELECT username, reserved1 FROM img_flag """)
+        for row in query:
+            username, url = row
+            if url:
+                self.avatar_urls[username] = url
 
     def _parse(self):
         self._parse_contact()
@@ -133,6 +143,7 @@ SELECT {} FROM message
         self._parse_msg()
         self._parse_imginfo()
         self._parse_emoji()
+        self._parse_img_flag()
 
     def get_emoji_encryption_key(self):
         # obtain local encryption key in a special entry in the database

@@ -3,6 +3,7 @@ import os
 import sys
 import argparse
 import logging
+from datetime import datetime
 
 from wechat.parser import WeChatDBParser
 from wechat.res import Resource
@@ -19,6 +20,8 @@ def get_args():
     parser.add_argument('--res', default='resource', help='the resource directory')
     parser.add_argument('--wxgf-server', help='address of the wxgf image decoder server')
     parser.add_argument('--avt', default='avatar.index', help='path to avatar.index file that only exists in old version of wechat. Ignore for new version of wechat.')
+    parser.add_argument('--start', help='start time in format of YYYY-MM-DD HH:MM:SS',
+                        type=datetime.fromisoformat)
     args = parser.parse_args()
     return args
 
@@ -43,6 +46,9 @@ if __name__ == '__main__':
     msgs = parser.msgs_by_chat[chatid]
     logger.info(f"Number of Messages for chatid {chatid}: {len(msgs)}")
     assert len(msgs) > 0
+    if args.start is not None:
+        msgs = [msg for msg in msgs if msg.createTime > args.start]
+        logger.info(f"Number of Messages after {args.start}: {len(msgs)}")
 
     render = HTMLRender(parser, res)
     htmls = render.render_msgs(msgs)

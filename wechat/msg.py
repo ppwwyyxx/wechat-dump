@@ -155,6 +155,12 @@ class WeChatMsg(object):
         else:
             return ret
 
+    def __eq__(self, r):
+        return self.createTime == r.createTime and \
+                self.talker == r.talker and \
+                self.isSend == r.isSend
+        # imgPath might change after migration.
+
     def __lt__(self, r):
         return self.createTime < r.createTime
 
