@@ -30,8 +30,6 @@ import xml.etree.ElementTree as ET
 import logging
 logger = logging.getLogger(__name__)
 
-from .common.textutil import ensure_unicode
-
 
 class WeChatMsg(object):
 
@@ -150,9 +148,9 @@ class WeChatMsg(object):
             self.type,
             self.talker_nickname if not self.isSend else 'me',
             self.createTime,
-            ensure_unicode(self.msg_str()))
+            self.msg_str())
         if self.imgPath:
-            ret = "{}|img:{}".format(ensure_unicode(ret.strip()), self.imgPath)
+            ret = "{}|img:{}".format(ret.strip(), self.imgPath)
             return ret
         else:
             return ret

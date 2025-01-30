@@ -8,7 +8,6 @@ import logging
 logger = logging.getLogger(__name__)
 
 from .msg import WeChatMsg, TYPE_SYSTEM
-from .common.textutil import ensure_unicode
 
 """ tables in concern:
 emojiinfo
@@ -47,9 +46,9 @@ SELECT username,conRemark,nickname FROM rcontact
         for row in contacts:
             username, remark, nickname = row
             if remark:
-                self.contacts[username] = ensure_unicode(remark)
+                self.contacts[username] = remark
             else:
-                self.contacts[username] = ensure_unicode(nickname)
+                self.contacts[username] = nickname
 
         for k, v in self.contacts.items():
             self.contacts_rev[v].append(k)
@@ -147,16 +146,18 @@ SELECT {} FROM message
 
     # process the values in a row
     def _parse_msg_row(self, row):
-        """ parse a record of message into my format"""
+        """Parse a record of message into my format.
+
+        Note that message are read in binary format.
+        """
         values = dict(zip(WeChatDBParser.FIELDS, row))
         values['createTime'] = datetime.fromtimestamp(values['createTime']/ 1000)
-        try:
-            values['content'].decode()
-        except:
-            logger.warning(f"Invalid byte sequence in message content (type={values['type']}, createTime={values['createTime']})")
-            values['content'] = 'FAILED TO DECODE'
         if values['content']:
-            values['content'] = ensure_unicode(values['content'])
+            try:
+                values['content'] = values['content'].decode()
+            except:
+                logger.warning(f"Invalid byte sequence in message content (type={values['type']}, createTime={values['createTime']})")
+                values['content'] = 'FAILED TO DECODE'
         else:
             values['content'] = ''
 
