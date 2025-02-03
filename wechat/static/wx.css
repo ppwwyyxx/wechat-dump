@@ -3,7 +3,7 @@ html,
 body {
   word-break: normal;
   word-wrap: break-word;
-} 
+}
 
 /* for single line hack */
 .chatListColumn .nickName,
@@ -145,7 +145,7 @@ body {
   text-align: center;
 }
 body {
-  position: relative;  
+  position: relative;
   padding: 20px 0;
   box-sizing: border-box;
 }
@@ -5141,7 +5141,9 @@ a.btnBlue:active .btnBluePanel {
 }
 .cloudText img {
   vertical-align: text-bottom;
-  margin-bottom: -5px;
+  max-width: 200px;
+  /* *margin-bottom: -5px; */
+  /* qqmusic cover img */
 }
 .cloudImg {
   line-height: 0;
@@ -5234,7 +5236,7 @@ a.btnBlue:active .btnBluePanel {
 }
 .you .cloud {
   float: left;
-  min-width: 50px;
+  /* *min-width: 50px; */
   max-width: 300px;
   margin: 0 0 0 15px;
 }
@@ -5389,7 +5391,7 @@ a.btnBlue:active .btnBluePanel {
 }
 .me .cloud {
   float: right;
-  min-width: 50px;
+  /* *min-width: 50px; */
   max-width: 300px;
   margin: 0 15px 0 0;
 }

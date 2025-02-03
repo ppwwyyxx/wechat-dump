@@ -1,14 +1,13 @@
 # -*- coding: UTF-8 -*-
 
 import sqlite3
-from collections import defaultdict
+from collections import defaultdict, Counter
 import itertools
 from datetime import datetime
 import logging
 logger = logging.getLogger(__name__)
 
 from .msg import WeChatMsg, TYPE_SYSTEM
-from .common.textutil import ensure_unicode
 
 """ tables in concern:
 emojiinfo
@@ -17,6 +16,7 @@ addr_upload2
 chatroom
 message
 rcontact
+img_flag
 """
 
 class WeChatDBParser(object):
@@ -26,13 +26,18 @@ class WeChatDBParser(object):
         """ db_fname: a decrypted EnMicroMsg.db"""
         self.db_fname = db_fname
         self.db_conn = sqlite3.connect(self.db_fname)
+        self.db_conn_bytes = sqlite3.connect(self.db_fname)
+        # https://stackoverflow.com/questions/22751363/sqlite3-operationalerror-could-not-decode-to-utf-8-column
+        self.db_conn_bytes.text_factory = lambda b: b
         self.cc = self.db_conn.cursor()
+
         self.contacts = {}      # username -> nickname
         self.contacts_rev = defaultdict(list)
         self.msgs_by_chat = defaultdict(list)
         self.emoji_groups = {}
         self.emoji_info = {}
         self.emoji_encryption_key = None
+        self.avatar_urls = {}
         self._parse()
 
     def _parse_contact(self):
@@ -43,9 +48,9 @@ SELECT username,conRemark,nickname FROM rcontact
         for row in contacts:
             username, remark, nickname = row
             if remark:
-                self.contacts[username] = ensure_unicode(remark)
+                self.contacts[username] = remark
             else:
-                self.contacts[username] = ensure_unicode(nickname)
+                self.contacts[username] = nickname
 
         for k, v in self.contacts.items():
             self.contacts_rev[v].append(k)
@@ -53,10 +58,11 @@ SELECT username,conRemark,nickname FROM rcontact
 
     def _parse_msg(self):
         msgs_tot_cnt = 0
-        db_msgs = self.cc.execute(
+        db_msgs = self.db_conn_bytes.cursor().execute(
 """
 SELECT {} FROM message
 """.format(','.join(WeChatDBParser.FIELDS)))
+        unknown_type_cnt = Counter()
         for row in db_msgs:
             values = self._parse_msg_row(row)
             if not values:
@@ -65,6 +71,9 @@ SELECT {} FROM message
             # TODO keep system message?
             if not WeChatMsg.filter_type(msg.type):
                 self.msgs_by_chat[msg.chat].append(msg)
+            if not msg.known_type:
+                unknown_type_cnt[msg.type] += 1
+        logger.warning("[Parser] Unhandled messages (type->cnt): {}".format(unknown_type_cnt))
 
         for k, v in self.msgs_by_chat.items():
             self.msgs_by_chat[k] = sorted(v, key=lambda x: x.createTime)
@@ -74,7 +83,15 @@ SELECT {} FROM message
     def _parse_userinfo(self):
         userinfo_q = self.cc.execute(""" SELECT id, value FROM userinfo """)
         userinfo = dict(userinfo_q)
-        self.username = userinfo[2]
+        self.username = userinfo.get(2, None)
+        if self.username is None:
+            nickname = userinfo.get(4, None)
+            if nickname is not None:
+                self.username = self.contacts_rev.get(nickname, [None])[0]
+        if self.username is None:
+            logger.error("Cannot find username in userinfo table!")
+            self.username = input("Please enter your username:")
+        assert isinstance(self.username, str), self.username
         logger.info("Your username is: {}".format(self.username))
 
     def _parse_imginfo(self):
@@ -111,13 +128,22 @@ SELECT {} FROM message
                 if cdnUrl or encrypturl:
                     self.emoji_info[md5] = (catalog, cdnUrl, encrypturl, aeskey)
 
+    def _parse_img_flag(self):
+        """Parse the img_flag table which stores avatar for each id."""
+        query = self.cc.execute(
+""" SELECT username, reserved1 FROM img_flag """)
+        for row in query:
+            username, url = row
+            if url:
+                self.avatar_urls[username] = url
 
     def _parse(self):
-        self._parse_userinfo()
         self._parse_contact()
+        self._parse_userinfo()  # depend on self.contacts
         self._parse_msg()
         self._parse_imginfo()
         self._parse_emoji()
+        self._parse_img_flag()
 
     def get_emoji_encryption_key(self):
         # obtain local encryption key in a special entry in the database
@@ -131,13 +157,24 @@ SELECT {} FROM message
 
     # process the values in a row
     def _parse_msg_row(self, row):
-        """ parse a record of message into my format"""
+        """Parse a record of message into my format.
+
+        Note that message are read in binary format.
+        """
         values = dict(zip(WeChatDBParser.FIELDS, row))
+        values['createTime'] = datetime.fromtimestamp(values['createTime']/ 1000)
         if values['content']:
-            values['content'] = ensure_unicode(values['content'])
+            try:
+                values['content'] = values['content'].decode()
+            except:
+                logger.warning(f"Invalid byte sequence in message content (type={values['type']}, createTime={values['createTime']})")
+                values['content'] = 'FAILED TO DECODE'
         else:
             values['content'] = ''
-        values['createTime'] = datetime.fromtimestamp(values['createTime']/ 1000)
+
+        values['talker'] = values['talker'].decode()
+        if values['imgPath']:
+            values['imgPath'] = values['imgPath'].decode()
         values['chat'] = values['talker']
         try:
             if values['chat'].endswith('@chatroom'):

@@ -1,9 +1,9 @@
 # -*- coding: UTF-8 -*-
 
-import glob
 import os
-import re
 from PIL import Image
+import requests
+import time
 import io
 import base64
 import logging
@@ -15,9 +15,9 @@ import atexit
 from .emoji import EmojiReader
 from .avatar import AvatarReader
 from .common.textutil import md5 as get_md5_hex, get_file_b64
-from .common.timer import timing
 from .msg import TYPE_SPEAK
 from .audio import parse_wechat_audio_file
+from .wxgf import WxgfAndroidDecoder, is_wxgf_file
 
 LIB_PATH = os.path.dirname(os.path.abspath(__file__))
 VOICE_DIRNAME = 'voice2'
@@ -28,11 +28,16 @@ VIDEO_DIRNAME = 'video'
 JPEG_QUALITY = 50
 
 class Resource(object):
-    """ multimedia resources in chat"""
-    def __init__(self, parser, res_dir, avt_db):
+    """ Multimedia resources parser."""
+    def __init__(self, parser,
+                 res_dir: str,
+                 *,
+                 wxgf_server: str | None = None,
+                 avt_db: str | None = None):
         """
         Args:
             res_dir: path to the resource directory
+            wxgf_server: "hostname:port" that points to the wxgf converter android app
             avt_db: "avatar.index" file that only exists in old versions of wechat
         """
         def check(subdir):
@@ -47,7 +52,8 @@ class Resource(object):
         self.voice_dir = os.path.join(res_dir, VOICE_DIRNAME)
         self.video_dir = os.path.join(res_dir, VIDEO_DIRNAME)
         self.avt_reader = AvatarReader(res_dir, avt_db)
-        self.emoji_reader = EmojiReader(res_dir, self.parser)
+        self.wxgf_decoder = WxgfAndroidDecoder(wxgf_server)
+        self.emoji_reader = EmojiReader(res_dir, self.parser, wxgf_decoder=self.wxgf_decoder)
 
     def _get_voice_filename(self, imgpath):
         fname = get_md5_hex(imgpath.encode('ascii'))
@@ -78,12 +84,24 @@ class Resource(object):
         self.voice_cache = [pool.apply_async(parse_wechat_audio_file,
                                              (self._get_voice_filename(k),)) for k in voice_paths]
 
-    def get_avatar(self, username):
+    def get_avatar(self, username) -> str:
         """ return base64 unicode string"""
         im = self.avt_reader.get_avatar(username)
         if im is None:
-            logger.warning(f"Cannot find avatar for {username}.")
-            return ""
+            # Try downloading the avatar directly.
+            avatar_url = self.parser.avatar_urls.get(username)
+            if avatar_url is None:
+                return ""
+            logger.info(f"Requesting avatar of {username} from {avatar_url} ...")
+            try:
+                r = requests.get(avatar_url).content
+                im = Image.open(io.BytesIO(r))
+            except Exception:
+                logger.exception(f"Failed to fetch avatar of {username}.")
+                return ""
+            else:
+                self.avt_reader.save_avatar_to_avtdir(username, im)
+
         buf = io.BytesIO()
         try:
             im.save(buf, 'JPEG', quality=JPEG_QUALITY)
@@ -146,13 +164,40 @@ class Resource(object):
         def get_jpg_b64(img_file):
             if not img_file:
                 return None
-            if not img_file.endswith('jpg') and \
-               imghdr.what(img_file) != 'jpeg':
-                im = Image.open(open(img_file, 'rb'))
-                buf = io.BytesIO()
-                im.convert('RGB').save(buf, 'JPEG', quality=JPEG_QUALITY)
-                return base64.b64encode(buf.getvalue()).decode('ascii')
-            return get_file_b64(img_file)
+
+            # True jpeg. Simplest case.
+            if img_file.endswith('jpg') and \
+                   imghdr.what(img_file) == 'jpeg':
+                return get_file_b64(img_file)
+
+            if is_wxgf_file(img_file):
+                start = time.time()
+                buf = self.wxgf_decoder.decode_with_cache(img_file, None)
+                if buf is None:
+                    if not self.wxgf_decoder.has_server():
+                        logger.warning("wxgf decoder server is not provided. Cannot decode wxgf images. Please follow instructions to create wxgf decoder server if these images need to be decoded.")
+                    else:
+                        logger.error("Failed to decode wxgf file: {}".format(img_file))
+                    return None
+                else:
+                    elapsed = time.time() - start
+                    if elapsed > 0.01 and self.wxgf_decoder.has_server():
+                        logger.info(f"Decoded {img_file} in {elapsed:.2f} seconds")
+            else:
+                with open(img_file, 'rb') as f:
+                    buf = f.read()
+
+            # File is not actually jpeg. Convert.
+            if imghdr.what(file=None, h=buf) != 'jpeg':
+                try:
+                    im = Image.open(io.BytesIO(buf))
+                except:
+                    return None
+                else:
+                    bufio = io.BytesIO()
+                    im.convert('RGB').save(bufio, 'JPEG', quality=JPEG_QUALITY)
+                    buf = bufio.getvalue()
+            return base64.b64encode(buf).decode('ascii')
 
         big_file = get_jpg_b64(big_file)
         if big_file:
@@ -163,12 +208,11 @@ class Resource(object):
         """ Returns: (b64 encoded img string, format) """
         return self.emoji_reader.get_emoji(md5)
 
-    def get_video(self, videoid):
+    def get_video(self, videoid) -> str | None:
         video_file = os.path.join(self.video_dir, videoid + ".mp4")
         video_thumbnail_file = os.path.join(self.video_dir, videoid + ".jpg")
         if os.path.exists(video_file):
             return video_file
         elif os.path.exists(video_thumbnail_file):
             return video_thumbnail_file
-        logger.warning(f"Cannot find video {videoid}")
-        return ""
+        return None

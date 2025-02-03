@@ -10,7 +10,7 @@ import logging
 import sqlite3
 logger = logging.getLogger(__name__)
 
-from .common.textutil import ensure_unicode, md5
+from .common.textutil import md5
 
 
 def _filename_priority(s):
@@ -49,11 +49,16 @@ class AvatarReader(object):
         except Exception:
             pass
 
-    def get_avatar_from_avtdir(self, avtid):
+    def get_avatar_from_avtdir(self, avtid) -> Image.Image | None:
         dir1, dir2 = avtid[:2], avtid[2:4]
         candidates = glob.glob(os.path.join(self.avt_dir, dir1, dir2, f"*{avtid}*"))
         candidates = sorted(set(candidates), key=_filename_priority, reverse=True)
         for cand in candidates:
+            if os.path.isdir(cand):
+                candidates.extend(os.path.join(cand, x) for x in os.listdir(cand))
+        for cand in candidates:
+            if os.path.isdir(cand):
+                continue
             try:
                 if cand.endswith(".bm"):
                     return self.read_bm_file(cand)
@@ -67,7 +72,6 @@ class AvatarReader(object):
         """ username: `username` field in db.rcontact"""
         if not self._use_avt:
             return None
-        username = ensure_unicode(username)
         avtid = md5(username.encode('utf-8'))
 
         if self.avt_db is not None:
@@ -79,7 +83,16 @@ class AvatarReader(object):
             ret = self.get_avatar_from_avtdir(avtid)
             if ret is not None:
                 return ret
-        logger.warning("Avatar for {} not found anywhere.".format(username))
+        logger.warning("Avatar file for {} not found.".format(username))
+
+    def save_avatar_to_avtdir(self, username: str, im: Image.Image):
+        """Save a downloaded avatar to avtdir so it can be reused next time."""
+        avtid = md5(username.encode('utf-8'))
+        dir1, dir2 = avtid[:2], avtid[2:4]
+        fname = os.path.join(self.avt_dir, dir1, dir2, f"user_{avtid}.png")
+        os.makedirs(os.path.dirname(fname), exist_ok=True)
+        logger.info(f"Caching downloaded avatar for {username} to {fname}.")
+        im.save(fname, 'PNG')
 
     def read_img_from_block(self, filename, pos, size):
         file_idx = pos >> 32

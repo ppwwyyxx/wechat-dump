@@ -14,18 +14,21 @@ TYPE_CUSTOM_EMOJI = 1048625
 TYPE_REDENVELOPE = 436207665
 TYPE_MONEY_TRANSFER = 419430449  # 微信转账
 TYPE_LOCATION_SHARING = -1879048186
+TYPE_REPLY = 822083633  # 回复的消息.
+TYPE_FILE = 1090519089
+TYPE_QQMUSIC = 1040187441
 TYPE_APP_MSG = 16777265
 
-_KNOWN_TYPES = [eval(k) for k in dir() if k.startswith('TYPE_')]
+_KNOWN_TYPES = tuple([eval(k) for k in dir() if k.startswith('TYPE_')])
 
 import re
+import json
 import io
+import html
 from pyquery import PyQuery
 import xml.etree.ElementTree as ET
 import logging
 logger = logging.getLogger(__name__)
-
-from .common.textutil import ensure_unicode
 
 
 class WeChatMsg(object):
@@ -39,10 +42,7 @@ class WeChatMsg(object):
     def __init__(self, values):
         for k, v in values.items():
             setattr(self, k, v)
-        if self.type not in _KNOWN_TYPES:
-            logger.warn("Unhandled message type: {}".format(self.type))
-            # only to supress repeated warning:
-            _KNOWN_TYPES.append(self.type)
+        self.known_type = self.type in _KNOWN_TYPES
 
     def msg_str(self):
         if self.type == TYPE_LOCATION:
@@ -110,6 +110,28 @@ class WeChatMsg(object):
             except:
                 pass
             return "[Money Transfer]"
+        elif self.type == TYPE_REPLY:
+            pq = PyQuery(self.content_xml_ready)
+            titles = pq('title')
+            if len(titles) == 0:
+                return self.content_xml_ready
+            msg = titles[0].text
+            # TODO parse reply.
+            return msg
+        elif self.type == TYPE_FILE:
+            pq = PyQuery(self.content_xml_ready)
+            titles = pq('title')
+            if len(titles) == 0:
+                return self.content_xml_ready
+            return "FILE:" + titles[0].text
+        elif self.type == TYPE_QQMUSIC:
+            pq = PyQuery(self.content_xml_ready)
+            title = pq('title')[0].text
+            singer = pq('des')[0].text
+            url = html.unescape(pq('url')[0].text)
+            return json.dumps(dict(
+                title=title, singer=singer, url=url
+            ))
         else:
             # TODO replace smiley with text
             return self.content
@@ -126,12 +148,18 @@ class WeChatMsg(object):
             self.type,
             self.talker_nickname if not self.isSend else 'me',
             self.createTime,
-            ensure_unicode(self.msg_str()))
+            self.msg_str())
         if self.imgPath:
-            ret = "{}|img:{}".format(ensure_unicode(ret.strip()), self.imgPath)
+            ret = "{}|img:{}".format(ret.strip(), self.imgPath)
             return ret
         else:
             return ret
+
+    def __eq__(self, r):
+        return self.createTime == r.createTime and \
+                self.talker == r.talker and \
+                self.isSend == r.isSend
+        # imgPath might change after migration.
 
     def __lt__(self, r):
         return self.createTime < r.createTime

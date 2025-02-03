@@ -6,7 +6,8 @@ PROG_DIR=`dirname "$PROG_NAME"`
 cd "$PROG_DIR"
 
 # Please check that your path is the same, since this might be different among devices
-RES_DIR="/mnt/sdcard/tencent/MicroMsg"
+# RES_DIR="/mnt/sdcard/tencent/MicroMsg"  # old version of wechat use this path.
+RES_DIR="/data/data/com.tencent.mm"
 MM_DIR="/data/data/com.tencent.mm"
 
 echo "Starting rooted adb server..."

@@ -1,13 +1,12 @@
 #!/usr/bin/env python3
-# -*- coding: UTF-8 -*-
 import os
 import sys
 import argparse
 import logging
+from datetime import datetime
 
 from wechat.parser import WeChatDBParser
 from wechat.res import Resource
-from wechat.common.textutil import ensure_unicode
 from wechat.render import HTMLRender
 
 logger = logging.getLogger("wechat")
@@ -15,17 +14,20 @@ logger = logging.getLogger("wechat")
 def get_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('name', help='name of contact')
-    parser.add_argument('--output', help='output html file', default='output.html')
-    parser.add_argument('--db', default='decrypted.db', help='path to decrypted database')
-    parser.add_argument('--avt', default='avatar.index', help='path to avatar.index file that only exists in old version of wechat')
-    parser.add_argument('--res', default='resource', help='reseource directory')
+    parser.add_argument('--output', help='output html file, e.g. output.html', default='output.html')
+    parser.add_argument('--db', default='EnMicroMsg.db.decrypted',
+                        help='path to the decrypted database, e.g. EnMicroMsg.db.decrypted')
+    parser.add_argument('--res', default='resource', help='the resource directory')
+    parser.add_argument('--wxgf-server', help='address of the wxgf image decoder server')
+    parser.add_argument('--avt', default='avatar.index', help='path to avatar.index file that only exists in old version of wechat. Ignore for new version of wechat.')
+    parser.add_argument('--start', help='start time in format of YYYY-MM-DD HH:MM:SS',
+                        type=datetime.fromisoformat)
     args = parser.parse_args()
     return args
 
 if __name__ == '__main__':
     args = get_args()
 
-    name = ensure_unicode(args.name)
     output_file = args.output
 
     parser = WeChatDBParser(args.db)
@@ -35,13 +37,18 @@ if __name__ == '__main__':
     except KeyError:
         sys.stderr.write(u"Valid Contacts: {}\n".format(
             u'\n'.join(parser.all_chat_nicknames)))
-        sys.stderr.write(u"Couldn't find the chat {}.".format(name));
+        sys.stderr.write(u"Couldn't find the chat {}.".format(args.name));
         sys.exit(1)
 
-    res = Resource(parser, args.res, args.avt)
+    res = Resource(parser, args.res,
+                   wxgf_server=args.wxgf_server,
+                   avt_db=args.avt)
     msgs = parser.msgs_by_chat[chatid]
     logger.info(f"Number of Messages for chatid {chatid}: {len(msgs)}")
     assert len(msgs) > 0
+    if args.start is not None:
+        msgs = [msg for msg in msgs if msg.createTime > args.start]
+        logger.info(f"Number of Messages after {args.start}: {len(msgs)}")
 
     render = HTMLRender(parser, res)
     htmls = render.render_msgs(msgs)

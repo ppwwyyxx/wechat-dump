@@ -2,7 +2,8 @@
 # -*- coding: UTF-8 -*-
 
 import os
-import base64
+from collections import Counter
+from functools import lru_cache
 import glob
 from pyquery import PyQuery
 import logging
@@ -20,7 +21,7 @@ except ImportError:
     css_compress = lambda x: x
 
 from .msg import *
-from .common.textutil import ensure_unicode, get_file_b64
+from .common.textutil import get_file_b64
 from .common.progress import ProgressReporter
 from .common.timer import timing
 from .smiley import SmileyProvider
@@ -32,17 +33,29 @@ TEMPLATES_FILES = {TYPE_MSG: "TP_MSG",
                    TYPE_EMOJI: "TP_EMOJI",
                    TYPE_CUSTOM_EMOJI: "TP_EMOJI",
                    TYPE_LINK: "TP_MSG",
-                   TYPE_VIDEO_FILE: "TP_VIDEO_FILE"
+                   TYPE_VIDEO_FILE: "TP_VIDEO_FILE",
+                   TYPE_QQMUSIC: "TP_QQMUSIC",
                   }
-TEMPLATES = {
-    k: open(os.path.join(STATIC_PATH, '{}.html'.format(v))).read()
-    for k, v in TEMPLATES_FILES.items()
-}
+
+
+@lru_cache()
+def get_template(name: str | int) -> str | None:
+    """Return the html template given a file name or msg type."""
+    if isinstance(name, int):
+        name = TEMPLATES_FILES.get(name, None)
+        if name is None:
+            return None
+    html_path = os.path.join(STATIC_PATH, f"{name}.html")
+    with open(html_path) as f:
+        return f.read()
+
 
 class HTMLRender(object):
     def __init__(self, parser, res=None):
-        self.html = ensure_unicode(open(HTML_FILE).read())
-        self.time_html = open(TIME_HTML_FILE).read()
+        with open(HTML_FILE) as f:
+            self.html = f.read()
+        with open(TIME_HTML_FILE) as f:
+            self.time_html = f.read()
         self.parser = parser
         self.res = res
         assert self.res is not None, \
@@ -53,8 +66,8 @@ class HTMLRender(object):
         self.css_string = []    # css to add
         for css in css_files:
             logger.info("Loading {}".format(os.path.basename(css)))
-            css = ensure_unicode((open(css).read()))
-            self.css_string.append(css)
+            with open(css) as f:
+                self.css_string.append(f.read())
 
         js_files = glob.glob(os.path.join(LIB_PATH, 'static/*.js'))
         # to load jquery before other js
@@ -62,8 +75,10 @@ class HTMLRender(object):
         self.js_string = []
         for js in js_files:
             logger.info("Loading {}".format(os.path.basename(js)))
-            js = ensure_unicode(open(js).read())
-            self.js_string.append(js)
+            with open(js) as f:
+                self.js_string.append(f.read())
+
+        self.unknown_type_cnt = Counter()
 
     @property
     def all_css(self):
@@ -90,24 +105,29 @@ class HTMLRender(object):
         return self.final_js
 
     #@timing(total=True)
-    def render_msg(self, msg):
+    def render_msg(self, msg: WeChatMsg):
         """ render a message, return the html block"""
         # TODO for chatroom, add nickname on avatar
         sender = u'you ' + msg.talker if not msg.isSend else 'me'
         format_dict = {'sender_label': sender,
                        'time': msg.createTime }
+        if not msg.known_type:
+            self.unknown_type_cnt[msg.type] += 1
         if(not msg.isSend and msg.is_chatroom()):
             format_dict['nickname'] = '>\n       <pre align=\'left\'>'+msg.talker_nickname+'</pre'
         else:
             format_dict['nickname'] = ' '
 
         def fallback():
-            template = TEMPLATES[TYPE_MSG]
+            template = get_template(TYPE_MSG)
             content = msg.msg_str()
-            format_dict['content'] = self.smiley.replace_smileycode(content)
-            return template.format(**format_dict)
+            content = self.smiley.replace_smileycode(content)
+            if not msg.known_type:
+                # Show raw (usually xml) content if unknown.
+                content = html.escape(content)
+            return template.format(content=content, **format_dict)
 
-        template = TEMPLATES.get(msg.type)
+        template = get_template(msg.type)
         if msg.type == TYPE_SPEAK:
             audio_str, duration = self.res.get_voice_mp3(msg.imgPath)
             format_dict['voice_duration'] = duration
@@ -128,6 +148,18 @@ class HTMLRender(object):
             # TODO do not show fancybox when no bigimg found
             format_dict['img'] = (img, 'jpeg')
             return template.format(**format_dict)
+        elif msg.type == TYPE_QQMUSIC:
+            jobj = json.loads(msg.msg_str())
+            content = f"{jobj['title']} - {jobj['singer']}"
+
+            if msg.imgPath is not None:
+                # imgPath was original THUMBNAIL_DIRPATH://th_xxxxxxxxx
+                imgpath = msg.imgPath.split('_')[-1]
+                img = self.res.get_img([imgpath])
+                format_dict['img'] = (img, 'jpeg')
+            else:
+                template = get_template("TP_QQMUSIC_NOIMG")
+            return template.format(url=jobj['url'], content=content, **format_dict)
         elif msg.type == TYPE_EMOJI or msg.type == TYPE_CUSTOM_EMOJI:
             if 'emoticonmd5' in msg.content:
                 pq = PyQuery(msg.content)
@@ -145,16 +177,21 @@ class HTMLRender(object):
                 import IPython as IP; IP.embed()
             return template.format(**format_dict)
         elif msg.type == TYPE_LINK:
-            content = msg.msg_str()
-            # TODO show a short link with long href, if link too long
-            if content.startswith(u'URL:'):
-                url = content[4:]
-                content = u'URL:<a target="_blank" href="{0}">{0}</a>'.format(url)
+            pq = PyQuery(msg.content_xml_ready)
+            url = pq('url').text()
+            if url:
+                title = pq('title')[0].text
+                content = '<a target="_blank" href="{0}">{1}</a>'.format(url, title)
                 format_dict['content'] = content
                 return template.format(**format_dict)
         elif msg.type == TYPE_VIDEO_FILE:
             video = self.res.get_video(msg.imgPath)
-            if video.endswith(".mp4"):
+            if video is None:
+                logger.warning(f"Cannot find video {msg.imgPath} ({msg.createTime})")
+                # fallback
+                format_dict['content'] = f"VIDEO FILE {msg.imgPath}"
+                return get_template(TYPE_MSG).format(**format_dict)
+            elif video.endswith(".mp4"):
                 video_str = get_file_b64(video)
                 format_dict["video_str"] = video_str
                 return template.format(**format_dict)
@@ -162,10 +199,7 @@ class HTMLRender(object):
                 # only has thumbnail
                 image_str = get_file_b64(video)
                 format_dict["img"] = (image_str, 'jpeg')
-                return TEMPLATES[TYPE_IMG].format(**format_dict)
-            # fallback
-            format_dict['content'] = f"VIDEO FILE {msg.imgPath}"
-            return TEMPLATES_FILES[TYPE_MSG].format(**format_dict)
+                return get_template(TYPE_IMG).format(**format_dict)
         elif msg.type == TYPE_WX_VIDEO:
             # TODO: fetch video from resource
             return fallback()
@@ -197,7 +231,8 @@ class HTMLRender(object):
                            )
 
     def prepare_avatar_css(self, talkers):
-        avatar_tpl= ensure_unicode(open(FRIEND_AVATAR_CSS_FILE).read())
+        with open(FRIEND_AVATAR_CSS_FILE) as f:
+            avatar_tpl = f.read()
         my_avatar = self.res.get_avatar(self.parser.username)
         css = avatar_tpl.format(name='me', avatar=my_avatar)
 
@@ -224,6 +259,7 @@ class HTMLRender(object):
         slice_by_size = MessageSlicerBySize().slice(msgs)
         ret = [self._render_partial_msgs(s) for s in slice_by_size]
         self.prgs.finish()
+        logger.warning("[HTMLRenderer] Unhandled messages (type->cnt): {}".format(self.unknown_type_cnt))
         return ret
 
 if __name__ == '__main__':
