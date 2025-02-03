@@ -1,33 +1,29 @@
-You can also obtain the access password through Frida. If you have a python environment on your computer, it is recommended to use this method, because this method can directly obtain the password without having to try the spliced ​​passwords one by one, and it is absolutely correct. First, install the Frida package on your computer using the following command:
+# Obtain Database Password Using Frida
 
-```
-pip install frida
-pip install frida-tools
-```
+You can obtain the access password directly through Frida. If you can access your WeChat account, this method can directly obtain the correct database password. 
 
-Then use adb to view the mobile phone architecture:
-
+## Install
+Install frida on your computer and download frida-server for your phone:
 ```
-adb shell getprop ro.product.cpu.abi
-```
+pip install frida frida-tools
 
-What you get is arm64-v8a, then go to https://github.com/frida/frida/releases page to download the corresponding frida-server--arm64.xz package, and then unzip it. Note: The version number of frida-server here must be consistent with the version number of frrida installed on the computer above, otherwise additional errors may occur. Transfer frida-server to the phone through adb:
-
-```
-adb push frida-server-<version>-android-arm /data/local/tmp
+VERSION=$(frida --version)
+ARCH=arm64
+wget https://github.com/frida/frida/releases/download/$VERSION/frida-server-$VERSION-android-$ARCH.xz
+xz -d frida-server-$VERSION-android-$ARCH.xz
 ```
 
-Then run frida-server on your phone:
+* Note: if your device architecture is not arm64-v8a, replace "arm64" in the above command with the correct architecture. Possible values are "arm", "arm64", "x86", "x86_64". You can get the architecture of your phone with the command `adb shell getprop ro.product.cpu.abi`.
 
+Copy frida-server to your phone, and run it:
 ```
-adb shell
-su
-cd /data/local/tmp
-chmod 777 frida-server-<version>-android-arm
-./frida-server-<version>-android-arm
+DEST=/data/local/tmp
+adb push frida-server-$VERSION-android-$ARCH $DEST
+adb shell su -c "chmod 777 $DEST/frida-server-$VERSION-android-$ARCH"
+adb shell su -c "$DEST/frida-server-$VERSION-android-$ARCH"
 ```
 
-After running, do not close the terminal interface. In addition, start a terminal and enter:
+After running, do not close the terminal interface. Start a new terminal and enter:
 
 ```
 adb forward tcp:27042 tcp:27042
@@ -35,11 +31,16 @@ adb forward tcp:27043 tcp:27043
 frida-ps -U
 ```
 
-If the terminal outputs some processes, it means that the environment has been set up successfully. After the setup is successful, run the following Python script on your computer:
+If the terminal outputs some processes, it means that the environment has been set up successfully. Then, make sure your WeChat account is logged in on the phone, open WeChat, and run this command on your computer:
 
 ```
 wget https://raw.githubusercontent.com/ellermister/wechat-clean/main/wechatdbpass.js
 frida -U -n Wechat -l wechatdbpass.js
+# 中文系统使用 frida -U -n 微信 -l wechatdbpass.js
 ```
 
-(guide translated from https://blog.greycode.top/posts/android-wechat-bak/ and https://github.com/ellermister/wechat-clean/blob/main/wechatdbpass.js )
+The above command will print passwords for every database. Look for `EnMicroMsg.db` in the logs, e.g.:
+```
+SQLiteConnection: /data/user/0/com.tencent.mm/MicroMsg/XXXXXXXXXXXXXXXXXXXXXX/EnMicroMsg.db (0)
+password: XXXXXX
+```
