@@ -17,7 +17,9 @@ The native libs are extracted from the WeChat v7.0.22 APK downloaded from [here]
 
 ## Use
 
-![image](screenshot.jpg)
+<p align="center">
+    <img src="screenshot.jpg" alt="screenshot" width="400">
+</p>
 
 1. (Optional) Configure the port number if needed, or leave it to default.
 2. Click "Start Server"

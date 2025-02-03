@@ -36,7 +36,7 @@ If the tool works for you, please take a moment to add your phone/OS to [the wik
       + `./decrypt-db.py uin`, which looks for uin in `/data/data/com.tencent.mm/shared_prefs/`
       + Login to [web WeChat](https://wx.qq.com), get wxuin=1234567 from `document.cookie`
     + Get your device id (a positive integer), possible ways are:
-      + `./decrypt-db.py imei` implements some ways to find device id.
+      + `./decrypt-db.py imei` implements some ways to find possible device ids.
       + Call `*#06#` on your phone
       + Find IMEI in system settings
     + Decrypt database with combination of uin and device id:
@@ -50,10 +50,9 @@ If the tool works for you, please take a moment to add your phone/OS to [the wik
       See [#33](https://github.com/ppwwyyxx/wechat-dump/issues/33).
       The command will dump decrypted database at `EnMicroMsg.db.decrypted`.
 
-  If the above decryption doesn't work, you can also try the [password cracker](https://github.com/chg-hou/EnMicroMsg.db-Password-Cracker)
-  to brute-force the key. The encryption key is not very strong.
-
-  Another method is to use frida to listen to the sql instance creation on wechat, you can follow [frida.md](frida.md)
+  If the above decryption doesn't work, you can also try:
+  * Use Frida to listen to the password directly. See [frida.md](decryption/frida.md)
+  * Use [password cracker](https://github.com/chg-hou/EnMicroMsg.db-Password-Cracker) to brute-force the key. The encryption key is not very strong.
 
 3. Copy the WeChat user resource directory `/data/data/com.tencent.mm/MicroMsg/${userid}/{avatar,emoji,image2,sfs,video,voice2}` from the phone to the `resource` directory:
 	+ `./android-interact.sh res`
