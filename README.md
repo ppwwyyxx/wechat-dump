@@ -53,6 +53,8 @@ If the tool works for you, please take a moment to add your phone/OS to [the wik
   If the above decryption doesn't work, you can also try the [password cracker](https://github.com/chg-hou/EnMicroMsg.db-Password-Cracker)
   to brute-force the key. The encryption key is not very strong.
 
+  Another method is to use frida to listen to the sql instance creation on wechat, you can follow [frida.md](frida.md)
+
 3. Copy the WeChat user resource directory `/data/data/com.tencent.mm/MicroMsg/${userid}/{avatar,emoji,image2,sfs,video,voice2}` from the phone to the `resource` directory:
 	+ `./android-interact.sh res`
 	+ Change `RES_DIR` in the script if the location of these directories is different on your phone.
