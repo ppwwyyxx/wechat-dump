@@ -1,6 +1,9 @@
 from websocket import create_connection
 import os
+import logging
 
+
+logger = logging.getLogger(__name__)
 
 WXGF_HEADER = b'wxgf'
 FAILURE_MESSAGE = b'FAILED'
@@ -13,6 +16,7 @@ class WxgfAndroidDecoder:
         if server is not None:
             if "://" not in server:
                 server = "ws://" + server
+            logger.info(f"Connecting to {server} ...")
             self.ws = create_connection(server)
 
     def __del__(self):
