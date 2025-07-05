@@ -183,7 +183,7 @@ class HTMLRender(object):
                 try:
                     title = pq('title')[0].text
                 except Exception as e:
-                    print(e)
+                    logger.warning(e)
                     title = url
                 content = '<a target="_blank" href="{0}">{1}</a>'.format(url, title)
                 format_dict['content'] = content
