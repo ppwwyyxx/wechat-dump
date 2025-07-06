@@ -21,7 +21,7 @@ def get_args():
 if __name__ == '__main__':
     args = get_args()
     parser = WeChatDBParser(args.db)
-    res = Resource(parser, args.res, '')
+    res = Resource(parser, args.res)
 
     try:
         chatid = parser.get_chat_id(args.name)
