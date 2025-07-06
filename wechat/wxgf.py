@@ -17,6 +17,7 @@ class WxgfAndroidDecoder:
             if "://" not in server:
                 server = "ws://" + server
             logger.info(f"Connecting to {server} ...")
+            self.server = server
             self.ws = create_connection(server)
 
     def __del__(self):
@@ -28,8 +29,19 @@ class WxgfAndroidDecoder:
 
     def decode(self, data: bytes) -> bytes | None:
         assert data[:4] == WXGF_HEADER, data[:20]
-        self.ws.send(data, opcode=0x2)
-        res = self.ws.recv()
+        try:
+            self.ws.send(data, opcode=0x2)
+        except BrokenPipeError as e:
+            logger.warning(f'Failed to send data to wxgf service. {e}. Reconnecting ..')
+            self.ws = create_connection(self.server)
+            self.ws.send(data, opcode=0x2)
+        try:
+            res = self.ws.recv()
+        except Exception as e:
+            logger.warning(f'Failed to recv data to wxgf service. {e}. Reconnecting ..')
+            self.ws = create_connection(self.server)
+            self.ws.send(data, opcode=0x2)
+            res = self.ws.recv()
         if res == FAILURE_MESSAGE:
             return None
         return res

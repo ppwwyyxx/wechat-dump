@@ -180,7 +180,11 @@ class HTMLRender(object):
             pq = PyQuery(msg.content_xml_ready)
             url = pq('url').text()
             if url:
-                title = pq('title')[0].text
+                try:
+                    title = pq('title')[0].text
+                except Exception as e:
+                    logger.warning('No title found in LINK message: ' + str(e))
+                    title = url
                 content = '<a target="_blank" href="{0}">{1}</a>'.format(url, title)
                 format_dict['content'] = content
                 return template.format(**format_dict)
