@@ -32,13 +32,13 @@ class WxgfAndroidDecoder:
         try:
             self.ws.send(data, opcode=0x2)
         except BrokenPipeError as e:
-            logger.warning(e)
+            logger.warning(f'Failed to send data to wxgf service. {e}. Reconnecting ..')
             self.ws = create_connection(self.server)
             self.ws.send(data, opcode=0x2)
         try:
             res = self.ws.recv()
         except Exception as e:
-            logger.warning(e)
+            logger.warning(f'Failed to recv data to wxgf service. {e}. Reconnecting ..')
             self.ws = create_connection(self.server)
             self.ws.send(data, opcode=0x2)
             res = self.ws.recv()
