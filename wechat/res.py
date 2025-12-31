@@ -8,12 +8,12 @@ import io
 import base64
 import logging
 logger = logging.getLogger(__name__)
-import imghdr
 from multiprocessing import Pool
 import atexit
 
 from .emoji import EmojiReader
 from .avatar import AvatarReader
+from .common.imgutil import what as img_what
 from .common.textutil import md5 as get_md5_hex, get_file_b64
 from .msg import TYPE_SPEAK
 from .audio import parse_wechat_audio_file
@@ -167,7 +167,7 @@ class Resource(object):
 
             # True jpeg. Simplest case.
             if img_file.endswith('jpg') and \
-                   imghdr.what(img_file) == 'jpeg':
+                   img_what(img_file) == 'jpeg':
                 return get_file_b64(img_file)
 
             if is_wxgf_file(img_file):
@@ -188,7 +188,7 @@ class Resource(object):
                     buf = f.read()
 
             # File is not actually jpeg. Convert.
-            if imghdr.what(file=None, h=buf) != 'jpeg':
+            if img_what(file=None, h=buf) != 'jpeg':
                 try:
                     im = Image.open(io.BytesIO(buf))
                 except:

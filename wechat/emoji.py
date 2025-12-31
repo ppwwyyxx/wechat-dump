@@ -4,13 +4,13 @@ import logging
 import io
 import requests
 import base64
-import imghdr
 from PIL import Image
 import pickle
 from Crypto.Cipher import AES
 
 from .wxgf import WxgfAndroidDecoder, is_wxgf_buffer
 from .parser import WeChatDBParser
+from .common.imgutil import what as img_what
 from .common.textutil import md5 as get_md5_hex, get_file_b64, get_file_md5
 
 
@@ -124,10 +124,10 @@ class EmojiReader:
                 candidates = []
 
         def get_data_no_fallback(fname):
-            if imghdr.what(fname):
+            if img_what(fname):
                 data_md5 = get_file_md5(fname)
                 if data_md5 == md5:
-                    return get_file_b64(fname), imghdr.what(fname)
+                    return get_file_b64(fname), img_what(fname)
 
             try:
                 content = self._decrypt_emoji(fname)
@@ -147,9 +147,9 @@ class EmojiReader:
                 logger.error(f"Error decrypting emoji {fname} : {str(e)}")
 
         def get_data_fallback(fname):
-            if not imghdr.what(fname):
+            if not img_what(fname):
                 return  # fallback files are not encrypted
-            return get_file_b64(fname), imghdr.what(fname)
+            return get_file_b64(fname), img_what(fname)
 
         get_data_func = get_data_fallback if allow_fallback else get_data_no_fallback
         results = [(x, get_data_func(x)) for x in candidates]
