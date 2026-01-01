@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import io
 from pathlib import Path
 
@@ -51,4 +49,3 @@ def _what_from_bytes(data: bytes) -> str | None:
     except Exception:
         return None
     return fmt.lower() if fmt else None
-
