@@ -136,6 +136,126 @@ class WeChatMsg(object):
             # TODO replace smiley with text
             return self.content
 
+    def reply_info(self):
+        """Parse TYPE_REPLY payload.
+
+        Returns: {title, ref_name, ref_content, ref_type, ref_svrid}.
+        """
+        if self.type != TYPE_REPLY:
+            return None
+
+        def _one_line(text: str, *, max_len: int) -> str:
+            text = html.unescape(text or "")
+            text = re.sub(r"\s+", " ", text).strip()
+            if len(text) > max_len:
+                return text[: max_len - 1] + "…"
+            return text
+
+        def _summarize_ref_content(ref_type: int | None, raw: str) -> str:
+            raw = html.unescape(raw or "")
+            if ref_type == TYPE_IMG:
+                return "Image"
+            if ref_type == TYPE_SPEAK:
+                return "Voice"
+            if ref_type in (TYPE_VIDEO_FILE, TYPE_WX_VIDEO):
+                return "Video"
+            if ref_type == TYPE_LINK:
+                xml = raw
+                idx = xml.find("<msg")
+                if idx != -1:
+                    xml = xml[idx:]
+                try:
+                    root = ET.fromstring(xml)
+                    appmsg = root.find("appmsg") or root.find(".//appmsg")
+                    if appmsg is None:
+                        raise ValueError("missing appmsg")
+                    title = _one_line(appmsg.findtext("title") or "", max_len=200)
+                    url = _one_line(appmsg.findtext("url") or "", max_len=200)
+                    if title:
+                        return title
+                    if url:
+                        return url
+                except Exception:
+                    pass
+                return "Link"
+            if ref_type == TYPE_EMOJI or ref_type == TYPE_CUSTOM_EMOJI:
+                return "Emoji"
+
+            if ref_type is not None and ref_type != TYPE_MSG:
+                # Avoid dumping raw xml blobs for non-text types.
+                if raw.lstrip().startswith("<") and len(raw) > 40:
+                    return f"[Type {ref_type}]"
+            return _one_line(raw, max_len=200)
+
+        xml = self.content_xml_ready
+        idx = xml.find("<msg")
+        if idx != -1:
+            xml = xml[idx:]
+
+        title = ""
+        ref_name = ""
+        ref_content_raw = ""
+        ref_type_i = None
+        ref_svrid_i = None
+
+        try:
+            root = ET.fromstring(xml)
+            appmsg = root.find("appmsg") or root.find(".//appmsg")
+            if appmsg is not None:
+                title = html.unescape(appmsg.findtext("title") or "")
+
+            refer = root.find(".//refermsg")
+            if refer is None and appmsg is not None:
+                refer = appmsg.find("refermsg") or appmsg.find(".//refermsg")
+
+            if refer is not None:
+                ref_svrid = refer.findtext("svrid") or refer.findtext("svrId")
+                try:
+                    ref_svrid_i = int(ref_svrid) if ref_svrid else None
+                except Exception:
+                    ref_svrid_i = None
+                ref_type = refer.findtext("type")
+                try:
+                    ref_type_i = int(ref_type) if ref_type else None
+                except Exception:
+                    ref_type_i = None
+                ref_name = _one_line(refer.findtext("displayname") or refer.findtext("fromusr") or "", max_len=80)
+                ref_content_raw = refer.findtext("content") or ""
+        except Exception:
+            try:
+                pq = PyQuery(xml, parser="xml")
+                title = html.unescape(pq("title").text() or "")
+                ref_name = _one_line(
+                    pq("refermsg displayname").text() or pq("refermsg fromusr").text() or "",
+                    max_len=80,
+                )
+                ref_content_raw = pq("refermsg content").text() or ""
+                ref_svrid = pq("refermsg svrid").text() or pq("refermsg svrId").text()
+                try:
+                    ref_svrid_i = int(ref_svrid) if ref_svrid else None
+                except Exception:
+                    ref_svrid_i = None
+                ref_type = pq("refermsg type").text()
+                try:
+                    ref_type_i = int(ref_type) if ref_type else None
+                except Exception:
+                    ref_type_i = None
+            except Exception:
+                return None
+
+        ref_content = _summarize_ref_content(ref_type_i, ref_content_raw)
+
+        if not title and not ref_name and not ref_content:
+            return None
+
+        return {
+            "title": title.strip(),
+            "ref_name": ref_name,
+            "ref_content": ref_content,
+            "ref_type": ref_type_i,
+            "ref_svrid": ref_svrid_i,
+        }
+
     @property
     def content_xml_ready(self):
         # remove xml headers to avoid possible errors it may create
@@ -180,4 +300,3 @@ class WeChatMsg(object):
         if not emoji:
             return None
         return emoji.attrs['productid']
-

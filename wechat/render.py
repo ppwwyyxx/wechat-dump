@@ -33,6 +33,7 @@ TEMPLATES_FILES = {TYPE_MSG: "TP_MSG",
                    TYPE_EMOJI: "TP_EMOJI",
                    TYPE_CUSTOM_EMOJI: "TP_EMOJI",
                    TYPE_LINK: "TP_MSG",
+                   TYPE_REPLY: "TP_REPLY",
                    TYPE_VIDEO_FILE: "TP_VIDEO_FILE",
                    TYPE_QQMUSIC: "TP_QQMUSIC",
                   }
@@ -160,6 +161,78 @@ class HTMLRender(object):
             else:
                 template = get_template("TP_QQMUSIC_NOIMG")
             return template.format(url=jobj['url'], content=content, **format_dict)
+        elif msg.type == TYPE_REPLY:
+            info = msg.reply_info()
+            if not info:
+                return fallback()
+
+            def _escape_fmt(s: str) -> str:
+                return s.replace("{", "{{").replace("}", "}}")
+
+            title = info.get("title") or ""
+            reply_to = info.get("ref_name") or "unknown"
+            reply_quote = info.get("ref_content") or ""
+            ref_svrid = info.get("ref_svrid")
+
+            if not title and not reply_quote:
+                return fallback()
+
+            format_dict["content"] = _escape_fmt(self.smiley.replace_smileycode(title))
+            format_dict["reply_to"] = _escape_fmt(reply_to)
+
+            reply_thumb_html = ""
+            if ref_svrid is not None and hasattr(self, "_reply_thumb_cache"):
+                if ref_svrid in self._reply_thumb_cache:
+                    reply_thumb_html = self._reply_thumb_cache[ref_svrid]
+                else:
+                    ref_msg = getattr(self, "_msg_by_svrid", {}).get(ref_svrid)
+                    if ref_msg is not None:
+                        try:
+                            if ref_msg.type == TYPE_IMG and ref_msg.imgPath:
+                                imgpath = ref_msg.imgPath.split("_")[-1]
+                                bigimgpath = self.parser.imginfo.get(ref_msg.msgSvrId)
+                                fnames = [k for k in [imgpath, bigimgpath] if k]
+                                b64 = self.res.get_img_thumb(fnames, max_size=64)
+                                if b64:
+                                    reply_thumb_html = (
+                                        f'<img class="replyThumb" src="data:image/jpeg;base64,{b64}" />'
+                                    )
+                            elif ref_msg.type in (TYPE_VIDEO_FILE, TYPE_WX_VIDEO) and ref_msg.imgPath:
+                                b64 = self.res.get_video_thumb(ref_msg.imgPath, max_size=64)
+                                if b64:
+                                    reply_thumb_html = (
+                                        f'<img class="replyThumb" src="data:image/jpeg;base64,{b64}" />'
+                                    )
+                            elif ref_msg.type in (TYPE_EMOJI, TYPE_CUSTOM_EMOJI):
+                                if "emoticonmd5" in ref_msg.content:
+                                    pq = PyQuery(ref_msg.content)
+                                    md5 = pq("emoticonmd5").text()
+                                else:
+                                    md5 = ref_msg.imgPath
+                                if md5:
+                                    emoji_img, fmt = self.res.get_emoji_by_md5(md5)
+                                    if emoji_img and fmt:
+                                        fmt = fmt.lower()
+                                        if fmt == "jpg":
+                                            fmt = "jpeg"
+                                        reply_thumb_html = (
+                                            f'<img class="replyThumb replyThumbEmoji" '
+                                            f'src="data:image/{fmt};base64,{emoji_img}" />'
+                                        )
+                        except Exception:
+                            logger.exception("Failed to render reply thumbnail (%s).", ref_svrid)
+
+                    self._reply_thumb_cache[ref_svrid] = reply_thumb_html
+
+            if reply_thumb_html:
+                reply_quote_html = reply_thumb_html
+            else:
+                quote_text = self.smiley.replace_smileycode(reply_quote)
+                reply_quote_html = f'<span class="replyText">{quote_text}</span>'
+            format_dict["reply_quote_html"] = _escape_fmt(reply_quote_html)
+
+            template = template or get_template(TYPE_MSG)
+            return template.format(**format_dict)
         elif msg.type == TYPE_EMOJI or msg.type == TYPE_CUSTOM_EMOJI:
             if 'emoticonmd5' in msg.content:
                 pq = PyQuery(msg.content)
@@ -247,6 +320,9 @@ class HTMLRender(object):
 
     def render_msgs(self, msgs):
         """ render msgs of one chat, return a list of html"""
+        chatid = msgs[0].chat
+        self._msg_by_svrid = {m.msgSvrId: m for m in self.parser.msgs_by_chat.get(chatid, msgs)}
+        self._reply_thumb_cache = {}
         if msgs[0].is_chatroom():
             talkers = set([m.talker for m in msgs])
         else:
