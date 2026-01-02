@@ -54,6 +54,8 @@ class Resource(object):
         self.avt_reader = AvatarReader(res_dir, avt_db)
         self.wxgf_decoder = WxgfAndroidDecoder(wxgf_server)
         self.emoji_reader = EmojiReader(res_dir, self.parser, wxgf_decoder=self.wxgf_decoder)
+        self.pool = Pool(3)
+        atexit.register(lambda x: x.terminate(), self.pool)
 
     def _get_voice_filename(self, imgpath):
         fname = get_md5_hex(imgpath.encode('ascii'))
@@ -79,10 +81,8 @@ class Resource(object):
         voice_paths = [msg.imgPath for msg in msgs if msg.type == TYPE_SPEAK]
         # NOTE: remove all the caching code to debug serial decoding
         self.voice_cache_idx = {k: idx for idx, k in enumerate(voice_paths)}
-        pool = Pool(3)
-        atexit.register(lambda x: x.terminate(), pool)
-        self.voice_cache = [pool.apply_async(parse_wechat_audio_file,
-                                             (self._get_voice_filename(k),)) for k in voice_paths]
+        self.voice_cache = [self.pool.apply_async(parse_wechat_audio_file,
+                            (self._get_voice_filename(k),)) for k in voice_paths]
 
     def get_avatar(self, username) -> str:
         """ return base64 unicode string"""
