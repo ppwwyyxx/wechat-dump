@@ -34,6 +34,7 @@ class WeChatDBParser(object):
         self.contacts = {}      # username -> nickname
         self.contacts_rev = defaultdict(list)
         self.msgs_by_chat = defaultdict(list)
+        self.chatroom_member_displaynames = {}
         self.emoji_groups = {}
         self.emoji_info = {}
         self.emoji_encryption_key = None
@@ -60,7 +61,7 @@ SELECT username,conRemark,nickname FROM rcontact
         msgs_tot_cnt = 0
         db_msgs = self.db_conn_bytes.cursor().execute(
 """
-SELECT {} FROM message
+	SELECT {} FROM message
 """.format(','.join(WeChatDBParser.FIELDS)))
         unknown_type_cnt = Counter()
         for row in db_msgs:
@@ -93,6 +94,108 @@ SELECT {} FROM message
             self.username = input("Please enter your username:")
         assert isinstance(self.username, str), self.username
         logger.info("Your username is: {}".format(self.username))
+
+    @staticmethod
+    def _read_pb_varint(data, idx):
+        result = 0
+        shift = 0
+        while True:
+            b = data[idx]
+            idx += 1
+            result |= (b & 0x7F) << shift
+            if not (b & 0x80):
+                return result, idx
+            shift += 7
+            if shift > 64:
+                raise ValueError("Too many bytes when decoding protobuf varint")
+
+    @staticmethod
+    def _iter_pb_fields(data):
+        data = bytes(data)
+        idx = 0
+        n = len(data)
+        while idx < n:
+            key, idx = WeChatDBParser._read_pb_varint(data, idx)
+            field_num = key >> 3
+            wire_type = key & 0x7
+            if wire_type == 0:
+                value, idx = WeChatDBParser._read_pb_varint(data, idx)
+                yield field_num, wire_type, value
+            elif wire_type == 1:
+                idx += 8
+            elif wire_type == 2:
+                length, idx = WeChatDBParser._read_pb_varint(data, idx)
+                value = data[idx:idx + length]
+                idx += length
+                yield field_num, wire_type, value
+            elif wire_type == 5:
+                idx += 4
+            else:
+                raise ValueError(f"Unsupported protobuf wire type: {wire_type}")
+
+    @staticmethod
+    def _parse_chatroom_roomdata(roomdata):
+        displaynames = {}
+        for field_num, wire_type, value in WeChatDBParser._iter_pb_fields(roomdata):
+            if field_num != 1 or wire_type != 2:
+                continue
+            username = None
+            displayname = None
+            for f2, w2, v2 in WeChatDBParser._iter_pb_fields(value):
+                if w2 != 2:
+                    continue
+                if f2 == 1:
+                    username = v2.decode("utf-8", errors="replace")
+                elif f2 == 2:
+                    displayname = v2.decode("utf-8", errors="replace").strip()
+            if username and displayname:
+                displaynames[username] = displayname
+        return displaynames
+
+    def _parse_chatroom(self):
+        self.chatroom_member_displaynames = {}
+        try:
+            rows = self.cc.execute(
+                "SELECT chatroomname, roomdata, selfDisplayName FROM chatroom"
+            )
+            has_self_display = True
+        except Exception as e:
+            try:
+                rows = self.cc.execute("SELECT chatroomname, roomdata FROM chatroom")
+                has_self_display = False
+            except Exception as e2:
+                logger.info(f"Chatroom table not available: {e2}")
+                return
+
+        total_names = 0
+        for row in rows:
+            if has_self_display:
+                chatroomname, roomdata, self_display = row
+            else:
+                chatroomname, roomdata = row
+                self_display = None
+            room_names = {}
+            if roomdata:
+                try:
+                    room_names = WeChatDBParser._parse_chatroom_roomdata(roomdata)
+                except Exception as e:
+                    logger.warning(
+                        f"Failed to parse roomdata for chatroom {chatroomname}: {e}"
+                    )
+                    room_names = {}
+            if self_display:
+                try:
+                    self_display = self_display.strip()
+                except Exception:
+                    self_display = None
+                if self_display:
+                    room_names.setdefault(self.username, self_display)
+
+            if room_names:
+                self.chatroom_member_displaynames[chatroomname] = room_names
+                total_names += len(room_names)
+
+        logger.info(f"Parsed {total_names} member display names from chatrooms.")
 
     def _parse_imginfo(self):
         imginfo_q = self.cc.execute("""SELECT msgSvrId, bigImgPath FROM ImgInfo2""")
@@ -140,6 +243,7 @@ SELECT {} FROM message
     def _parse(self):
         self._parse_contact()
         self._parse_userinfo()  # depend on self.contacts
+        self._parse_chatroom()  # depend on self.username
         self._parse_msg()
         self._parse_imginfo()
         self._parse_emoji()
@@ -183,12 +287,23 @@ SELECT {} FROM message
 
                 if values['isSend'] == 1:
                     values['talker'] = self.username
+                    values['talker_nickname'] = (
+                        self.chatroom_member_displaynames
+                        .get(values['chat'], {})
+                        .get(self.username)
+                        or self.contacts.get(self.username, self.username)
+                    )
                 elif values['type'] == TYPE_SYSTEM:
                     values['talker'] = 'SYSTEM'
                 else:
                     talker = content[:content.find(':')]
                     values['talker'] = talker
-                    values['talker_nickname'] = self.contacts.get(talker, talker)
+                    values['talker_nickname'] = (
+                        self.chatroom_member_displaynames
+                        .get(values['chat'], {})
+                        .get(talker)
+                        or self.contacts.get(talker, talker)
+                    )
 
                 values['content'] = content[content.find('\n') + 1:]
             else:
@@ -230,4 +345,3 @@ SELECT {} FROM message
             return nick_name_or_id
         else:
             return self.get_id_by_nickname(nick_name_or_id)
-
