@@ -35,6 +35,7 @@ If the tool works for you, please take a moment to add your phone/OS to [the wik
     + Get WeChat uin (an integer), possible ways are:
       + `./decrypt-db.py uin`, which looks for uin in `/data/data/com.tencent.mm/shared_prefs/`
       + Login to [web WeChat](https://wx.qq.com), get wxuin=1234567 from `document.cookie`
+      + If you have multiple accounts, pass `--userid <32-hex>` (the MicroMsg user dir name) to filter/prioritize uin candidates.
     + Get your device id (a positive integer), possible ways are:
       + `./decrypt-db.py imei` implements some ways to find possible device ids.
       + Call `*#06#` on your phone
@@ -49,6 +50,7 @@ If the tool works for you, please take a moment to add your phone/OS to [the wik
       database. Some phones may have multiple IMEIs, you may need to try them all.
       See [#33](https://github.com/ppwwyyxx/wechat-dump/issues/33).
       The command will dump decrypted database at `EnMicroMsg.db.decrypted`.
+      Use `--output <path>` to change the output location. Use `--compat <n>` (repeatable) to try other sqlcipher `cipher_compatibility` values.
 
   If the above decryption doesn't work, you can also try:
   * Use Frida to listen to the password directly. See [frida.md](decryption/frida.md)
