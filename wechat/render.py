@@ -181,48 +181,38 @@ class HTMLRender(object):
             format_dict["reply_to"] = _escape_fmt(reply_to)
 
             reply_thumb_html = ""
-            if ref_svrid is not None and hasattr(self, "_reply_thumb_cache"):
-                if ref_svrid in self._reply_thumb_cache:
-                    reply_thumb_html = self._reply_thumb_cache[ref_svrid]
-                else:
-                    ref_msg = getattr(self, "_msg_by_svrid", {}).get(ref_svrid)
-                    if ref_msg is not None:
-                        try:
-                            if ref_msg.type == TYPE_IMG and ref_msg.imgPath:
-                                imgpath = ref_msg.imgPath.split("_")[-1]
-                                bigimgpath = self.parser.imginfo.get(ref_msg.msgSvrId)
-                                fnames = [k for k in [imgpath, bigimgpath] if k]
-                                b64 = self.res.get_img_thumb(fnames, max_size=64)
-                                if b64:
-                                    reply_thumb_html = (
-                                        f'<img class="replyThumb" src="data:image/jpeg;base64,{b64}" />'
-                                    )
-                            elif ref_msg.type in (TYPE_VIDEO_FILE, TYPE_WX_VIDEO) and ref_msg.imgPath:
-                                b64 = self.res.get_video_thumb(ref_msg.imgPath, max_size=64)
-                                if b64:
-                                    reply_thumb_html = (
-                                        f'<img class="replyThumb" src="data:image/jpeg;base64,{b64}" />'
-                                    )
-                            elif ref_msg.type in (TYPE_EMOJI, TYPE_CUSTOM_EMOJI):
-                                if "emoticonmd5" in ref_msg.content:
-                                    pq = PyQuery(ref_msg.content)
-                                    md5 = pq("emoticonmd5").text()
-                                else:
-                                    md5 = ref_msg.imgPath
-                                if md5:
-                                    emoji_img, fmt = self.res.get_emoji_by_md5(md5)
-                                    if emoji_img and fmt:
-                                        fmt = fmt.lower()
-                                        if fmt == "jpg":
-                                            fmt = "jpeg"
-                                        reply_thumb_html = (
-                                            f'<img class="replyThumb replyThumbEmoji" '
-                                            f'src="data:image/{fmt};base64,{emoji_img}" />'
-                                        )
-                        except Exception:
-                            logger.exception("Failed to render reply thumbnail (%s).", ref_svrid)
-
-                    self._reply_thumb_cache[ref_svrid] = reply_thumb_html
+            ref_msg = getattr(self, "_msg_by_svrid", {}).get(ref_svrid) if ref_svrid is not None else None
+            if ref_msg is not None:
+                try:
+                    if ref_msg.type == TYPE_IMG and ref_msg.imgPath:
+                        imgpath = ref_msg.imgPath.split("_")[-1]
+                        bigimgpath = self.parser.imginfo.get(ref_msg.msgSvrId)
+                        fnames = [k for k in [imgpath, bigimgpath] if k]
+                        b64 = self.res.get_img_thumb(fnames, max_size=64)
+                        if b64:
+                            reply_thumb_html = f'<img class="replyThumb" src="data:image/jpeg;base64,{b64}" />'
+                    elif ref_msg.type in (TYPE_VIDEO_FILE, TYPE_WX_VIDEO) and ref_msg.imgPath:
+                        b64 = self.res.get_video_thumb(ref_msg.imgPath, max_size=64)
+                        if b64:
+                            reply_thumb_html = f'<img class="replyThumb" src="data:image/jpeg;base64,{b64}" />'
+                    elif ref_msg.type in (TYPE_EMOJI, TYPE_CUSTOM_EMOJI):
+                        if "emoticonmd5" in ref_msg.content:
+                            pq = PyQuery(ref_msg.content)
+                            md5 = pq("emoticonmd5").text()
+                        else:
+                            md5 = ref_msg.imgPath
+                        if md5:
+                            emoji_img, fmt = self.res.get_emoji_by_md5(md5)
+                            if emoji_img and fmt:
+                                fmt = fmt.lower()
+                                if fmt == "jpg":
+                                    fmt = "jpeg"
+                                reply_thumb_html = (
+                                    f'<img class="replyThumb replyThumbEmoji" '
+                                    f'src="data:image/{fmt};base64,{emoji_img}" />'
+                                )
+                except Exception:
+                    logger.exception("Failed to render reply thumbnail (%s).", ref_svrid)
 
             if reply_thumb_html:
                 reply_quote_html = reply_thumb_html
@@ -322,7 +312,6 @@ class HTMLRender(object):
         """ render msgs of one chat, return a list of html"""
         chatid = msgs[0].chat
         self._msg_by_svrid = {m.msgSvrId: m for m in self.parser.msgs_by_chat.get(chatid, msgs)}
-        self._reply_thumb_cache = {}
         if msgs[0].is_chatroom():
             talkers = set([m.talker for m in msgs])
         else:
