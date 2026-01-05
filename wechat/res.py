@@ -174,25 +174,22 @@ class Resource(object):
         if max_size is None and img_file.endswith('jpg') and img_what(img_file) == 'jpeg':
             return get_file_b64(img_file)
 
-        try:
-            if is_wxgf_file(img_file):
-                start = time.time()
-                buf = self.wxgf_decoder.decode_with_cache(img_file, None)
-                if buf is None:
-                    if not self.wxgf_decoder.has_server():
-                        logger.warning("wxgf decoder server is not provided. Cannot decode wxgf images. Please follow instructions to create wxgf decoder server if these images need to be decoded.")
-                    else:
-                        logger.error("Failed to decode wxgf file: {}".format(img_file))
-                    return None
+        if is_wxgf_file(img_file):
+            start = time.time()
+            buf = self.wxgf_decoder.decode_with_cache(img_file, None)
+            if buf is None:
+                if not self.wxgf_decoder.has_server():
+                    logger.warning("wxgf decoder server is not provided. Cannot decode wxgf images. Please follow instructions to create wxgf decoder server if these images need to be decoded.")
                 else:
-                    elapsed = time.time() - start
-                    if elapsed > 0.01 and self.wxgf_decoder.has_server():
-                        logger.info(f"Decoded {img_file} in {elapsed:.2f} seconds")
+                    logger.error("Failed to decode wxgf file: {}".format(img_file))
+                return None
             else:
-                with open(img_file, "rb") as f:
-                    buf = f.read()
-        except Exception:
-            return None
+                elapsed = time.time() - start
+                if elapsed > 0.01 and self.wxgf_decoder.has_server():
+                    logger.info(f"Decoded {img_file} in {elapsed:.2f} seconds")
+        else:
+            with open(img_file, "rb") as f:
+                buf = f.read()
 
         # If we don't need resize/convert and it's already jpeg, avoid re-compressing.
         if max_size is None and img_what(file=None, h=buf) == 'jpeg':
