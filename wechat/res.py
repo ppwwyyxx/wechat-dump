@@ -179,7 +179,7 @@ class Resource(object):
             buf = self.wxgf_decoder.decode_with_cache(img_file, None)
             if buf is None:
                 if not self.wxgf_decoder.has_server():
-                    logger.warning("wxgf decoder server is not provided. Cannot decode wxgf images. Please follow instructions to create wxgf decoder server if these images need to be decoded.")
+                    logger.warning("Cannot decode wxgf images. Install ffmpeg+ffprobe or provide a wxgf decoder server with --wxgf-server.")
                 else:
                     logger.error("Failed to decode wxgf file: {}".format(img_file))
                 return None

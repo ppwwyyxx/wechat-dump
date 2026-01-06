@@ -19,6 +19,7 @@ If the tool works for you, please take a moment to add your phone/OS to [the wik
 + [sqlcipher](https://github.com/sqlcipher/sqlcipher) >= 4.1
 + sox (command line tools)
 + Silk audio decoder (included; build it with `./third-party/compile_silk.sh`)
++ ffmpeg (optional; to decode WXGF images locally)
 + Other python dependencies: `pip install -r requirements.txt`.
 
 #### Get Necessary Data:
@@ -62,10 +63,12 @@ If the tool works for you, please take a moment to add your phone/OS to [the wik
   	  `busybox tar` is recommended as the Android system's `tar` may choke on long paths.
 	+ In the end, we need a `resource` directory with the following subdir: `avatar,emoji,image2,sfs,video,voice2`.
 
-4. (Optional) Install and start a WXGF decoder server on an android device. Without this, certain WXGF images will not be rendered or will be rendered in low resolution.
-   See [WXGFDecoder](WXGFDecoder) for instructions.
+4. (Optional) Decode WXGF images:
+   * If `ffmpeg`/`ffprobe` are available, WXGF images/emojis are decoded locally when possible.
+   * Otherwise, you can install and start a WXGF decoder server on an android device and pass `--wxgf-server ws://xx.xx.xx.xx:xxxx`.
+     See [WXGFDecoder](WXGFDecoder) for instructions.
 
-4. (Optional) Download the emoji cache from [here](https://github.com/ppwwyyxx/wechat-dump/releases/download/0.1/emoji.cache.tar.bz2)
+5. (Optional) Download the emoji cache from [here](https://github.com/ppwwyyxx/wechat-dump/releases/download/0.1/emoji.cache.tar.bz2)
 	and decompress it under `wechat-dump`. This will avoid downloading too many emojis during rendering.
 
         wget -c https://github.com/ppwwyyxx/wechat-dump/releases/download/0.1/emoji.cache.tar.bz2
@@ -109,7 +112,7 @@ See [here](http://ppwwyyxx.com/static/wechat/example.html) for an example html.
 ### TODO List (help needed!)
 * After chat history migration, some emojis in the `EmojiInfo` table don't have corresponding URLs but only a md5 -
   they are not downloaded by WeChat until the message needs to be displayed. We don't know how to manually download these emojis.
-* Decoding WXGF images using an android app is too complex. Looking for an easier way (e.g. qemu).
+* Verify/improve host-side WXGF decoding coverage.
 * Fix rare unhandled message types: > 10000 and < 0
 * Better user experiences... see `grep 'TODO' wechat -R`
 

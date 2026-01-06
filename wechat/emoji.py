@@ -137,7 +137,7 @@ class EmojiReader:
                         content = self.wxgf_decoder.decode_with_cache(fname, content)
                         if content is None:
                             if not self.wxgf_decoder.has_server():
-                                logger.warning("wxgf decoder server is not provided. Cannot decode wxgf emojis.")
+                                logger.warning("Cannot decode wxgf emojis. Install ffmpeg+ffprobe or provide a wxgf decoder server with --wxgf-server.")
                             raise ValueError("Failed to decrypt wxgf file.")
                     else:
                         raise ValueError("Decrypted data mismatch md5!")
