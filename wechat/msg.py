@@ -45,6 +45,10 @@ class WeChatMsg(object):
         self.known_type = self.type in _KNOWN_TYPES
 
     def msg_str(self):
+        if self.type == TYPE_IMG:
+            return "Image"
+        elif self.type == TYPE_SPEAK:
+            return "Voice"
         if self.type == TYPE_LOCATION:
             try:
                 pq = PyQuery(self.content_xml_ready, parser='xml')
@@ -65,7 +69,7 @@ class WeChatMsg(object):
                 title = pq('title').text()
                 if title:  # may not be correct
                     return "FILE:{}".format(title)
-                return "NOT IMPLEMENTED: " + self.content_xml_ready
+                return "Link"
             return "URL:{}".format(url)
         elif self.type == TYPE_NAMECARD:
             pq = PyQuery(self.content_xml_ready, parser='xml')
@@ -89,7 +93,13 @@ class WeChatMsg(object):
             return "LOCATION SHARING"
         elif self.type == TYPE_EMOJI:
             # TODO add emoji name
+            if self.content.lstrip().startswith("<"):
+                return "Emoji"
+            if not self.content:
+                return "Emoji"
             return self.content
+        elif self.type == TYPE_CUSTOM_EMOJI:
+            return "Emoji"
         elif self.type == TYPE_REDENVELOPE:
             data_to_parse = io.BytesIO(self.content.encode('utf-8'))
             try:
@@ -136,6 +146,74 @@ class WeChatMsg(object):
             # TODO replace smiley with text
             return self.content
 
+    def reply_info(self):
+        """Parse TYPE_REPLY payload.
+
+        Returns: {title, ref_name, ref_content, ref_type, ref_svrid}.
+        """
+        if self.type != TYPE_REPLY:
+            return None
+
+        def _one_line(text: str, *, max_len: int) -> str:
+            text = re.sub(r"\s+", " ", (text or "")).strip()
+            if len(text) > max_len:
+                return text[: max_len - 1] + "…"
+            return text
+
+        xml = self.content_xml_ready
+        idx = xml.find("<msg")
+        if idx != -1:
+            xml = xml[idx:]
+
+        try:
+            pq = PyQuery(xml, parser="xml")
+        except Exception:
+            return None
+
+        title = html.unescape(pq("appmsg > title").text() or pq("title").eq(0).text() or "")
+
+        ref_name_raw = pq("refermsg displayname").text() or pq("refermsg fromusr").text() or ""
+        ref_name = _one_line(html.unescape(ref_name_raw), max_len=80)
+
+        ref_content_raw = pq("refermsg content").text() or ""
+
+        ref_svrid_i = None
+        ref_svrid = pq("refermsg svrid").text() or pq("refermsg svrId").text()
+        if ref_svrid:
+            try:
+                ref_svrid_i = int(ref_svrid)
+            except Exception:
+                ref_svrid_i = None
+
+        ref_type_i = None
+        ref_type = pq("refermsg type").text()
+        if ref_type:
+            try:
+                ref_type_i = int(ref_type)
+            except Exception:
+                ref_type_i = None
+
+        ref_content_fallback = html.unescape(ref_content_raw or "")
+        if ref_type_i is None:
+            ref_content = ref_content_fallback
+        else:
+            try:
+                ref_content = WeChatMsg({"type": ref_type_i, "content": ref_content_fallback}).msg_str()
+            except Exception:
+                ref_content = ref_content_fallback
+        ref_content = _one_line(ref_content, max_len=200)
+
+        if not title and not ref_name and not ref_content:
+            return None
+
+        return {
+            "title": title.strip(),
+            "ref_name": ref_name,
+            "ref_content": ref_content,
+            "ref_type": ref_type_i,
+            "ref_svrid": ref_svrid_i,
+        }
+
     @property
     def content_xml_ready(self):
         # remove xml headers to avoid possible errors it may create
@@ -180,4 +258,3 @@ class WeChatMsg(object):
         if not emoji:
             return None
         return emoji.attrs['productid']
-
