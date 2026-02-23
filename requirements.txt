@@ -8,3 +8,4 @@ csscompressor
 numpy
 ipython
 websocket-client
+pytest

@@ -8,7 +8,7 @@ from PIL import Image
 import pickle
 from Crypto.Cipher import AES
 
-from .wxgf import WxgfAndroidDecoder, is_wxgf_buffer
+from .wxgf import WxgfDecoder, is_wxgf_buffer
 from .parser import WeChatDBParser
 from .common.imgutil import what as img_what
 from .common.textutil import md5 as get_md5_hex, get_file_b64, get_file_md5
@@ -30,7 +30,7 @@ class EmojiReader:
         resource_dir: str,
         parser: WeChatDBParser,
         *,
-        wxgf_decoder: WxgfAndroidDecoder,
+        wxgf_decoder: WxgfDecoder,
         cache_file: str=None):
         """
         Args:
@@ -137,7 +137,7 @@ class EmojiReader:
                         content = self.wxgf_decoder.decode_with_cache(fname, content)
                         if content is None:
                             if not self.wxgf_decoder.has_server():
-                                logger.warning("wxgf decoder server is not provided. Cannot decode wxgf emojis.")
+                                logger.warning("Cannot decode wxgf emojis. Install ffmpeg+ffprobe or provide a wxgf decoder server with --wxgf-server.")
                             raise ValueError("Failed to decode wxgf file.")
                     else:
                         raise ValueError("Decoded data mismatch md5!")

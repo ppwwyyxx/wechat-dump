@@ -17,7 +17,7 @@ from .common.imgutil import what as img_what
 from .common.textutil import md5 as get_md5_hex, get_file_b64
 from .msg import TYPE_SPEAK
 from .audio import parse_wechat_audio_file
-from .wxgf import WxgfAndroidDecoder, is_wxgf_file
+from .wxgf import WxgfDecoder, is_wxgf_file
 
 LIB_PATH = os.path.dirname(os.path.abspath(__file__))
 VOICE_DIRNAME = 'voice2'
@@ -53,7 +53,7 @@ class Resource(object):
         self.voice_dir = os.path.join(res_dir, VOICE_DIRNAME)
         self.video_dir = os.path.join(res_dir, VIDEO_DIRNAME)
         self.avt_reader = AvatarReader(res_dir, avt_db)
-        self.wxgf_decoder = WxgfAndroidDecoder(wxgf_server)
+        self.wxgf_decoder = WxgfDecoder(wxgf_server)
         self.emoji_reader = EmojiReader(res_dir, self.parser, wxgf_decoder=self.wxgf_decoder)
 
     def _get_voice_filename(self, imgpath):
@@ -179,7 +179,7 @@ class Resource(object):
             buf = self.wxgf_decoder.decode_with_cache(img_file, None)
             if buf is None:
                 if not self.wxgf_decoder.has_server():
-                    logger.warning("wxgf decoder server is not provided. Cannot decode wxgf images. Please follow instructions to create wxgf decoder server if these images need to be decoded.")
+                    logger.warning("Cannot decode wxgf images. Install ffmpeg+ffprobe or provide a wxgf decoder server with --wxgf-server.")
                 else:
                     logger.error("Failed to decode wxgf file: {}".format(img_file))
                 return None
